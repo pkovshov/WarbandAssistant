@@ -1,0 +1,5 @@
+-e /sandbox/MountAndBladeWarband/packages/mbw_language
+mss
+numpy
+opencv-python
+pytesseract
