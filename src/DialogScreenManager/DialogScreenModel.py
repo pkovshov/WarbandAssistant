@@ -19,6 +19,11 @@ def is_title(key):
 
 
 @title
+def is_king(key):
+    return re.fullmatch(r"trp_kingdom_\d_lord_pl", key) is not None
+
+
+@title
 def is_lord(key):
     return re.fullmatch(r"trp_knight_\d_\d+\d?_pl", key) is not None
 
@@ -54,9 +59,66 @@ def is_lady(key):
                     "trp_kingdom_5_1c_daughter_4_pl"))
 
 
+@title
+def is_npc(key):
+    return re.fullmatch(r"trp_npc\d+\d?", key) is not None
 
 
+@title
+def is_guild_master(key):
+    return re.fullmatch(r"trp_town_\d+\d?_mayor", key) is not None
 
+
+@title
+def is_tavern_keeper(key):
+    return re.fullmatch(r"trp_town_\d+\d?_tavernkeeper", key) is not None
+
+
+@title
+def is_tournament_master(key):
+    return re.fullmatch(r"trp_town_\d+\d?_arena_master", key) is not None
+
+
+@title
+def is_weaponsmith(key):
+    return re.fullmatch(r"trp_town_\d+\d?_weaponsmith", key) is not None
+
+
+@title
+def is_armorer(key):
+    return re.fullmatch(r"trp_town_\d+\d?_armorer", key) is not None
+
+
+@title
+def is_armorer(key):
+    return re.fullmatch(r"trp_town_\d+\d?_armorer", key) is not None
+
+
+@title
+def is_horse_merchant(key):
+    return re.fullmatch(r"trp_town_\d+\d?_horse_merchant", key) is not None
+
+
+@title
+def is_merchant(key):
+    return re.fullmatch(r"trp_town_\d+\d?_merchant", key) is not None
+
+
+@title
+def is_town_walker(key):
+    return key in ("trp_town_walker_1",
+                   "trp_town_walker_2")
+
+
+@title
+def is_village_elder(key):
+    return re.fullmatch(r"trp_village_\d{1,3}_elder", key) is not None
+
+
+@title
+def is_village_walker(key):
+    return key in ("trp_village_walker_1",
+                   "trp_village_walker_2")
 
 
 if __name__ == "__main__":
