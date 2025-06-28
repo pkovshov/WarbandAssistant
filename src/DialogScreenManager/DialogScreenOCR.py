@@ -10,22 +10,25 @@ class DialogScreenOCR:
     def __init__(self):
         import config
         from . import dialog_screen_config
+        self.__logger = logging.getLogger(__name__)
         self.__whitelist = config.whitelist_characters
         self.__resolution = config.resolution
-        self.__title_box = dialog_screen_config.title_box
+        title_box = dialog_screen_config.title_box
+        self.__title_slice = (slice(title_box.t, title_box.b),
+                              slice(title_box.l, title_box.r))
         self.__prev_title_img = None
         self.__prev_title_text = None
-        self.__logger = logging.getLogger(__name__)
         pass
 
     @typechecked
-    def ocr(self, img: np.ndarray) -> str:
+    def title(self, img: np.ndarray) -> str:
         assert img.dtype == np.uint8
         assert img.ndim == 3
         assert img.shape[0] == self.__resolution.height
         assert img.shape[1] == self.__resolution.width
         assert img.shape[2] == 3
-        title_img = self._crop_title(img)
+        # crop
+        title_img = img[self.__title_slice]
         if np.array_equal(title_img, self.__prev_title_img):
             assert self.__prev_title_text is not None
             return self.__prev_title_text
@@ -36,16 +39,6 @@ class DialogScreenOCR:
             self.__prev_title_text = title_text
             self.__logger.debug(f"new image: {title_text}")
             return title_text
-
-    @typechecked
-    def _crop_title(self, img: np.ndarray) -> np.ndarray:
-        # TODO: move slice creation to __init__ method
-        #       and remove __crop_title method
-        LEFT, TOP, RIGHT, BOTTOM = self.__title_box
-        row_slice = slice(TOP, BOTTOM)
-        col_slice = slice(LEFT, RIGHT)
-        img_slice = (row_slice, col_slice)
-        return img[img_slice]
 
     @typechecked
     def _preprocess_title(self, img: np.ndarray) -> np.ndarray:
