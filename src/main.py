@@ -3,34 +3,46 @@
 import argparse
 import logging
 import os
+from types import MappingProxyType
+from typing import Mapping
 
 from mbw_language import LangLoader
+from mbw_language.LangValParser import Interpolation
 import mss
 import numpy as np
+from typeguard import typechecked
 
 from DialogScreenManager.DialogScreenManager import DialogScreenManager
-import config
 
 logger = logging.getLogger(__name__)
 dialog_screen_manager = None
 
 
 def init(log_level, write_to_dataset):
+    import config
     # config logging
     logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
     logging.getLogger(DialogScreenManager.__name__).setLevel(log_level)
     # load lang
-    lang_dir_path = os.path.join(config.languages_dir_path, config.language)
-    lang_file_paths = LangLoader.find_csv(lang_dir_path)
-    if len(lang_file_paths) == 0:
-        raise ValueError(f"No csv files found at {lang_dir_path}")
-    else:
-        lang = LangLoader.load_files(*lang_file_paths)
-        if len(lang) == 0:
-            raise ValueError(f"Empty lang is loaded by {lang_dir_path}")
+    lang = load_lang(os.path.join(config.languages_dir_path, config.language),
+                     playername=config.playermane)
     # create dialog screen manager
     global dialog_screen_manager
     dialog_screen_manager = DialogScreenManager(lang, write_to_dataset)
+
+
+@typechecked
+def load_lang(*args: str, playername: str) -> Mapping[str, Interpolation]:
+    # load lang from passed dirs
+    lang_file_paths = LangLoader.find_csv(*args)
+    if len(lang_file_paths) == 0:
+        raise ValueError(f"No csv files found at {','.join(args)}")
+    lang = LangLoader.load_files(*lang_file_paths)
+    if len(lang) == 0:
+        raise ValueError(f"Empty lang is loaded by {','.join(args)}")
+    # update lang with special keys
+    lang = lang | {"wa_player": playername}
+    return MappingProxyType(lang)
 
 
 def main(args):
@@ -68,8 +80,8 @@ parser.set_defaults(func=main)
 
 
 if __name__ == "__main__":
-    args = parser.parse_args()
-    if args.monitor is not None and len(args.monitor) > 1:
+    sys_args = parser.parse_args()
+    if sys_args.monitor is not None and len(sys_args.monitor) > 1:
         parser.error("argument -m/--monitor cannot be specified twice.")
-    args.monitor = args.monitor[0] if args.monitor else 1
-    args.func(args)
+    sys_args.monitor = sys_args.monitor[0] if sys_args.monitor else 1
+    sys_args.func(sys_args)
