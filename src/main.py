@@ -1,10 +1,10 @@
+import argparse
 import logging
 import os
 
+from mbw_language import LangLoader
 import mss
 import numpy as np
-
-from mbw_language import LangLoader
 
 from DialogScreenManager.DialogScreenManager import DialogScreenManager
 import config
@@ -13,10 +13,10 @@ logger = logging.getLogger(__name__)
 dialog_screen_manager = None
 
 
-def init():
+def init(log_level):
     # config logging
     logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
-    logging.getLogger(DialogScreenManager.__name__).setLevel(logging.DEBUG)
+    logging.getLogger(DialogScreenManager.__name__).setLevel(log_level)
     # load lang
     lang_dir_path = os.path.join(config.languages_dir_path, config.language)
     lang_file_paths = LangLoader.find_csv(lang_dir_path)
@@ -31,8 +31,8 @@ def init():
     dialog_screen_manager = DialogScreenManager(lang)
 
 
-def main():
-    init()
+def main(args):
+    init(logging.DEBUG if args.verbose else logging.INFO)
     with mss.mss() as sct:
         monitor = sct.monitors[config.monitor_idx]
         try:
@@ -42,7 +42,6 @@ def main():
             print("STOP")
 
 
-
 def run(sct, monitor):
     while True:
         scr = sct.grab(monitor)
@@ -50,5 +49,12 @@ def run(sct, monitor):
         dialog_screen_manager.process(img)
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-v', '--verbose', action='store_true',
+                    help=f'''Verbose mode: show debug level logs''')
+parser.set_defaults(func=main)
+
+
 if __name__ == "__main__":
-    main()
+    args = parser.parse_args()
+    args.func(args)
