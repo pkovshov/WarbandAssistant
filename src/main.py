@@ -1,3 +1,5 @@
+#!/usr/bin/python3.10
+
 import argparse
 import logging
 import os
@@ -34,7 +36,7 @@ def init(log_level):
 def main(args):
     init(logging.DEBUG if args.verbose else logging.INFO)
     with mss.mss() as sct:
-        monitor = sct.monitors[config.monitor_idx]
+        monitor = sct.monitors[args.monitor]
         print("START")
         try:
             run(sct, monitor)
@@ -51,11 +53,19 @@ def run(sct, monitor):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-v', '--verbose', action='store_true',
-                    help=f'''Verbose mode: show debug level logs''')
+parser.add_argument("-v", "--verbose",
+                    action="store_true",
+                    help="Enable verbose mode to print debug-level logs.")
+parser.add_argument("-m", "--monitor",
+                    action="append", type=int, default=[],
+                    help="The number of the monitor to be captured (starting from 1, default is 1).",
+                    metavar="2")
 parser.set_defaults(func=main)
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
+    if args.monitor is not None and len(args.monitor) > 1:
+        parser.error("argument -m/--monitor cannot be specified twice.")
+    args.monitor = args.monitor[0] if args.monitor else 1
     args.func(args)

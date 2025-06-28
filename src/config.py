@@ -1,6 +1,5 @@
 from Resolution import Resolution
 
-monitor_idx = 1
 resolution = Resolution(1920, 1080)
 whitelist_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?:'-"
 language = "en"
