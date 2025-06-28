@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 dialog_screen_manager = None
 
 
-def init(log_level):
+def init(log_level, write_to_dataset):
     # config logging
     logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
     logging.getLogger(DialogScreenManager.__name__).setLevel(log_level)
@@ -30,11 +30,12 @@ def init(log_level):
             raise ValueError(f"Empty lang is loaded by {lang_dir_path}")
     # create dialog screen manager
     global dialog_screen_manager
-    dialog_screen_manager = DialogScreenManager(lang)
+    dialog_screen_manager = DialogScreenManager(lang, write_to_dataset)
 
 
 def main(args):
-    init(logging.DEBUG if args.verbose else logging.INFO)
+    init(log_level=logging.DEBUG if args.verbose else logging.INFO,
+         write_to_dataset=args.dataset)
     with mss.mss() as sct:
         monitor = sct.monitors[args.monitor]
         print("START")
@@ -56,6 +57,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose",
                     action="store_true",
                     help="Enable verbose mode to print debug-level logs.")
+parser.add_argument("-ds", "--dataset",
+                    action="store_true",
+                    help="Enable writing data to datasets.")
 parser.add_argument("-m", "--monitor",
                     action="append", type=int, default=[],
                     help="The number of the monitor to be captured (starting from 1, default is 1).",

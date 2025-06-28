@@ -33,6 +33,13 @@ class DialogScreenFuzzy:
             return ()
         return result.keys
 
+    @typechecked
+    def title_score(self, title: str) -> Optional[float]:
+        result = self.__cached_title(title)
+        if result is None:
+            return None
+        return result.score
+
     def __cached_title(self, title: str) -> Optional[Result]:
         if title != self.__prev_title:
             self.__prev_title = title

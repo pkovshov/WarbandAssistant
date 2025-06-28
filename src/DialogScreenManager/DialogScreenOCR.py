@@ -35,10 +35,10 @@ class DialogScreenOCR:
         else:
             self.__prev_title_img = title_img
             title_img = self._preprocess_title(title_img)
-            title_text = self._tesseract_ocr(title_img)
-            self.__prev_title_text = title_text
-            self.__logger.debug(f"new image: {title_text}")
-            return title_text
+            title_ocr = self._tesseract_ocr(title_img)
+            self.__prev_title_text = title_ocr
+            self.__logger.debug(f"new image: {repr(title_ocr)}")
+            return title_ocr
 
     @typechecked
     def _preprocess_title(self, img: np.ndarray) -> np.ndarray:
