@@ -1,11 +1,19 @@
+from collections import namedtuple
 import logging
-from typing import Mapping, Optional
+from typing import Mapping, Optional, Tuple
 
 from mbw_language import LangValParser
 import rapidfuzz as fz
 from typeguard import typechecked
 
 from .DialogScreenModel import is_dialog_title_key
+
+
+Result = namedtuple("Result", "score, keys")
+TEXT = 0
+SCORE = 1
+KEY = 2
+
 
 class DialogScreenFuzzy:
     @typechecked
@@ -15,15 +23,48 @@ class DialogScreenFuzzy:
         self.__title_score_cutoff = dialog_screen_config.fuzzy_title_score_cutoff
         self.__logger.info(f"title_score_cutoff = {self.__title_score_cutoff}")
         self.__titles = {key: val for key, val in lang.items() if is_dialog_title_key(key)}
+        self.__prev_title = None
+        self.__prev_result = None
 
     @typechecked
-    def title_key(self, title: str) -> Optional[str]:
-        best_match = fz.process.extractOne(query=title,
-                                           choices=self.__titles,
-                                           scorer=fz.fuzz.token_set_ratio,
-                                           score_cutoff=self.__title_score_cutoff)
-        if best_match is None:
+    def title_key(self, title: str) -> Tuple[str, ...]:
+        result = self.__cached_title(title)
+        if result is None:
+            return ()
+        return result.keys
+
+    def __cached_title(self, title: str) -> Optional[Result]:
+        if title != self.__prev_title:
+            self.__prev_title = title
+            self.__prev_result = self.__title(title)
+        return self.__prev_result
+
+    def __title(self, title: str) -> Optional[Result]:
+        choices = self.__titles
+        # token set ratio with score cutoff
+        matches = fz.process.extract(query=title,
+                                     scorer=fz.fuzz.token_set_ratio,
+                                     score_cutoff=self.__title_score_cutoff,
+                                     choices=choices,
+                                     limit=len(choices))
+        if not matches:
             return None
-        _, _, key = best_match
-        val = self.__titles[key]
-        return key
+        # build choices from matches
+        choices = {key: choices[key] for _, _, key in matches}
+        # sort matches by ratio
+        matches = fz.process.extract(query=title,
+                                     scorer=fz.fuzz.ratio,
+                                     choices=choices,
+                                     limit=len(choices))
+        # filter best matches
+        best_score = matches[0][SCORE]
+        matches = [match for match in matches if match[SCORE] == best_score]
+        # check that all best matches have the same text
+        best_text = matches[0][TEXT]
+        for match in matches:
+            if match[TEXT] != best_text:
+                self.__logger.warning(f"best matches have different texts: '{best_text}' and 'match[TEXT]'")
+                break
+        # build result
+        keys = tuple(key for _, _, key in matches)
+        return Result(best_score, keys)

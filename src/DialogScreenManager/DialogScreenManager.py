@@ -34,8 +34,9 @@ class DialogScreenManager:
             title = title.strip()
             if len(title) > 0 and title[-1] == ":":
                 title = title[:-1]
-            title_key = self.__fuzzy.title_key(title)
-            if title_key is not None:
+            title_keys = self.__fuzzy.title_key(title)
+            if title_keys:
+                title_key = title_keys[0]
                 val = self.__lang[title_key]
                 if DialogScreenModel.is_king(title_key):
                     text = f"Ruler {val}"

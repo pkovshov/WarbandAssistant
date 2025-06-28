@@ -35,6 +35,7 @@ def main(args):
     init(logging.DEBUG if args.verbose else logging.INFO)
     with mss.mss() as sct:
         monitor = sct.monitors[config.monitor_idx]
+        print("START")
         try:
             run(sct, monitor)
         except KeyboardInterrupt:
