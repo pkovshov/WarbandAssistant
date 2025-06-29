@@ -62,7 +62,7 @@ class DialogScreenDataset:
             self.__logger.warning("git repository has modified files")
         # load dataset
         self.__maxidx, dataset = self._load_dataset(self.__dir_path)
-        self.__dataset_keys = set(DatasetKey(crop=item.crop,
+        self.__dataset_keys = set(DatasetKey(crop=tuple(item.crop),
                                              title_ocr=item.title_ocr)
                                   for item in dataset)
 
