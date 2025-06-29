@@ -193,6 +193,12 @@ def is_quest_unremarkable_townsman(key):
 
 
 @dialog_title
+def is_trainer(key):
+    """Trainers in the Training fields"""
+    return re.fullmatch(r"trp_trainer_\d", key) is not None
+
+
+@dialog_title
 def is_troop_farmer(key):
     return key == "trp_farmer"
 
