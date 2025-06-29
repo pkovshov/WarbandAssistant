@@ -175,6 +175,12 @@ def is_quest_merchant(key):
 
 
 @dialog_title
+def is_quest_fugitive(key):
+    """Hunt Down Fugitive"""
+    return key == "trp_fugitive"
+
+
+@dialog_title
 def is_quest_ordinary_townsman(key):
     """Quest Follow the spy"""
     return key == "trp_spy"
