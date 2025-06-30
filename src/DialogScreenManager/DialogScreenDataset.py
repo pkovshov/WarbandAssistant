@@ -37,7 +37,7 @@ DatasetKey = namedtuple("DatasetKey",
 class DialogScreenDataset:
     """Class that collects data for dialog screen datasets"""
     @typechecked
-    def __init__(self):
+    def __init__(self, playername: Optional[str]):
         # create logger
         self.__logger = logging.getLogger(__name__)
         # process configs
@@ -46,7 +46,7 @@ class DialogScreenDataset:
         self.__dir_path = dialog_screen_dataset_config.dataset_dir_path
         self.__resolution = config.resolution
         self.__language = config.language
-        self.__playername = config.playermane
+        self.__playername = playername
         # build crop slice and store title box and crop slice
         title_box = dialog_screen_dataset_config.title_box
         self.__title_box = title_box

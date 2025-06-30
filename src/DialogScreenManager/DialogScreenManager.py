@@ -4,6 +4,7 @@ from typing import Mapping
 from mbw_language import LangValParser
 import numpy as np
 from typeguard import typechecked
+from typing import Optional
 
 from .DialogScreenOCR import DialogScreenOCR
 from .DialogScreenFuzzy import DialogScreenFuzzy
@@ -20,12 +21,15 @@ class DialogScreenManager:
     - manage filling inferred dataset
     """
     @typechecked
-    def __init__(self, lang: Mapping[str, LangValParser.Interpolation], write_to_dataset=False):
+    def __init__(self,
+                 lang: Mapping[str, LangValParser.Interpolation],
+                 write_to_dataset: bool = False,
+                 playername: Optional[str] = None):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
         self.__ocr = DialogScreenOCR()
         self.__fuzzy = DialogScreenFuzzy(lang)
-        self.__dataset = DialogScreenDataset() if write_to_dataset else None
+        self.__dataset = DialogScreenDataset(playername=playername) if write_to_dataset else None
         self.__prev__title_ocr = None
 
         pass

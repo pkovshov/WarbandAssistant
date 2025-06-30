@@ -26,7 +26,7 @@ def init(log_level, write_to_dataset, playername=None):
     logging.getLogger(__name__).setLevel(log_level)
     # process player name
     if playername is None:
-        playername = config.playermane
+        playername = config.playername
     if playername is None:
         logger.info(f"playername NOT defined")
     else:
@@ -41,7 +41,7 @@ def init(log_level, write_to_dataset, playername=None):
                      playername=playername)
     # create dialog screen manager
     global dialog_screen_manager
-    dialog_screen_manager = DialogScreenManager(lang, write_to_dataset)
+    dialog_screen_manager = DialogScreenManager(lang, write_to_dataset, playername)
 
 
 @typechecked
