@@ -23,33 +23,33 @@ class DialogScreenFuzzy:
         self.__title_score_cutoff = dialog_screen_config.fuzzy_title_score_cutoff
         self.__logger.info(f"title_score_cutoff = {self.__title_score_cutoff}")
         self.__titles = {key: val for key, val in lang.items() if is_dialog_title_key(key)}
-        self.__prev_title = None
-        self.__prev_result = None
+        self.__prev_title_ocr = None
+        self.__prev_title_keys = None
 
     @typechecked
-    def title_key(self, title: str) -> Tuple[str, ...]:
-        result = self.__cached_title(title)
+    def title_key(self, title_ocr: str) -> Tuple[str, ...]:
+        result = self.__cached_title(title_ocr)
         if result is None:
             return ()
         return result.keys
 
     @typechecked
-    def title_score(self, title: str) -> Optional[float]:
-        result = self.__cached_title(title)
+    def title_score(self, title_ocr: str) -> Optional[float]:
+        result = self.__cached_title(title_ocr)
         if result is None:
             return None
         return result.score
 
-    def __cached_title(self, title: str) -> Optional[Result]:
-        if title != self.__prev_title:
-            self.__prev_title = title
-            self.__prev_result = self.__title(title)
-        return self.__prev_result
+    def __cached_title(self, title_ocr: str) -> Optional[Result]:
+        if title_ocr != self.__prev_title_ocr:
+            self.__prev_title_ocr = title_ocr
+            self.__prev_title_keys = self.__fuzzy_title(title_ocr)
+        return self.__prev_title_keys
 
-    def __title(self, title: str) -> Optional[Result]:
+    def __fuzzy_title(self, title_ocr: str) -> Optional[Result]:
         choices = self.__titles
         # token set ratio with score cutoff
-        matches = fz.process.extract(query=title,
+        matches = fz.process.extract(query=title_ocr,
                                      scorer=fz.fuzz.token_set_ratio,
                                      score_cutoff=self.__title_score_cutoff,
                                      choices=choices,
@@ -59,7 +59,7 @@ class DialogScreenFuzzy:
         # build choices from matches
         choices = {key: choices[key] for _, _, key in matches}
         # sort matches by ratio
-        matches = fz.process.extract(query=title,
+        matches = fz.process.extract(query=title_ocr,
                                      scorer=fz.fuzz.ratio,
                                      choices=choices,
                                      limit=len(choices))

@@ -11,6 +11,8 @@ import numpy as np
 from typeguard import typechecked
 import yaml
 
+from .DialogScreenArtifactsProcessor import DialogScreenArtifactsProcessor
+
 
 GitStatus = namedtuple("GitStatus", "branch, commit, has_modified")
 
@@ -22,6 +24,7 @@ DatasetItem = namedtuple("DatasetItem",
                          "language, "
                          "playername, "
                          "crop, "
+                         "sample_matches, "
                          "title_ocr, "
                          "fuzzy_score, "
                          "keys, "                         
@@ -31,10 +34,11 @@ DatasetItem = namedtuple("DatasetItem",
 
 DatasetKey = namedtuple("DatasetKey",
                         "crop, "
-                        "title_ocr")
+                        "title_ocr, "
+                        "sample_matches")
 
 
-class DialogScreenDataset:
+class DialogScreenDataset(DialogScreenArtifactsProcessor):
     """Class that collects data for dialog screen datasets"""
     @typechecked
     def __init__(self, playername: Optional[str]):
@@ -63,20 +67,30 @@ class DialogScreenDataset:
         # load dataset
         self.__maxidx, dataset = self._load_dataset(self.__dir_path)
         self.__dataset_keys = set(DatasetKey(crop=tuple(item.crop),
-                                             title_ocr=item.title_ocr)
+                                             title_ocr=item.title_ocr,
+                                             sample_matches=item.sample_matches)
                                   for item in dataset)
 
     @typechecked
-    def process(self, img: np.ndarray, title_ocr: str, title_fuzzy_score: Optional[float], title_keys: Tuple[str, ...]):
+    def process(self,
+                img: np.ndarray,
+                sample_matches: bool,
+                title_ocr: str,
+                title_fuzzy_score: Optional[float],
+                title_keys: Tuple[str, ...]):
         assert img.dtype == np.uint8
         assert img.ndim == 3
         assert img.shape[0] == self.__resolution.height
         assert img.shape[1] == self.__resolution.width
         assert img.shape[2] == 3
 
+        if not sample_matches and len(title_keys) == 0:
+            return
+
         # check uniq dataset key
         detaset_key = DatasetKey(crop=self.__title_box,
-                                 title_ocr=title_ocr)
+                                 title_ocr=title_ocr,
+                                 sample_matches=sample_matches)
         if detaset_key in self.__dataset_keys:
             return
         # build idx and file pathes
@@ -92,6 +106,7 @@ class DialogScreenDataset:
                            language=self.__language,
                            playername=self.__playername,
                            crop=tuple(self.__title_box),
+                           sample_matches=sample_matches,
                            title_ocr=title_ocr,
                            fuzzy_score=title_fuzzy_score,
                            keys=title_keys,

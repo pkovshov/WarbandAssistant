@@ -17,7 +17,7 @@ class DialogScreenOCR:
         self.__title_slice = (slice(title_box.t, title_box.b),
                               slice(title_box.l, title_box.r))
         self.__prev_title_img = None
-        self.__prev_title_text = None
+        self.__prev_title_ocr = None
         pass
 
     @typechecked
@@ -29,16 +29,13 @@ class DialogScreenOCR:
         assert img.shape[2] == 3
         # crop
         title_img = img[self.__title_slice]
-        if np.array_equal(title_img, self.__prev_title_img):
-            assert self.__prev_title_text is not None
-            return self.__prev_title_text
-        else:
+        if not np.array_equal(title_img, self.__prev_title_img):
             self.__prev_title_img = title_img
             title_img = self._preprocess_title(title_img)
             title_ocr = self._tesseract_ocr(title_img)
-            self.__prev_title_text = title_ocr
+            self.__prev_title_ocr = title_ocr
             self.__logger.debug(f"new image: {repr(title_ocr)}")
-            return title_ocr
+        return self.__prev_title_ocr
 
     @typechecked
     def _preprocess_title(self, img: np.ndarray) -> np.ndarray:

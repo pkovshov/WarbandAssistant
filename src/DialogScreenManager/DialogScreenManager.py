@@ -6,9 +6,11 @@ import numpy as np
 from typeguard import typechecked
 from typing import Optional
 
+from .DialogScreenSampler import DialogScreenSampler
 from .DialogScreenOCR import DialogScreenOCR
 from .DialogScreenFuzzy import DialogScreenFuzzy
 from .DialogScreenDataset import DialogScreenDataset
+from .DialogScreenLogger import DialogScreenLogger
 from . import DialogScreenModel
 
 
@@ -24,38 +26,33 @@ class DialogScreenManager:
     def __init__(self,
                  lang: Mapping[str, LangValParser.Interpolation],
                  write_to_dataset: bool = False,
-                 playername: Optional[str] = None):
+                 playername: Optional[str] = None,
+                 force_parsing: bool = False):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
+        self.__sample = DialogScreenSampler()
         self.__ocr = DialogScreenOCR()
         self.__fuzzy = DialogScreenFuzzy(lang)
-        self.__dataset = DialogScreenDataset(playername=playername) if write_to_dataset else None
+        self.__force_parsing = force_parsing
+        self.__artifacts = []
+        if write_to_dataset:
+            self.__artifacts.append(DialogScreenDataset(playername=playername))
+        self.__artifacts.append(DialogScreenLogger(self.__lang))
         self.__prev__title_ocr = None
 
-        pass
-
     def process(self, img: np.ndarray):
-        title_ocr = self.__ocr.title(img)
-        if title_ocr != self.__prev__title_ocr:
-            self.__prev__title_ocr = title_ocr
+        sample_matches = self.__sample.check(img)
+        if sample_matches or self.__force_parsing:
+            title_ocr = self.__ocr.title(img)
+            # Game adds colon ':' to the end of dialog title
+            # Note that colon character is not part of language resources
             title = title_ocr.strip()
             if len(title) > 0 and title[-1] == ":":
                 title = title[:-1]
-            title_keys = self.__fuzzy.title_key(title)
-            if title_keys:
-                if self.__dataset is not None:
-                    self.__dataset.process(img=img,
-                                           title_ocr=title_ocr,
-                                           title_fuzzy_score=self.__fuzzy.title_score(title),
-                                           title_keys=title_keys)
-                title_key = title_keys[0]
-                val = self.__lang[title_key]
-                if DialogScreenModel.is_king(title_key):
-                    text = f"Ruler {val}"
-                elif DialogScreenModel.is_lord(title_key):
-                    text = f"Lord {val}"
-                elif DialogScreenModel.is_lady(title_key):
-                    text = f"Lady {val}"
-                else:
-                    text = val
-                self.__logger.info(text)
+            # process artifacts
+            for processor in self.__artifacts:
+                processor.process(img=img,
+                                  sample_matches=sample_matches,
+                                  title_ocr=title_ocr,
+                                  title_fuzzy_score=self.__fuzzy.title_score(title),
+                                  title_keys=self.__fuzzy.title_key(title))
