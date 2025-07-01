@@ -19,7 +19,7 @@ GitStatus = namedtuple("GitStatus", "branch, commit, has_modified")
 # TODO: convert to a class with type checking
 #       class has to support Mapping type
 DatasetItem = namedtuple("DatasetItem",
-                         "verified, "
+                         "verification, "
                          "resolution, "
                          "language, "
                          "playername, "
@@ -101,7 +101,7 @@ class DialogScreenDataset(DialogScreenArtifactsProcessor):
         # build crop img
         crop_img = img[self.__title_crop_slice]
         # build dataset item
-        item = DatasetItem(verified=False,
+        item = DatasetItem(verification=None,
                            resolution=tuple(self.__resolution),
                            language=self.__language,
                            playername=self.__playername,
