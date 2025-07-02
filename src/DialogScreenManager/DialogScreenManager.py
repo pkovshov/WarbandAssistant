@@ -9,7 +9,7 @@ from typing import Optional
 from .DialogScreenSampler import DialogScreenSampler
 from .DialogScreenOCR import DialogScreenOCR
 from .DialogScreenFuzzy import DialogScreenFuzzy
-from .DialogScreenDataset import DialogScreenDataset
+from .DialogScreenDatasetProcessor import DialogScreenDatasetProcessor
 from .DialogScreenLogger import DialogScreenLogger
 from . import DialogScreenModel
 
@@ -36,7 +36,7 @@ class DialogScreenManager:
         self.__force_parsing = force_parsing
         self.__artifacts = []
         if write_to_dataset:
-            self.__artifacts.append(DialogScreenDataset(playername=playername))
+            self.__artifacts.append(DialogScreenDatasetProcessor(playername=playername))
         self.__artifacts.append(DialogScreenLogger(self.__lang))
         self.__prev__title_ocr = None
 

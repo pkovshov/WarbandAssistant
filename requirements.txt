@@ -1,4 +1,5 @@
 -e /sandbox/MountAndBladeWarband/packages/mbw_language
+-e /sandbox/MountAndBladeWarband/packages/wa_datasets
 mss
 numpy
 opencv-python
