@@ -44,10 +44,12 @@ class DialogScreenManager:
         sample_matches = self.__sample.check(img)
         if sample_matches or self.__force_parsing:
             title_ocr, title = self.__ocr.title(img)
+            score = self.__fuzzy.title_score(title)
+            keys = self.__fuzzy.title_key(title)
             # process artifacts
             for processor in self.__artifacts:
                 processor.process(img=img,
                                   sample_matches=sample_matches,
                                   title_ocr=title_ocr,
-                                  title_fuzzy_score=self.__fuzzy.title_score(title),
-                                  title_keys=self.__fuzzy.title_key(title))
+                                  title_fuzzy_score=score,
+                                  title_keys=keys)

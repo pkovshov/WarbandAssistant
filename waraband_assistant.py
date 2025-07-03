@@ -18,6 +18,7 @@ sys.path.append(os.path.abspath(os.path.join(scrip_dir_path, 'src')))
 from wa_language import LangLoader
 from wa_language.LangValParser import Interpolation
 from wa_screen_manager.DialogScreen.DialogScreenManager import DialogScreenManager
+from wa_screen_manager import DialogScreen
 
 logger = logging.getLogger(__name__)
 dialog_screen_manager = None
@@ -27,7 +28,7 @@ def init(log_level, write_to_dataset, playername, force_parsing):
     from wa_screen_manager import config
     # config logging
     logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
-    logging.getLogger(DialogScreenManager.__name__).setLevel(log_level)
+    logging.getLogger(DialogScreen.__name__).setLevel(log_level)
     logging.getLogger(__name__).setLevel(log_level)
     # process player name
     if playername is None:
