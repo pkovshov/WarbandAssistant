@@ -1,0 +1,15 @@
+env_list = ["doctest"]
+
+[env_run_base]
+deps = [
+    "pytest",
+    "-r requirements.txt",
+]
+setenv = [
+    {PYTHONPATH = "{toxinidir}/src"}
+]
+
+[env.doctest]
+commands = [
+  ["pytest", "--doctest-modules"],
+]

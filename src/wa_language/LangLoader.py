@@ -77,7 +77,7 @@ def find_csv(*args: str) -> List[str]:
     file_pathes = []
     for dir_path in args:
         for file_name in os.listdir(dir_path):
-            if re.fullmatch('.*\.csv', file_name):
+            if re.fullmatch(r'.*\.csv', file_name):
                 file_path = os.path.join(dir_path, file_name)
                 if os.path.isfile(file_path):
                     file_path = os.path.abspath(file_path)
