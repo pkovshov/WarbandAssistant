@@ -1,3 +1,8 @@
+"""
+Look over the categories of language keys.
+Focus on those that contain keys suitable for dialog titles.
+"""
+
 from os import path
 
 from mbw_language.LangLoader import *
