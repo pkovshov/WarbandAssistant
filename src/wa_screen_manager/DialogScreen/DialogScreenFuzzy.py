@@ -2,7 +2,7 @@ from collections import namedtuple
 import logging
 from typing import Mapping, Optional, Tuple
 
-from mbw_language import LangValParser
+from wa_language import LangValParser
 import rapidfuzz as fz
 from typeguard import typechecked
 

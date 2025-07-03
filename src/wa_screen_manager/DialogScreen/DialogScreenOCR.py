@@ -8,7 +8,7 @@ from typeguard import typechecked
 
 class DialogScreenOCR:
     def __init__(self):
-        import config
+        from wa_screen_manager import config
         from . import dialog_screen_config
         self.__logger = logging.getLogger(__name__)
         self.__whitelist = config.whitelist_characters

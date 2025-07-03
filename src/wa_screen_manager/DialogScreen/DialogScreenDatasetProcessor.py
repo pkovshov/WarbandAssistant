@@ -16,7 +16,7 @@ class DialogScreenDatasetProcessor(DialogScreenArtifactsProcessor):
     @typechecked
     def __init__(self, playername: Optional[str]):
         from . import dialog_screen_dataset_config
-        import config
+        from wa_screen_manager import config
         self.__logger = logging.getLogger(__name__)
         git_status = self._git_status()
         self.__logger.info(f"git status: {'HAS' if git_status.has_modified else 'NO'} modified, "

@@ -3,23 +3,28 @@
 import argparse
 import logging
 import os
+import sys
 from types import MappingProxyType
 from typing import Mapping, Optional
 
-from mbw_language import LangLoader
-from mbw_language.LangValParser import Interpolation
 import mss
 import numpy as np
 from typeguard import typechecked
 
-from DialogScreenManager.DialogScreenManager import DialogScreenManager
+scrip_dir_path = os.path.abspath(os.path.dirname(__file__))
+os.chdir(scrip_dir_path)
+sys.path.append(os.path.abspath(os.path.join(scrip_dir_path, 'src')))
+
+from wa_language import LangLoader
+from wa_language.LangValParser import Interpolation
+from wa_screen_manager.DialogScreen.DialogScreenManager import DialogScreenManager
 
 logger = logging.getLogger(__name__)
 dialog_screen_manager = None
 
 
 def init(log_level, write_to_dataset, playername, force_parsing):
-    import config
+    from wa_screen_manager import config
     # config logging
     logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
     logging.getLogger(DialogScreenManager.__name__).setLevel(log_level)

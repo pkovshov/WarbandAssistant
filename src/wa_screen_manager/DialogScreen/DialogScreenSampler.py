@@ -14,7 +14,7 @@ class DialogScreenSampler:
         # create logger
         self.__logger = logging.getLogger(__name__)
         # process configs
-        import config
+        from wa_screen_manager import config
         from . import dialog_screen_sampler_config
         resolution = config.resolution
         self.__resolution = config.resolution

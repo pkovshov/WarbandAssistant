@@ -5,9 +5,9 @@ Focus on those that contain keys suitable for dialog titles.
 
 from os import path
 
-from mbw_language.LangLoader import *
+from wa_language.LangLoader import *
 
-import config
+from wa_screen_manager import config
 from DialogScreenManager.DialogScreenModel import *
 
 lang = load_files(path.join(config.languages_dir_path, config.language, "troops.csv"))

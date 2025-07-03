@@ -1,7 +1,7 @@
 import logging
 from typing import Mapping, Optional, Tuple
 
-from mbw_language import LangValParser
+from wa_language import LangValParser
 import numpy as np
 from typeguard import typechecked
 

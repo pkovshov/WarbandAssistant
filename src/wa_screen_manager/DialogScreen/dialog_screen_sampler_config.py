@@ -1,4 +1,4 @@
-from Box import Box
+from wa_screen_manager.Box import Box
 
 blank_img_path = "/sandbox/MountAndBladeWarband/resources/blanks/dialog_screen.png"
 
