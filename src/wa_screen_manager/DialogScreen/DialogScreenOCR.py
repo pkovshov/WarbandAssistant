@@ -17,6 +17,7 @@ class DialogScreenOCR:
         title_box = dialog_screen_config.title_box
         self.__title_slice = (slice(title_box.t, title_box.b),
                               slice(title_box.l, title_box.r))
+        self.__threshold = dialog_screen_config.title_threshold
         self.__prev_title_img = None
         self.__prev_title_ocr = None
         pass
@@ -50,8 +51,8 @@ class DialogScreenOCR:
     def _preprocess_title(self, img: np.ndarray) -> np.ndarray:
         # grayscale
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # Otsu threshold
-        _, img = cv2.threshold(img, 0, 255, cv2.THRESH_TRUNC + cv2.THRESH_OTSU)
+        # threshold
+        _, img = cv2.threshold(img, self.__threshold, 255, cv2.THRESH_TRUNC)
         return img
 
     @typechecked

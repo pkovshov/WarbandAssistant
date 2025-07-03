@@ -38,11 +38,11 @@ for idx, (meta, image_path) in dataset.meta_and_image_path().items():
     image = load_image_and_restore_crop(image_path,
                                         meta.resolution,
                                         meta.crop)
-    idx_meta_image.append((ocr, fuzzy, dataset.idx_to_stem(idx), meta, image))
+    idx_meta_image.append((dataset.idx_to_stem(idx), meta, image))
 
 
-@pytest.mark.parametrize("ocr, fuzzy, idx, meta, image", idx_meta_image)
-def test_dialog_title_dataset(ocr, fuzzy, idx, meta, image):
+@pytest.mark.parametrize("idx, meta, image", idx_meta_image)
+def test_dialog_title_dataset(idx, meta, image):
     title_ocr, title = ocr.title(image)
     title_keys = fuzzy.title_key(title)
-    assert title_keys == tuple(meta.keys)
+    assert title_keys == tuple(meta.keys), title_ocr
