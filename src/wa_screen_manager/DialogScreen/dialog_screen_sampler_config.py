@@ -1,6 +1,10 @@
-from wa_screen_manager.Box import Box
+from os import path
 
-blank_img_path = "/sandbox/MountAndBladeWarband/resources/blanks/dialog_screen.png"
+from wa_screen_manager.Box import Box
+import path_conf
+
+blank_img_path = path.join(path_conf.samples,
+                           "dialog_screen_blank.png")
 
 # Right top and right bottom corners.
 # Requires two samples for reliable matching in case of screen tearing.

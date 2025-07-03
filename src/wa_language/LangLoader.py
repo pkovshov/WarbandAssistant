@@ -28,6 +28,19 @@ class LangValue(Interpolation):
 
 
 @typechecked
+def load_lang() -> Mapping[str, LangValue]:
+    import path_conf
+    lang_dir_path = path_conf.language
+    lang_file_paths = find_csv(lang_dir_path)
+    if len(lang_file_paths) == 0:
+        raise ValueError(f"No csv files found at {lang_dir_path}")
+    lang = load_files(*lang_file_paths)
+    if len(lang) == 0:
+        raise ValueError(f"Empty lang is loaded by {lang_dir_path}")
+    return lang
+
+
+@typechecked
 def load_files(*args: str, encoding=None) -> Mapping[str, LangValue]:
     lang = {}
     dup_keys = set()

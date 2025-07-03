@@ -6,11 +6,10 @@ Focus on those that contain keys suitable for dialog titles.
 from os import path
 
 from wa_language.LangLoader import *
+import path_conf
+from wa_screen_manager.DialogScreen.DialogScreenModel import *
 
-from wa_screen_manager import config
-from DialogScreenManager.DialogScreenModel import *
-
-lang = load_files(path.join(config.languages_dir_path, config.language, "troops.csv"))
+lang = load_files(path.join(path_conf.language, "troops.csv"))
 
 
 def test_checker_count(check, caption):

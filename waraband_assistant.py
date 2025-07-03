@@ -42,22 +42,15 @@ def init(log_level, write_to_dataset, playername, force_parsing):
     #       or maybe is part of other dialog titles (Merchant for example)
     #       Also it needs to process such cases in DialogScreen
     # load lang
-    lang = load_lang(os.path.join(config.languages_dir_path, config.language),
-                     playername=playername)
+    lang = load_lang(playername=playername)
     # create dialog screen manager
     global dialog_screen_manager
     dialog_screen_manager = DialogScreenManager(lang, write_to_dataset, playername, force_parsing)
 
 
 @typechecked
-def load_lang(*args: str, playername: Optional[str]) -> Mapping[str, Interpolation]:
-    # load lang from passed dirs
-    lang_file_paths = LangLoader.find_csv(*args)
-    if len(lang_file_paths) == 0:
-        raise ValueError(f"No csv files found at {','.join(args)}")
-    lang = LangLoader.load_files(*lang_file_paths)
-    if len(lang) == 0:
-        raise ValueError(f"Empty lang is loaded by {','.join(args)}")
+def load_lang(playername: Optional[str]) -> Mapping[str, Interpolation]:
+    lang = LangLoader.load_lang()
     # TODO: extend load_files with a param accepting a dict with special keys
     # update lang with special keys
     if playername is not None:
