@@ -9,6 +9,8 @@ from .DialogScreenBaseDataset import DialogScreenBaseDataset, Resolution, MetaAn
 
 NAME = "dialog_titles"
 
+VERIFICATION_NOT_A_DIALOG_TITLE = "Not a dialog title"
+
 # TODO: convert to a class with type checking
 #       class has to support Mapping type
 MetaItem = namedtuple("MetaItem",

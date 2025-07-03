@@ -43,12 +43,7 @@ class DialogScreenManager:
     def process(self, img: np.ndarray):
         sample_matches = self.__sample.check(img)
         if sample_matches or self.__force_parsing:
-            title_ocr = self.__ocr.title(img)
-            # Game adds colon ':' to the end of dialog title
-            # Note that colon character is not part of language resources
-            title = title_ocr.strip()
-            if len(title) > 0 and title[-1] == ":":
-                title = title[:-1]
+            title_ocr, title = self.__ocr.title(img)
             # process artifacts
             for processor in self.__artifacts:
                 processor.process(img=img,

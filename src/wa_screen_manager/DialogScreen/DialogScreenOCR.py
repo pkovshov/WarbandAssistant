@@ -1,4 +1,5 @@
 import logging
+from typing import Tuple
 
 import cv2
 import numpy as np
@@ -21,7 +22,7 @@ class DialogScreenOCR:
         pass
 
     @typechecked
-    def title(self, img: np.ndarray) -> str:
+    def title(self, img: np.ndarray) -> Tuple[str, str]:
         assert img.dtype == np.uint8
         assert img.ndim == 3
         assert img.shape[0] == self.__resolution.height
@@ -35,7 +36,15 @@ class DialogScreenOCR:
             title_ocr = self._tesseract_ocr(title_img)
             self.__prev_title_ocr = title_ocr
             self.__logger.debug(f"new image: {repr(title_ocr)}")
-        return self.__prev_title_ocr
+        return self.__prev_title_ocr, self._postprocess_title(self.__prev_title_ocr)
+
+    @typechecked
+    def _postprocess_title(self, title: str) -> str:
+        # Game adds colon ':' to the end of dialog title
+        # Note that colon character is not part of language resources
+        return (title[:-1]
+                if len(title) > 0 and title[-1] == ":"
+                else title)
 
     @typechecked
     def _preprocess_title(self, img: np.ndarray) -> np.ndarray:

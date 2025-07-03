@@ -6,10 +6,8 @@ deps = [
     "-r requirements.txt",
 ]
 setenv = [
-    {PYTHONPATH = "{toxinidir}/src"}
+    {PYTHONPATH = "{toxinidir}:{toxinidir}/src"}
 ]
-
-[env.doctest]
 commands = [
   ["pytest", "--doctest-modules"],
 ]

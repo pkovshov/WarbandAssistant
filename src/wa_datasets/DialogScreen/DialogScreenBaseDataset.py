@@ -38,10 +38,10 @@ class DialogScreenBaseDataset(ABC):
                  dataset_dir_name: str,
                  new_screenshots_resolution: Optional[Resolution],
                  lazy_load: bool = False):
-        from .dialog_screen_dataset_config import DIALOG_SCREEN_DATASETS_DIR_PATH
+        import path_conf
         self.__logger = logging.getLogger(__name__)
         self.__name = dataset_dir_name
-        self.__dir_path = path.join(DIALOG_SCREEN_DATASETS_DIR_PATH,
+        self.__dir_path = path.join(path_conf.datasets,
                                     dataset_dir_name)
         self.__resolution = new_screenshots_resolution
         self.__state = State.INIT
