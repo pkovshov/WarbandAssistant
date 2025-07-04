@@ -6,3 +6,4 @@ with open('path_conf.json') as file:
 language = path_conf["language"]
 samples = path_conf["samples"]
 datasets = path_conf["datasets"]
+test_output = path_conf["test_output"]

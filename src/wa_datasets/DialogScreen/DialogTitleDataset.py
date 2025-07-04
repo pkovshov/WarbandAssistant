@@ -7,9 +7,6 @@ from typeguard import typechecked
 from wa_types import Box, Resolution
 from .DialogScreenBaseDataset import DialogScreenBaseDataset, MetaAndImagePath
 
-
-NAME = "dialog_titles"
-
 VERIFICATION_NOT_A_DIALOG_TITLE = "Not a dialog title"
 
 # TODO: convert to a class with type checking
@@ -37,6 +34,8 @@ MetaKey = namedtuple("MetaKey",
 
 
 class DialogTitleDataset(DialogScreenBaseDataset):
+    NAME = "dialog_titles"
+
     @typechecked
     def __init__(self,
                  resolution: Optional[Resolution] = None,
@@ -44,7 +43,7 @@ class DialogTitleDataset(DialogScreenBaseDataset):
                  language: Optional[str] = None,
                  playername: Optional[str] = None,
                  lazy_load: bool = False):
-        super().__init__(NAME, resolution, lazy_load)
+        super().__init__(DialogTitleDataset.NAME, resolution, lazy_load)
         self.__resolution = resolution
         self.__crop = crop
         self.__language = language
