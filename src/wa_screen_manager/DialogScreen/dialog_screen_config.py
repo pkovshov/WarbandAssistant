@@ -10,7 +10,7 @@ screen_blank_img_path = path.join(path_conf.samples,
 screen_sample_boxes = (Box(1890, 0, 1920, 20),
                        Box(1890, 1060, 1920, 1080))
 
-title_box = Box(668, 74, 1819, 114)
+title_box = Box(668, 72, 1819, 116)
 title_threshold = 98
 fuzzy_title_score_cutoff = 75
 
