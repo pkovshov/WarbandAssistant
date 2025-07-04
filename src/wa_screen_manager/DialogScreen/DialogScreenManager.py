@@ -7,8 +7,8 @@ from typing import Optional
 
 from wa_types import is_screenshot
 from wa_language import LangValParser
-from .DialogScreenSampler import DialogScreenScreenSampler, DialogScreenRelationSampler
-from .DialogScreenOCR import DialogScreenTitleOCR, DialogScreenRelationOCR
+from .DialogScreenSamplers import DialogScreenScreenSampler, DialogScreenRelationSampler
+from .DialogScreenOCRs import DialogScreenTitleOCR, DialogScreenRelationOCR
 from .DialogScreenFuzzy import DialogScreenFuzzy
 from .DialogScreenDatasetProcessor import DialogScreenDatasetProcessor
 from .DialogScreenLogger import DialogScreenLogger
