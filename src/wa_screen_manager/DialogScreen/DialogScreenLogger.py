@@ -5,11 +5,10 @@ from wa_language import LangValParser
 import numpy as np
 from typeguard import typechecked
 
-from .DialogScreenArtifactsProcessor import DialogScreenArtifactsProcessor
 from . import DialogScreenModel
 
 
-class DialogScreenLogger(DialogScreenArtifactsProcessor):
+class DialogScreenLogger:
     @typechecked
     def __init__(self, lang: Mapping[str, LangValParser.Interpolation]):
         self.__logger = logging.getLogger(__name__)
@@ -18,16 +17,16 @@ class DialogScreenLogger(DialogScreenArtifactsProcessor):
 
     @typechecked
     def process(self,
-                img: np.ndarray,
-                sample_matches: bool,
+                image: np.ndarray,
+                dialog_sample_matches: bool,
                 title_ocr: str,
                 title_fuzzy_score: Optional[float],
                 title_keys: Tuple[str, ...]):
         # the most appropriate cache is (sample_matches, title_keys)
         # but I suppose that fuzzy provides same result for the same input
-        if self.__cache == (sample_matches, title_ocr):
+        if self.__cache == (dialog_sample_matches, title_ocr):
             return
-        self.__cache = sample_matches, title_ocr
+        self.__cache = dialog_sample_matches, title_ocr
         text = None
         if title_keys:
             text = "Dialog: "
@@ -41,9 +40,9 @@ class DialogScreenLogger(DialogScreenArtifactsProcessor):
                 text += repr(f"Lady {val}")
             else:
                 text = val
-            if not sample_matches:
+            if not dialog_sample_matches:
                 text += " (FALSE POSITIVE)"
-        elif sample_matches:
+        elif dialog_sample_matches:
             text = repr("") + " (FALSE NEGATIVE)"
         if text is not None:
             self.__logger.info(text)
