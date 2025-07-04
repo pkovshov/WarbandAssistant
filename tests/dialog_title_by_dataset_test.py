@@ -5,7 +5,7 @@ import pytest
 from wa_language.LangLoader import load_lang
 from wa_datasets.DialogScreen.DialogTitleDataset import (DialogTitleDataset,
                                                          VERIFICATION_NOT_A_DIALOG_TITLE)
-from wa_screen_manager.DialogScreen.DialogScreenOCR import DialogScreenOCR
+from wa_screen_manager.DialogScreen.DialogScreenOCR import DialogScreenTitleOCR
 from wa_screen_manager.DialogScreen.DialogScreenFuzzy import DialogScreenFuzzy
 
 
@@ -22,7 +22,7 @@ lang = load_lang()
 
 dataset = DialogTitleDataset(lazy_load=True)
 
-ocr = DialogScreenOCR()
+ocr = DialogScreenTitleOCR()
 
 fuzzy = DialogScreenFuzzy(lang)
 

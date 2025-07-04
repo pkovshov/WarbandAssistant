@@ -14,7 +14,7 @@ import numpy as np
 from typeguard import typechecked
 import yaml
 
-from wa_types import Resolution
+from wa_types import Resolution, is_screenshot
 
 
 class State(Enum):
@@ -76,12 +76,8 @@ class DialogScreenBaseDataset(ABC):
         if self.__state is State.BLOCKED:
             self.__logger.warning(f"BLOCKED {self.__name} dataset does not support add")
             return
-        assert screenshot.dtype == np.uint8
-        assert screenshot.ndim == 3
-        if self.__resolution:
-            assert screenshot.shape[0] == self.__resolution.height
-            assert screenshot.shape[1] == self.__resolution.width
-        assert screenshot.shape[2] == 3
+        assert self.__resolution is not None
+        assert is_screenshot(screenshot, self.__resolution)
         meta_key = self._meta_to_key(meta)
         if meta_key in self.__meta_index:
             return

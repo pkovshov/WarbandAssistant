@@ -2,6 +2,8 @@ from typing import NamedTuple, Tuple
 
 from typeguard import typechecked
 
+from .Resolution import Resolution
+
 
 class Box(NamedTuple):
     """LEFT, TOP, RIGHT, BOTTOM
@@ -19,6 +21,8 @@ class Box(NamedTuple):
     [0, 100, 200, 250]
     >>> print(box.slice)
     (slice(100, 250, None), slice(0, 200, None))
+    >>> print(box.resolution)
+    Resolution(width=200, height=150)
     """
     l: int  # Left coordinate
     t: int  # Top coordinate
@@ -29,6 +33,11 @@ class Box(NamedTuple):
     @typechecked
     def slice(self) -> Tuple[slice, slice]:
         return slice(self.t, self.b), slice(self.l, self.r)
+
+    @property
+    @typechecked
+    def resolution(self) -> Resolution:
+        return Resolution(self.r - self.l, self.b - self.t)
 
 
 if __name__ == "__main__":

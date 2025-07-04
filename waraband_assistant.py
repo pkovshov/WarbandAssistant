@@ -67,7 +67,7 @@ def main(args):
          force_parsing=args.force_parsing)
     with mss.mss() as sct:
         monitor = sct.monitors[args.monitor]
-        print("START")
+        print("START", "datasets", "ON" if args.dataset else "OFF")
         try:
             run(sct, monitor)
         except KeyboardInterrupt:
@@ -91,7 +91,7 @@ parser.add_argument("-ds", "--dataset",
                     help="Enable writing data to datasets.")
 parser.add_argument("-fp", "--force-parsing",
                     action="store_true",
-                    help="Make OCR and fuzzy even is sample does not match.")
+                    help="Parse screen even if screen sample does not match.")
 parser.add_argument("-m", "--monitor",
                     action="append", type=int, default=[],
                     help="The number of the monitor to be captured (starting from 1, default is 1).",
