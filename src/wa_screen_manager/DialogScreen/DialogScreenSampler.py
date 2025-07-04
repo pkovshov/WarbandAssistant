@@ -27,9 +27,7 @@ class DialogScreenSampler:
                    for box in sample_boxes), \
             "Need to check bottom line to avoid screen tearing"
         # build slices
-        sample_slices = [(slice(box.t, box.b),
-                          slice(box.l, box.r))
-                         for box in sample_boxes]
+        sample_slices = [box.slice for box in sample_boxes]
         # for each slice load samples from blank
         blank_img = cv2.imread(dialog_screen_sampler_config.blank_img_path)
         self.__samples = [Sample(slice=slice_, image=blank_img[slice_])

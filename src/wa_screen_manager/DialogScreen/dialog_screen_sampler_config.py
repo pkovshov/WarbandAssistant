@@ -1,6 +1,6 @@
 from os import path
 
-from wa_screen_manager.Box import Box
+from wa_types import Box
 import path_conf
 
 blank_img_path = path.join(path_conf.samples,

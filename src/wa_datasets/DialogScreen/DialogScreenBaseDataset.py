@@ -14,17 +14,13 @@ import numpy as np
 from typeguard import typechecked
 import yaml
 
+from wa_types import Resolution
+
 
 class State(Enum):
     INIT = "INIT"
     BLOCKED = "BLOCKED"
     META_LOADED = "META_LOADED"
-
-
-class Resolution(NamedTuple):
-    """WITH, HEIGHT"""
-    width: int  # width
-    height: int  # height
 
 
 MetaAndImagePath = namedtuple("MetaAndImage",

@@ -4,9 +4,9 @@ from typing import Optional, Tuple
 
 import numpy as np
 from typeguard import typechecked
+from wa_types import Resolution
 from wa_datasets.DialogScreen.DialogTitleDataset import (DialogTitleDataset,
-                                                         GitStatus,
-                                                         Resolution as DatasetResolution)
+                                                         GitStatus)
 
 from .DialogScreenArtifactsProcessor import DialogScreenArtifactsProcessor
 
@@ -15,7 +15,7 @@ class DialogScreenDatasetProcessor(DialogScreenArtifactsProcessor):
     """Class that collects data for dialog screen datasets"""
     @typechecked
     def __init__(self, playername: Optional[str]):
-        from . import dialog_screen_dataset_config
+        from . import dialog_screen_config
         from wa_screen_manager import config
         self.__logger = logging.getLogger(__name__)
         git_status = self._git_status()
@@ -24,8 +24,8 @@ class DialogScreenDatasetProcessor(DialogScreenArtifactsProcessor):
                            f"commit:{git_status.commit}")
         if git_status.has_modified:
             self.__logger.warning("git repository has modified files")
-        self.__dataset = DialogTitleDataset(resolution=DatasetResolution(*config.resolution),
-                                            crop=tuple(dialog_screen_dataset_config.title_box),
+        self.__dataset = DialogTitleDataset(resolution=config.resolution,
+                                            crop=dialog_screen_config.title_box,
                                             language=config.language,
                                             playername=playername,
                                             git_status=git_status)

@@ -4,7 +4,8 @@ from typing import Mapping, Optional, Tuple
 import numpy as np
 from typeguard import typechecked
 
-from .DialogScreenBaseDataset import DialogScreenBaseDataset, Resolution, MetaAndImagePath
+from wa_types import Box, Resolution
+from .DialogScreenBaseDataset import DialogScreenBaseDataset, MetaAndImagePath
 
 
 NAME = "dialog_titles"
@@ -41,7 +42,7 @@ class DialogTitleDataset(DialogScreenBaseDataset):
     @typechecked
     def __init__(self,
                  resolution: Optional[Resolution] = None,
-                 crop: Optional[Tuple[int, int, int, int]] = None,
+                 crop: Optional[Box] = None,
                  language: Optional[str] = None,
                  playername: Optional[str] = None,
                  git_status: Optional[GitStatus] = None,
@@ -64,11 +65,16 @@ class DialogTitleDataset(DialogScreenBaseDataset):
             title_ocr: str,
             title_fuzzy_score: Optional[float],
             title_keys: Tuple[str, ...]):
+        assert self.__resolution is not None
+        assert self.__crop is not None
+        assert self.__language is not None
         super().add(MetaItem(verification=None,
                              resolution=tuple(self.__resolution),
                              language=self.__language,
                              playername=self.__playername,
-                             crop=self.__crop,
+                             # yaml does not support saving NamedTuple successors
+                             # so need to convert into tuple supported by yaml
+                             crop=list(self.__crop),
                              sample_matches=sample_matches,
                              title_ocr=title_ocr,
                              fuzzy_score=title_fuzzy_score,
@@ -88,11 +94,15 @@ class DialogTitleDataset(DialogScreenBaseDataset):
 
     @typechecked
     def _meta_to_key(self, meta: MetaItem) -> MetaKey:
-        return MetaKey(crop=tuple(meta.crop),
+        return MetaKey(
+                       # crop is loaded by yaml as a list
+                       # and is not hashable for such case
+                       # so need to convert into hashable tuple
+                       crop=tuple(meta.crop),
                        title_ocr=meta.title_ocr,
                        sample_matches=meta.sample_matches)
 
     @typechecked
     def _preprocess(self, screenshot: np.ndarray) -> np.ndarray:
-        return screenshot[self.__crop[1]:self.__crop[3],
-                          self.__crop[0]:self.__crop[2]]
+        assert self.__crop is not None
+        return screenshot[self.__crop.slice]

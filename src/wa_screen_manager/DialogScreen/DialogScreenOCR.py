@@ -14,9 +14,7 @@ class DialogScreenOCR:
         self.__logger = logging.getLogger(__name__)
         self.__whitelist = config.whitelist_characters
         self.__resolution = config.resolution
-        title_box = dialog_screen_config.title_box
-        self.__title_slice = (slice(title_box.t, title_box.b),
-                              slice(title_box.l, title_box.r))
+        self.__title_slice = dialog_screen_config.title_box.slice
         self.__threshold = dialog_screen_config.title_threshold
         self.__prev_title_img = None
         self.__prev_title_ocr = None

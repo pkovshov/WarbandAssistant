@@ -1,4 +1,4 @@
-from wa_screen_manager.Box import Box
+from wa_types import Box
 
 title_box = Box(668, 74, 1819, 114)
 title_threshold = 98
