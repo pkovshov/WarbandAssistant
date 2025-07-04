@@ -20,7 +20,7 @@ def load_image_and_restore_crop(image_path, resolution, crop):
 
 lang = load_lang()
 
-dataset = DialogTitleDataset()
+dataset = DialogTitleDataset(lazy_load=True)
 
 ocr = DialogScreenOCR()
 

@@ -5,9 +5,9 @@ from enum import Enum
 import logging
 import os
 from os import path
+import subprocess
 import traceback
-from types import MappingProxyType
-from typing import Dict, Mapping, NamedTuple, Optional, Set, Tuple
+from typing import Dict, Optional, Set, Tuple
 
 import cv2
 import numpy as np
@@ -28,6 +28,9 @@ MetaAndImagePath = namedtuple("MetaAndImage",
                               "image_path")
 
 
+GitStatus = namedtuple("GitStatus", "branch, commit, has_modified")
+
+
 class DialogScreenBaseDataset(ABC):
     @typechecked
     def __init__(self,
@@ -42,8 +45,17 @@ class DialogScreenBaseDataset(ABC):
         self.__resolution = new_screenshots_resolution
         self.__state = State.INIT
         self.__max_idx = 0
+        self.__git_status = None
         if not lazy_load:
+            self.__git_status = self._load_git_status()
             self.__load()
+
+    @property
+    @typechecked
+    def git_status(self) -> GitStatus:
+        if self.__git_status is None:
+            self.__git_status = self._load_git_status()
+        return self.__git_status
 
     @typechecked
     def meta_and_image_path(self) -> Optional[dict[int, MetaAndImagePath[object, str]]]:
@@ -285,3 +297,38 @@ class DialogScreenBaseDataset(ABC):
             self.__meta_index.add(meta_key)
             self.__meta[idx] = meta
         self.__state = State.META_LOADED
+
+    @typechecked
+    def _load_git_status(self) -> GitStatus:
+        # TODO: catch possible exceptions
+        #       and implement behavior with unavailable git status
+        # get current branch
+        branch = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            text=True
+        ).strip()
+        # get current commit
+        commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            text=True
+        ).strip()
+        # check for modified files in the working tree and/or staging area
+        has_modified = False
+        status_lines = subprocess.check_output(
+            ["git", "status", "--porcelain"],
+            text=True
+        ).splitlines()
+        for line in status_lines:
+            staged = line[0]
+            working_tree = line[1]
+            if 'M' in (staged, working_tree):
+                has_modified = True
+                break
+        # check and return GitStatus
+        git_status = GitStatus(branch=branch, commit=commit, has_modified=has_modified)
+        self.__logger.info(f"git status: {'HAS' if git_status.has_modified else 'NO'} modified, "
+                           f"branch:{git_status.branch}, "
+                           f"commit:{git_status.commit}")
+        if git_status.has_modified:
+            self.__logger.warning("git repository has modified files")
+        return git_status

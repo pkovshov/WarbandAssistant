@@ -18,7 +18,7 @@ sys.path.append(os.path.abspath(os.path.join(scrip_dir_path, 'src')))
 from wa_language import LangLoader
 from wa_language.LangValParser import Interpolation
 from wa_screen_manager.DialogScreen.DialogScreenManager import DialogScreenManager
-from wa_screen_manager import DialogScreen
+import wa_screen_manager, wa_datasets
 
 logger = logging.getLogger(__name__)
 dialog_screen_manager = None
@@ -28,15 +28,12 @@ def init(log_level, write_to_dataset, playername, force_parsing):
     from wa_screen_manager import config
     # config logging
     logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
-    logging.getLogger(DialogScreen.__name__).setLevel(log_level)
+    logging.getLogger(wa_screen_manager.__name__).setLevel(log_level)
+    logging.getLogger(wa_datasets.__name__).setLevel(log_level)
     logging.getLogger(__name__).setLevel(log_level)
     # process player name
     if playername is None:
         playername = config.playername
-    if playername is None:
-        logger.info(f"playername NOT defined")
-    else:
-        logger.info(f"playername = {repr(playername)}")
     # TODO: someone need to warn if playername is blank string like '  '
     #       such name could broke fuzzy
     # TODO: warn if playername equal with other dialog titles (lorn names for example)
@@ -44,6 +41,10 @@ def init(log_level, write_to_dataset, playername, force_parsing):
     #       Also it needs to process such cases in DialogScreen
     # load lang
     lang = load_lang(playername=playername)
+    if playername is None:
+        logger.info(f"playername NOT defined")
+    else:
+        logger.info(f"playername = {repr(playername)}")
     # create dialog screen manager
     global dialog_screen_manager
     dialog_screen_manager = DialogScreenManager(lang, write_to_dataset, playername, force_parsing)

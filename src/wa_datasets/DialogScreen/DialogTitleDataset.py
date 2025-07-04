@@ -35,8 +35,6 @@ MetaKey = namedtuple("MetaKey",
                      "title_ocr, "
                      "sample_matches")
 
-GitStatus = namedtuple("GitStatus", "branch, commit, has_modified")
-
 
 class DialogTitleDataset(DialogScreenBaseDataset):
     @typechecked
@@ -45,14 +43,12 @@ class DialogTitleDataset(DialogScreenBaseDataset):
                  crop: Optional[Box] = None,
                  language: Optional[str] = None,
                  playername: Optional[str] = None,
-                 git_status: Optional[GitStatus] = None,
                  lazy_load: bool = False):
         super().__init__(NAME, resolution, lazy_load)
         self.__resolution = resolution
         self.__crop = crop
         self.__language = language
         self.__playername = playername
-        self.__git_status = git_status
 
     @typechecked
     def meta_and_image_path(self) -> Optional[dict[int, MetaAndImagePath[MetaItem, str]]]:
@@ -79,9 +75,9 @@ class DialogTitleDataset(DialogScreenBaseDataset):
                              title_ocr=title_ocr,
                              fuzzy_score=title_fuzzy_score,
                              keys=title_keys,
-                             git_branch=self.__git_status.branch if self.__git_status else None,
-                             git_commit=self.__git_status.commit if self.__git_status else None,
-                             git_has_modified=self.__git_status.has_modified if self.__git_status else None),
+                             git_branch=self.git_status.branch,
+                             git_commit=self.git_status.commit,
+                             git_has_modified=self.git_status.has_modified),
                     screenshot)
 
     @typechecked
