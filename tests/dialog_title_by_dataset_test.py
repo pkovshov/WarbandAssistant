@@ -45,4 +45,4 @@ for idx, (meta, image_path) in dataset.meta_and_image_path().items():
 def test_dialog_title_dataset(idx, meta, image):
     title_ocr, title = ocr.title(image)
     title_keys = fuzzy.title_key(title)
-    assert title_keys == tuple(meta.keys), title_ocr
+    assert title_keys == tuple(meta.keys), f"OCR: {title_ocr}"
