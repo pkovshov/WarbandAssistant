@@ -7,7 +7,7 @@ import numpy as np
 from typeguard import typechecked
 
 from . import DialogScreenModel
-
+from .DialogScreenEvent import DialogScreenEvent
 
 Cache = namedtuple("Cache",
                    "screen_sample_matches, "
@@ -25,24 +25,10 @@ class DialogScreenLogger:
         self.__cache = None
 
     @typechecked
-    def process(self,
-                image: np.ndarray,
-                screen_sample_matches: bool,
-                title_ocr: str,
-                title: str,
-                title_fuzzy_score: Optional[float],
-                title_keys: Tuple[str, ...],
-                relation_ocr: Optional[str],
-                relation: Optional[int]):
-
-        if self.__cache == Cache(screen_sample_matches, title_ocr, relation_ocr):
-            return
-        self.__cache = Cache(screen_sample_matches, title_ocr, relation_ocr)
-        if not screen_sample_matches and not title_keys:
-            return
+    def process(self, event: DialogScreenEvent):
         text = "Dialog: "
-        if title_keys:
-            title_key = title_keys[0]
+        if event.title_keys:
+            title_key = event.title_keys[0]
             val = self.__lang[title_key]
             if DialogScreenModel.is_king(title_key):
                 text += f"Ruler {val}"
@@ -53,11 +39,10 @@ class DialogScreenLogger:
             else:
                 text += val
         else:
-            text += title
-        if relation_ocr is not None:
-            text += f" {relation}" if relation is not None else "?"
-        if screen_sample_matches and not title_keys:
+            text += repr(event.title)
+        if event.relation_ocr is not None:
+            text += " "
+            text += str(event.relation) if event.relation is not None else "?"
+        if not event.title_keys:
             text += " (FALSE NEGATIVE)"
-        if not screen_sample_matches:
-            text += " (FALSE POSITIVE)"
         self.__logger.info(text)
