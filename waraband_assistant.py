@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 dialog_screen_manager = None
 
 
-def init(log_level, write_to_dataset, playername, force_parsing):
+def init(log_level, write_to_dataset, playername):
     from wa_screen_manager import config
     # config logging
     logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
@@ -47,7 +47,7 @@ def init(log_level, write_to_dataset, playername, force_parsing):
         logger.info(f"playername = {repr(playername)}")
     # create dialog screen manager
     global dialog_screen_manager
-    dialog_screen_manager = DialogScreenManager(lang, write_to_dataset, playername, force_parsing)
+    dialog_screen_manager = DialogScreenManager(lang, write_to_dataset, playername)
 
 
 @typechecked
@@ -63,8 +63,7 @@ def load_lang(playername: Optional[str]) -> Mapping[str, Interpolation]:
 def main(args):
     init(log_level=logging.DEBUG if args.verbose else logging.INFO,
          write_to_dataset=args.dataset,
-         playername=args.player,
-         force_parsing=args.force_parsing)
+         playername=args.player)
     with mss.mss() as sct:
         monitor = sct.monitors[args.monitor]
         print("START", "datasets", "ON" if args.dataset else "OFF")
@@ -89,9 +88,6 @@ parser.add_argument("-v", "--verbose",
 parser.add_argument("-ds", "--dataset",
                     action="store_true",
                     help="Enable writing data to datasets.")
-parser.add_argument("-fp", "--force-parsing",
-                    action="store_true",
-                    help="Parse screen even if screen sample does not match.")
 parser.add_argument("-m", "--monitor",
                     action="append", type=int, default=[],
                     help="The number of the monitor to be captured (starting from 1, default is 1).",

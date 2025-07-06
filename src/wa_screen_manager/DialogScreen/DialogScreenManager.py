@@ -26,8 +26,7 @@ class DialogScreenManager:
     def __init__(self,
                  lang: Mapping[str, LangValParser.Interpolation],
                  write_to_dataset: bool = False,
-                 playername: Optional[str] = None,
-                 force_parsing: bool = False):
+                 playername: Optional[str] = None):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
         self.__screen_sample = DialogScreenScreenSampler()
@@ -35,7 +34,6 @@ class DialogScreenManager:
         self.__title_fuzzy = DialogScreenFuzzy(lang)
         self.__relation_sampler = DialogScreenRelationSampler()
         self.__relation_ocr = DialogScreenRelationOCR()
-        self.__force_parsing = force_parsing
         self.__artifacts_processors = []
         if write_to_dataset:
             self.__artifacts_processors.append(
@@ -46,7 +44,7 @@ class DialogScreenManager:
 
     def process(self, img: np.ndarray):
         screen_sample_matches = self.__screen_sample.check(img)
-        if screen_sample_matches or self.__force_parsing:
+        if screen_sample_matches:
             title_ocr, title = self.__title_ocr.title(img)
             score = self.__title_fuzzy.title_score(title)
             keys = self.__title_fuzzy.title_key(title)
