@@ -38,7 +38,7 @@ class DialogScreenBaseDataset(ABC):
                  new_screenshots_resolution: Optional[Resolution],
                  lazy_load: bool = False):
         import path_conf
-        self.__logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger(f"{type(self).__module__}.{type(self).__name__}")
         self.__name = dataset_dir_name
         self.__dir_path = path.join(path_conf.datasets,
                                     dataset_dir_name)
@@ -61,7 +61,7 @@ class DialogScreenBaseDataset(ABC):
     def meta_and_image_path(self) -> Optional[dict[int, MetaAndImagePath[object, str]]]:
         self.__load()
         if self.__state is State.BLOCKED:
-            self.__logger.warning(f"BLOCKED {self.__name} dataset does not support meta_and_image")
+            self._logger.warning(f"BLOCKED {self.__name} dataset does not support meta_and_image")
             return None
         result = dict()
         for idx, meta in self.__meta.items():
@@ -74,7 +74,7 @@ class DialogScreenBaseDataset(ABC):
     def add(self, meta: object, screenshot: np.ndarray):
         self.__load()
         if self.__state is State.BLOCKED:
-            self.__logger.warning(f"BLOCKED {self.__name} dataset does not support add")
+            self._logger.warning(f"BLOCKED {self.__name} dataset does not support add")
             return
         assert self.__resolution is not None
         assert is_screenshot(screenshot, self.__resolution)
@@ -85,10 +85,10 @@ class DialogScreenBaseDataset(ABC):
         image = self._preprocess(screenshot)
         idx = self.__max_idx + 1
         if not self.__write_data(idx, data):
-            self.__logger.warning(f"meta causes above error: {repr(meta)}")
+            self._logger.warning(f"meta causes above error: {repr(meta)}")
             return
         if not self.__write_image(idx, image):
-            self.__logger.warning(f"meta causes above error: {repr(meta)}")
+            self._logger.warning(f"meta causes above error: {repr(meta)}")
             return
         self.__max_idx = idx
         self.__meta_index.add(meta_key)
@@ -97,23 +97,23 @@ class DialogScreenBaseDataset(ABC):
     def replace_meta(self, idx: int, meta: object):
         self.__load()
         if self.__state is State.BLOCKED:
-            self.__logger.warning(f"BLOCKED {self.__name} dataset does not support replace_meta")
+            self._logger.warning(f"BLOCKED {self.__name} dataset does not support replace_meta")
             return
         if idx not in self.__meta:
-            self.__logger.warning(f"DISCARD replacing unknown index {idx}")
+            self._logger.warning(f"DISCARD replacing unknown index {idx}")
             return
         meta_key = self._meta_to_key(meta)
         if not isinstance(meta_key, Hashable):
-            self.__logger.warning(f"DISCARD replacing on meta with non-hashable meta key {repr(meta)}")
+            self._logger.warning(f"DISCARD replacing on meta with non-hashable meta key {repr(meta)}")
             return
         if (hash(meta_key) != hash(self._meta_to_key(self.__meta[idx])) and
             meta_key in self.__meta_index):
-            self.__logger.warning(f"DISCARD replacing on non-uniq meta {repr(meta)}")
+            self._logger.warning(f"DISCARD replacing on non-uniq meta {repr(meta)}")
             return
         data = self._meta_to_data(meta)
         if not self.__write_data(idx, data):
-            self.__logger.warning(f"meta causes above error: {repr(meta)}")
-            self.__logger.warning(f"DISCARD replacing due to write error")
+            self._logger.warning(f"meta causes above error: {repr(meta)}")
+            self._logger.warning(f"DISCARD replacing due to write error")
             return
         self.__meta[idx] = meta
 
@@ -149,12 +149,12 @@ class DialogScreenBaseDataset(ABC):
         yaml_file_path = path.join(self.__dir_path,
                                    self.__idx_to_yaml(idx))
         if path.isfile(yaml_file_path):
-            self.__logger.warning(f"REWRITE existent yaml file {yaml_file_path}")
+            self._logger.warning(f"REWRITE existent yaml file {yaml_file_path}")
         try:
             with open(yaml_file_path, "w") as file:
                 yaml.safe_dump(data, file, default_flow_style=False)
         except Exception:
-            self.__logger.warning(f"ERROR ON WRITING meta to file {yaml_file_path}\n" +
+            self._logger.warning(f"ERROR ON WRITING meta to file {yaml_file_path}\n" +
                                   traceback.format_exc())
             return False
         return True
@@ -164,11 +164,11 @@ class DialogScreenBaseDataset(ABC):
         png_file_path = path.join(self.__dir_path,
                                   self.__idx_to_png(idx))
         if path.isfile(png_file_path):
-            self.__logger.warning(f"REWRITE existent png file {png_file_path}")
+            self._logger.warning(f"REWRITE existent png file {png_file_path}")
         try:
             cv2.imwrite(png_file_path, image)
         except Exception:
-            self.__logger.warning(f"ERROR ON WRITING image to file {png_file_path}\n" +
+            self._logger.warning(f"ERROR ON WRITING image to file {png_file_path}\n" +
                                   traceback.format_exc())
             return False
         return True
@@ -201,7 +201,7 @@ class DialogScreenBaseDataset(ABC):
     @typechecked
     def __load_indexes(self) -> Optional[Set[int]]:
         if not path.isdir(self.__dir_path):
-            self.__logger.warning(f"BLOCK {self.__name} dataset. Not a directory {self.__dir_path}")
+            self._logger.warning(f"BLOCK {self.__name} dataset. Not a directory {self.__dir_path}")
             self.__state = State.BLOCKED
             return None
         # collect yaml and png indexes
@@ -211,12 +211,12 @@ class DialogScreenBaseDataset(ABC):
             # check that we are working with a file
             file_path = path.join(self.__dir_path, file_name)
             if not os.path.isfile(file_path):
-                self.__logger.warning(f"DISCARD {file_name}. Not a file {file_path}")
+                self._logger.warning(f"DISCARD {file_name}. Not a file {file_path}")
                 continue
             # got index and extension
             idx_and_ext = self.__file_name_to_idx_and_ext(file_name)
             if idx_and_ext is None:
-                self.__logger.warning(f"DISCARD {file_name}. Incorrect file name format")
+                self._logger.warning(f"DISCARD {file_name}. Incorrect file name format")
                 continue
             idx, ext = idx_and_ext
             # check the extension and append index to corresponding set
@@ -225,17 +225,17 @@ class DialogScreenBaseDataset(ABC):
             elif ext == "png":
                 png_idx_set.add(idx)
             else:
-                self.__logger.warning(f"DISCARD {file_name}. Incorrect extension")
+                self._logger.warning(f"DISCARD {file_name}. Incorrect extension")
                 continue
         # check that yaml files exist for all the png files
         lone_png_idx_set = png_idx_set - yaml_idx_set
         for idx in lone_png_idx_set:
-            self.__logger.warning(f"DISCARD {self.__idx_to_png(idx)}. Absent yaml file")
+            self._logger.warning(f"DISCARD {self.__idx_to_png(idx)}. Absent yaml file")
         # check that png files exist for all the yaml files
         # decline lone yaml files
         lone_yaml_idx_set = yaml_idx_set - png_idx_set
         for idx in lone_yaml_idx_set:
-            self.__logger.warning(f"DISCARD {self.__idx_to_yaml(idx)}. Absent png file")
+            self._logger.warning(f"DISCARD {self.__idx_to_yaml(idx)}. Absent png file")
             yaml_idx_set.remove(idx)
         # calculate max index
         self.__max_idx = max(yaml_idx_set) if len(yaml_idx_set) > 0 else 0
@@ -256,11 +256,11 @@ class DialogScreenBaseDataset(ABC):
                 with open(yaml_file_path) as file:
                     data = yaml.safe_load(file)
             except PermissionError:
-                self.__logger.warning(f"PERMISSION DENIED to read file {self.__idx_to_yaml(idx)}")
+                self._logger.warning(f"PERMISSION DENIED to read file {self.__idx_to_yaml(idx)}")
             except FileNotFoundError:
-                self.__logger.warning(f"FILE NOT FOUND {self.__idx_to_yaml(idx)}")
+                self._logger.warning(f"FILE NOT FOUND {self.__idx_to_yaml(idx)}")
             except yaml.YAMLError as error:
-                self.__logger.warning(f"FAILED TO PARSE yaml {self.__idx_to_yaml(idx)}\n"
+                self._logger.warning(f"FAILED TO PARSE yaml {self.__idx_to_yaml(idx)}\n"
                                       f"{type(error).__name__}('{error}'): \n" +
                                       traceback.format_exc())
             else:
@@ -281,14 +281,14 @@ class DialogScreenBaseDataset(ABC):
             try:
                 meta = self._data_to_meta(idx_to_data[idx])
             except Exception as error:
-                self.__logger.warning(f"FAILED TO PARSE as meta {self.__idx_to_yaml(idx)}\n"
+                self._logger.warning(f"FAILED TO PARSE as meta {self.__idx_to_yaml(idx)}\n"
                                       f"{type(error).__name__}('{error}'): \n" +
                                       traceback.format_exc())
                 continue
             meta_key = self._meta_to_key(meta)
             assert isinstance(meta_key, Hashable)
             if meta_key in self.__meta_index:
-                self.__logger.warning(f"DISCARD {self.__idx_to_yaml(idx)}. Non-uniq content")
+                self._logger.warning(f"DISCARD {self.__idx_to_yaml(idx)}. Non-uniq content")
                 continue
             self.__meta_index.add(meta_key)
             self.__meta[idx] = meta
@@ -322,9 +322,9 @@ class DialogScreenBaseDataset(ABC):
                 break
         # check and return GitStatus
         git_status = GitStatus(branch=branch, commit=commit, has_modified=has_modified)
-        self.__logger.info(f"git status: {'HAS' if git_status.has_modified else 'NO'} modified, "
+        self._logger.info(f"git status: {'HAS' if git_status.has_modified else 'NO'} modified, "
                            f"branch:{git_status.branch}, "
                            f"commit:{git_status.commit}")
         if git_status.has_modified:
-            self.__logger.warning("git repository has modified files")
+            self._logger.warning("git repository has modified files")
         return git_status

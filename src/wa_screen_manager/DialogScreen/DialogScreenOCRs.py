@@ -16,7 +16,7 @@ class DialogScreenBaseOCR(ABC):
                  resolution: Resolution,
                  crop_box: Box,
                  whitelist: str):
-        self._logger = logging.getLogger(type(self).__name__)
+        self._logger = logging.getLogger(f"{type(self).__module__}.{type(self).__name__}")
         self.__resolution = resolution
         self.__crop_slice = crop_box.slice
         self.__whitelist = whitelist
