@@ -10,7 +10,6 @@ from .DialogScreenSamplers import DialogScreenScreenSampler, DialogScreenRelatio
 from .DialogScreenOCRs import DialogScreenTitleOCR, DialogScreenRelationOCR
 from .DialogScreenFuzzy import DialogScreenFuzzy
 from .DialogScreenDatasetProcessor import DialogScreenDatasetProcessor
-from .DialogScreenLogger import DialogScreenLogger
 
 
 class DialogScreenManager:
@@ -36,7 +35,6 @@ class DialogScreenManager:
         self.__listeners = []
         if write_to_dataset:
             self.add_event_listener(DialogScreenDatasetProcessor(playername=playername).process)
-        self.add_event_listener(DialogScreenLogger(self.__lang).process)
         self.__prev__event = None
 
     @typechecked

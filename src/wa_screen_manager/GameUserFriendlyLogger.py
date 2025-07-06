@@ -6,8 +6,8 @@ from wa_language import LangValParser
 import numpy as np
 from typeguard import typechecked
 
-from . import DialogScreenModel
-from .DialogScreenEvent import DialogScreenEvent
+from wa_screen_manager.DialogScreen import DialogScreenModel
+from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogScreenEvent
 
 Cache = namedtuple("Cache",
                    "screen_sample_matches, "

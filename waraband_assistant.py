@@ -4,81 +4,40 @@ import argparse
 import logging
 import os
 import sys
-from types import MappingProxyType
-from typing import Mapping, Optional
-
-import mss
-import numpy as np
-from typeguard import typechecked
 
 scrip_dir_path = os.path.abspath(os.path.dirname(__file__))
 os.chdir(scrip_dir_path)
 sys.path.append(os.path.abspath(os.path.join(scrip_dir_path, 'src')))
 
-from wa_language import LangLoader
-from wa_language.LangValParser import Interpolation
-from wa_screen_manager.DialogScreen.DialogScreenManager import DialogScreenManager
-import wa_screen_manager, wa_datasets
-
-logger = logging.getLogger(__name__)
-dialog_screen_manager = None
-
-
-def init(log_level, write_to_dataset, playername):
-    from wa_screen_manager import config
-    # config logging
-    logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
-    logging.getLogger(wa_screen_manager.__name__).setLevel(log_level)
-    logging.getLogger(wa_datasets.__name__).setLevel(log_level)
-    logging.getLogger(__name__).setLevel(log_level)
-    # process player name
-    if playername is None:
-        playername = config.playername
-    # TODO: someone need to warn if playername is blank string like '  '
-    #       such name could broke fuzzy
-    # TODO: warn if playername equal with other dialog titles (lorn names for example)
-    #       or maybe is part of other dialog titles (Merchant for example)
-    #       Also it needs to process such cases in DialogScreen
-    # load lang
-    lang = load_lang(playername=playername)
-    if playername is None:
-        logger.info(f"playername NOT defined")
-    else:
-        logger.info(f"playername = {repr(playername)}")
-    # create dialog screen manager
-    global dialog_screen_manager
-    dialog_screen_manager = DialogScreenManager(lang, write_to_dataset, playername)
-
-
-@typechecked
-def load_lang(playername: Optional[str]) -> Mapping[str, Interpolation]:
-    lang = LangLoader.load_lang()
-    # TODO: extend load_files with a param accepting a dict with special keys
-    # update lang with special keys
-    if playername is not None:
-        lang = lang | {"wa_player": Interpolation(playername, raw=True)}
-    return MappingProxyType(lang)
+from wa_screen_manager.GameScreenManager import GameScreenManager
+import wa_screen_manager, wa_datasets, wa_language
 
 
 def main(args):
-    init(log_level=logging.DEBUG if args.verbose else logging.INFO,
-         write_to_dataset=args.dataset,
-         playername=args.player)
-    with mss.mss() as sct:
-        monitor = sct.monitors[args.monitor]
-        print("START", "datasets", "ON" if args.dataset else "OFF")
-        try:
-            run(sct, monitor)
-        except KeyboardInterrupt:
-            print("\b\b  \b\b", end="")
-            print("STOP")
-
-
-def run(sct, monitor):
-    while True:
-        scr = sct.grab(monitor)
-        img = np.array(scr)[:, :, :3]  # BGRA -> BGR
-        dialog_screen_manager.process(img)
+    from wa_screen_manager import config
+    # config logging
+    log_level = logging.DEBUG if args.verbose else logging.INFO
+    logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
+    logging.getLogger(wa_screen_manager.__name__).setLevel(log_level)
+    logging.getLogger(wa_datasets.__name__).setLevel(log_level)
+    logging.getLogger(wa_language.__name__).setLevel(log_level)
+    logging.getLogger(__name__).setLevel(log_level)
+    # process player name
+    playername = args.player
+    if playername is None:
+        playername = config.playername
+    # create GameScreenManager
+    write_to_dataset = args.dataset
+    game_Screen_manager = GameScreenManager(playername=playername,
+                                            write_to_dataset=write_to_dataset)
+    # run
+    monitor = args.monitor
+    print("START", "datasets", "ON" if write_to_dataset else "OFF")
+    try:
+        game_Screen_manager.run(monitor)
+    except KeyboardInterrupt:
+        print("\b\b  \b\b", end="")
+        print("STOP")
 
 
 parser = argparse.ArgumentParser()

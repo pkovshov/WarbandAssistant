@@ -17,7 +17,7 @@ class DialogScreenEvent:
         self.__image = image
         self.__title_ocr = title_ocr
         self.__title = title
-        self.__title_fuzze_score = title_fuzzy_score
+        self.__title_fuzzy_score = title_fuzzy_score
         self.__title_keys = title_keys
         self.__relation_ocr = relation_ocr
         self.__relation = relation
