@@ -2,14 +2,15 @@ from collections import namedtuple
 import logging
 from typing import Mapping, Optional, Tuple
 
-from wa_language import LangValParser
 import rapidfuzz as fz
 from typeguard import typechecked
 
-from .DialogScreenModel import is_dialog_title_key
+from wa_language import LangValParser
+from wa_language.model.troop_keys import is_troop_key
 
 
 Result = namedtuple("Result", "score, keys")
+
 TEXT = 0
 SCORE = 1
 KEY = 2
@@ -22,7 +23,7 @@ class DialogScreenFuzzy:
         self.__logger = logging.getLogger(__name__)
         self.__title_score_cutoff = dialog_screen_config.fuzzy_title_score_cutoff
         self.__logger.info(f"title_score_cutoff = {self.__title_score_cutoff}")
-        self.__titles = {key: val for key, val in lang.items() if is_dialog_title_key(key)}
+        self.__titles = {key: val for key, val in lang.items() if is_troop_key(key)}
         self.__prev_title_ocr = None
         self.__prev_title_keys = None
 

@@ -6,7 +6,7 @@ from wa_language import LangValParser
 import numpy as np
 from typeguard import typechecked
 
-from wa_screen_manager.DialogScreen import DialogScreenModel
+from wa_language.model import troop_keys
 from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogScreenEvent
 
 Cache = namedtuple("Cache",
@@ -30,11 +30,11 @@ class DialogScreenLogger:
         if event.title_keys:
             title_key = event.title_keys[0]
             val = self.__lang[title_key]
-            if DialogScreenModel.is_king(title_key):
+            if troop_keys.is_king_key(title_key):
                 text += f"Ruler {val}"
-            elif DialogScreenModel.is_lord(title_key):
+            elif troop_keys.is_lord_key(title_key):
                 text += f"Lord {val}"
-            elif DialogScreenModel.is_lady(title_key):
+            elif troop_keys.is_lady_key(title_key):
                 text += f"Lady {val}"
             else:
                 text += val
