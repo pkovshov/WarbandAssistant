@@ -1,4 +1,5 @@
-from typing import FrozenSet, List, Mapping, Tuple, Union
+import itertools
+from typing import FrozenSet, Iterable, List, Mapping, Tuple, Union
 
 from typeguard import typechecked
 
@@ -112,6 +113,33 @@ class Interpolation(str):
                 else:
                     items[idx] = str(substitution)
         return Interpolation("".join(items))
+
+    @typechecked
+    def spread(self, variables_and_values: Mapping[str, Iterable[str]]) -> List["Interpolation"]:
+        """Build a list of substitutions
+
+        Tests:
+        >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
+        >>> spread = interp.spread({"s1": ["ko", "ro"], "s2": ["jjj", "erq"]})
+        >>> spread.sort()
+        >>> print(*spread, sep='\\n')
+        ko, erq yes erq
+        ko, jjj yes jjj
+        ro, erq yes erq
+        ro, jjj yes jjj
+        >>> interp = Interpolation("{ma/fa}, {s2} yes {s1?{s2}:{reg3}}")
+        >>> spread = interp.spread({"wa_binary": ["first"], "s2": ["jjj", "erq"]})
+        >>> spread.sort()
+        >>> print(*spread, sep='\\n')
+        ma, erq yes {s1?erq:{reg3}}
+        ma, jjj yes {s1?jjj:{reg3}}
+        """
+        spread_list = [self]
+        for variable, values in variables_and_values.items():
+            for idx, interp in enumerate(spread_list):
+                spread_list[idx] = [interp.substitute(variable, value) for value in values]
+            spread_list = list(itertools.chain.from_iterable(spread_list))
+        return spread_list
 
     @property
     @typechecked
