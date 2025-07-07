@@ -8,50 +8,10 @@ import pytesseract
 from typeguard import typechecked
 
 from wa_types import Box, Resolution, is_screenshot
+from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR
 
 
-class DialogScreenBaseOCR(ABC):
-    @typechecked
-    def __init__(self,
-                 resolution: Resolution,
-                 crop_box: Box,
-                 whitelist: str):
-        self._logger = logging.getLogger(f"{type(self).__module__}.{type(self).__name__}")
-        self.__resolution = resolution
-        self.__crop_slice = crop_box.slice
-        self.__whitelist = whitelist
-        self.__prev_crop_img = None
-        self.__prev_text_ocr = None
-
-    @typechecked
-    def ocr(self, img: np.ndarray) -> str:
-        assert is_screenshot(img, self.__resolution)
-        crop_img = img[self.__crop_slice]
-        if not np.array_equal(crop_img, self.__prev_crop_img):
-            self.__prev_crop_img = crop_img
-            preprocessed_img = self._preprocess(crop_img)
-            text_ocr = self._tesseract_ocr(preprocessed_img)
-            self.__prev_text_ocr = text_ocr
-            self._logger.debug(f"new image: {repr(text_ocr)}")
-        return self.__prev_text_ocr
-
-    @typechecked
-    def _tesseract_ocr(self, img: np.ndarray) -> str:
-        whitelist = self.__whitelist
-        oem = 1
-        pcm = 6
-        config = f'--oem {oem} --psm {pcm} -c tessedit_char_whitelist="{whitelist}"'
-        result = pytesseract.image_to_string(img, config=config)
-        result = result.strip()
-        result = result.replace('\n', ' ')
-        return result
-
-    @abstractmethod
-    def _preprocess(self, crop_img: np.ndarray) -> np.ndarray:
-        raise NotImplemented
-
-
-class DialogScreenTitleOCR(DialogScreenBaseOCR):
+class DialogScreenTitleOCR(BaseOCR):
     def __init__(self):
         from wa_screen_manager import config
         from . import dialog_screen_config
@@ -59,7 +19,7 @@ class DialogScreenTitleOCR(DialogScreenBaseOCR):
         super().__init__(resolution=config.resolution,
                          crop_box=crop_box,
                          whitelist=config.whitelist_characters)
-        blank_image = cv2.imread(dialog_screen_config.screen_blank_img_path)
+        blank_image = cv2.imread(dialog_screen_config.dialog_screen_blank_img_path)
         blank_image = blank_image[crop_box.slice]
         blank_image = cv2.cvtColor(blank_image, cv2.COLOR_BGR2GRAY)
         self.__blank_img_gray = blank_image
@@ -92,7 +52,7 @@ class DialogScreenTitleOCR(DialogScreenBaseOCR):
         return img
 
 
-class DialogScreenRelationOCR(DialogScreenBaseOCR):
+class DialogScreenRelationOCR(BaseOCR):
     def __init__(self):
         import path_conf
         from wa_screen_manager import config
@@ -101,7 +61,7 @@ class DialogScreenRelationOCR(DialogScreenBaseOCR):
         super().__init__(resolution=config.resolution,
                          crop_box=crop_box,
                          whitelist=config.whitelist_numbers)
-        blank_image = cv2.imread(dialog_screen_config.screen_blank_img_path)
+        blank_image = cv2.imread(dialog_screen_config.dialog_screen_blank_img_path)
         blank_image = blank_image[crop_box.slice]
         blank_image = cv2.cvtColor(blank_image, cv2.COLOR_BGR2GRAY)
         self.__blank_img_gray = blank_image
@@ -130,4 +90,3 @@ class DialogScreenRelationOCR(DialogScreenBaseOCR):
         img = clahe.apply(img)
         img = cv2.GaussianBlur(img, (13, 13), 0.7)
         return img
-

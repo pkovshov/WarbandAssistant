@@ -1,3 +1,4 @@
+import itertools
 import logging
 from types import MappingProxyType
 from typing import Mapping, Optional
@@ -8,17 +9,22 @@ from typeguard import typechecked
 
 from wa_language import LangLoader
 from wa_language.LangValParser import Interpolation
+from .SampleMatch import SampleMatch
 from .DialogScreen.DialogScreenManager import DialogScreenManager
+from .MapScreen.MapScreenManager import MapScreenManager
 from .GameUserFriendlyLogger import DialogScreenLogger
+
 
 class GameScreenManager:
     @typechecked
     def __init__(self, playername: Optional[str] = None, write_to_dataset: Optional[bool] = False):
         self.__logger = logging.getLogger(__name__)
         lang = self._load_lang(playername=playername)
+        self.__map_screen_manger = MapScreenManager(lang, write_to_dataset)
         self.__dialog_screen_manger = DialogScreenManager(lang, write_to_dataset, playername)
         user_friendly_logger = DialogScreenLogger(lang)
-        self.__dialog_screen_manger.add_event_listener(user_friendly_logger.process)
+        self.__map_screen_manger.add_event_listener(user_friendly_logger.on_map_screen)
+        self.__dialog_screen_manger.add_event_listener(user_friendly_logger.on_dialog_screen)
         if playername is None:
             self.__logger.info(f"playername NOT defined")
         else:
@@ -26,12 +32,16 @@ class GameScreenManager:
 
     @typechecked
     def run(self, monitor_idx: int):
+        screen_managers = [self.__map_screen_manger,
+                           self.__dialog_screen_manger]
         with mss.mss() as sct:
             monitor = sct.monitors[monitor_idx]
-            while True:
-                scr = sct.grab(monitor)
-                img = np.array(scr)[:, :, :3]  # BGRA -> BGR
-                self.__dialog_screen_manger.process(img)
+            for screen_manager in itertools.cycle(screen_managers):
+                match = None
+                while match is not SampleMatch.FAIL:
+                    scr = sct.grab(monitor)
+                    img = np.array(scr)[:, :, :3]  # BGRA -> BGR
+                    match = screen_manager.process(img)
 
     @typechecked
     def _load_lang(self, playername: Optional[str]) -> Mapping[str, Interpolation]:

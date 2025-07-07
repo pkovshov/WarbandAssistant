@@ -5,6 +5,7 @@ import numpy as np
 from typeguard import typechecked
 
 from wa_language import LangValParser
+from wa_screen_manager.SampleMatch import SampleMatch
 from .DialogScreenEvent import DialogScreenEvent
 from .DialogScreenSamplers import DialogScreenScreenSampler, DialogScreenRelationSampler
 from .DialogScreenOCRs import DialogScreenTitleOCR, DialogScreenRelationOCR
@@ -16,8 +17,8 @@ class DialogScreenManager:
     """DialogScreenManager class
 
     Responsible for:
-    - processing Game Screens
-    - manage sample, ocr and fuzzy
+    - processing Dialog Screens
+    - manage samplers, ocrs and fuzzys
     - manage filling inferred dataset
     """
     @typechecked
@@ -43,7 +44,7 @@ class DialogScreenManager:
             self.__listeners.append(listener)
 
     @typechecked
-    def process(self, img: np.ndarray):
+    def process(self, img: np.ndarray) -> SampleMatch:
         screen_sample_matches = self.__screen_sample.check(img)
         if not screen_sample_matches:
             self.__prev__event = None
@@ -68,3 +69,4 @@ class DialogScreenManager:
                 self.__prev__event = event
                 for listener in self.__listeners:
                     listener(event)
+        return screen_sample_matches

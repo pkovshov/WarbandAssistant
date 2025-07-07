@@ -8,13 +8,7 @@ from typeguard import typechecked
 
 from wa_language.model import troop_keys
 from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogScreenEvent
-
-Cache = namedtuple("Cache",
-                   "screen_sample_matches, "
-                    # the most appropriate is using title_keys instead of title_ocr
-                    # but I suppose that fuzzy provides same result for the same input
-                   "title_ocr,"
-                   "relation")
+from wa_screen_manager.MapScreen.MapScreenEvent import MapScreenEvent
 
 
 class DialogScreenLogger:
@@ -25,7 +19,11 @@ class DialogScreenLogger:
         self.__cache = None
 
     @typechecked
-    def process(self, event: DialogScreenEvent):
+    def on_map_screen(self, event: MapScreenEvent):
+        self.__logger.info("calendar_ocr: " + repr(event.calendar_ocr))
+
+    @typechecked
+    def on_dialog_screen(self, event: DialogScreenEvent):
         text = "Dialog: "
         if event.title_keys:
             title_key = event.title_keys[0]

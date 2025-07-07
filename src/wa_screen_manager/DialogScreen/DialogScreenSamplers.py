@@ -7,29 +7,18 @@ import numpy as np
 from typeguard import typechecked
 
 from wa_types import Box, Resolution, is_screenshot
+from wa_screen_manager.BaseScreen.BaseSampler import BaseSampleReadingSampler
 
-Sample = namedtuple("Sample", "slice, image")
 
-
-class DialogScreenBaseSampler:
+class DialogScreenBaseSampler(BaseSampleReadingSampler):
     @typechecked
     def __init__(self,
                  resolution: Resolution,
                  sample_boxes: Tuple[Box, ...]):
         from . import dialog_screen_config
-        self._logger = logging.getLogger(type(self).__name__)
-        self.__resolution = resolution
-        sample_slices = [box.slice for box in sample_boxes]
-        blank_image = cv2.imread(dialog_screen_config.screen_blank_img_path)
-        self.__samples = [Sample(slice=slice_, image=blank_image[slice_])
-                          for slice_ in sample_slices]
-
-    @typechecked
-    def check(self, image: np.ndarray) -> bool:
-        assert is_screenshot(image, self.__resolution)
-        equal = all(np.array_equal(sample.image, image[sample.slice])
-                    for sample in self.__samples)
-        return equal
+        super().__init__(sample_img_path=dialog_screen_config.dialog_screen_blank_img_path,
+                         resolution=resolution,
+                         sample_boxes=sample_boxes)
 
 
 class DialogScreenScreenSampler(DialogScreenBaseSampler):
@@ -37,7 +26,7 @@ class DialogScreenScreenSampler(DialogScreenBaseSampler):
         from wa_screen_manager import config
         from . import dialog_screen_config
         resolution = config.resolution
-        sample_boxes = dialog_screen_config.screen_sample_boxes
+        sample_boxes = dialog_screen_config.dialog_screen_sample_boxes
         # make sure the top and bottom lines will be checked
         assert any(box.t == 0 for box in sample_boxes), \
             "Need to check top line to avoid screen tearing"
