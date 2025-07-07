@@ -11,7 +11,7 @@ class Identifier(Expression):
 
     Tests:
     >>> ident_1 = Identifier('s3')
-    >>> print(ident_1.value)
+    >>> print(ident_1.variable)
     s3
     >>> print(ident_1)
     s3
@@ -35,12 +35,16 @@ class Identifier(Expression):
     """
     @typechecked
     def __init__(self, src: str):
+        super().__init__()
         self.__item = parse_identifier(src)
 
     @property
     @typechecked
-    def value(self) -> str:
+    def variable(self) -> str:
         return self.__item
+
+    def _extract_variables(self):
+        return frozenset((self.variable,))
 
     def __eq__(self, other):
         if isinstance(other, Identifier):

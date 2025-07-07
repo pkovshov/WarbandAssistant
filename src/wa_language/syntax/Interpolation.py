@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import FrozenSet, List, Tuple, Union
 
 from typeguard import typechecked
 
@@ -58,6 +58,7 @@ class Interpolation(str):
         obj = super().__new__(cls, "".join(str(item) for item in items))
         obj.__items = items
         obj.__fields = tuple(item for item in items if isinstance(item, Field))
+        obj.__variables = None
         obj.__raw = raw
         return obj
 
@@ -70,6 +71,25 @@ class Interpolation(str):
     @typechecked
     def fields(self) -> Tuple[Field, ...]:
         return self.__fields
+
+    @property
+    @typechecked
+    def variables(self) -> FrozenSet[str]:
+        """ Extract all the variables from expression tree
+
+        Tests:
+        >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
+        >>> print(*sorted(interp.variables))
+        reg3 s1 s2
+        >>> interp = Interpolation("{shk}, {boy/girl}")
+        >>> print(*sorted(interp.variables))
+        shk wa_binary
+        """
+        if self.__variables is None:
+            self.__variables = frozenset()
+            for field in self.fields:
+                self.__variables |= field.expression.variables
+        return self.__variables
 
     @property
     @typechecked

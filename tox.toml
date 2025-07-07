@@ -1,4 +1,4 @@
-env_list = ["doctest"]
+env_list = ["all"]
 
 [env_run_base]
 deps = [
@@ -8,6 +8,13 @@ deps = [
 setenv = [
     {PYTHONPATH = "{toxinidir}/src"}
 ]
+
+[env.all]
 commands = [
   ["pytest", "--doctest-modules"],
+]
+
+[env.lang_syntax]
+commands = [
+  ["pytest", "src/wa_language/syntax", "--doctest-modules"],
 ]

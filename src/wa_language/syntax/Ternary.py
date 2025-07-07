@@ -10,6 +10,7 @@ from .Interpolation import Interpolation
 class Ternary(Expression):
     @typechecked
     def __init__(self, src: str):
+        super().__init__()
         self.__items = parse_ternary(src)
 
     @property
@@ -26,6 +27,12 @@ class Ternary(Expression):
     @typechecked
     def false_part(self) -> Interpolation:
         return self.__items[2]
+
+    def _extract_variables(self):
+        condition_variables = self.condition.variables
+        true_part_variables = self.true_part.variables
+        false_part_variables = self.false_part.variables
+        return condition_variables | true_part_variables | false_part_variables
 
     def __eq__(self, other):
         if isinstance(other, Ternary):

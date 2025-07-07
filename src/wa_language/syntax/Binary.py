@@ -4,6 +4,9 @@ from typeguard import typechecked
 
 from .Expression import Expression
 
+BINARY_CONDITION_VARIABLE = "wa_binary"
+BINARY_CONDITION_VARIABLE_FIRST_VALUE = "first"
+BINARY_CONDITION_VARIABLE_SECOND_VALUE = "second"
 
 class Binary(Expression):
     """
@@ -37,6 +40,7 @@ class Binary(Expression):
     """
     @typechecked
     def __init__(self, src: str):
+        super().__init__()
         self.__items = parse_binary(src)
 
     @property
@@ -48,6 +52,9 @@ class Binary(Expression):
     @typechecked
     def second(self) -> str:
         return self.__items[1]
+
+    def _extract_variables(self):
+        return frozenset((BINARY_CONDITION_VARIABLE,))
 
     def __eq__(self, other):
         if isinstance(other, Binary):
@@ -99,5 +106,3 @@ def parse_binary(src: str) -> Tuple[str, str]:
 if __name__ == "__main__":
     import doctest
     doctest.testmod(optionflags=doctest.IGNORE_EXCEPTION_DETAIL)
-
-
