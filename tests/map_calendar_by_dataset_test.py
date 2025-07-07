@@ -32,7 +32,6 @@ for idx, (meta, image_path) in dataset.meta_and_image_path().items():
                                         meta.resolution,
                                         meta.crop)
     idx_meta_image.append((dataset.idx_to_stem(idx),
-                           meta.calendar_ocr,
                            meta.date_key,
                            meta.year,
                            meta.day,
@@ -40,8 +39,7 @@ for idx, (meta, image_path) in dataset.meta_and_image_path().items():
                            image))
 
 
-@pytest.mark.parametrize("idx, "
-                         "calendar_ocr_exp, "
+@pytest.mark.parametrize("idx, "                         
                          "date_key_exp, "
                          "year_exp, "
                          "day_exp, "
@@ -49,7 +47,6 @@ for idx, (meta, image_path) in dataset.meta_and_image_path().items():
                          "image",
                          idx_meta_image)
 def test_dialog_title_dataset(idx,
-                              calendar_ocr_exp,
                               date_key_exp,
                               year_exp,
                               day_exp,
@@ -61,7 +58,6 @@ def test_dialog_title_dataset(idx,
     year = date_timeofday.year if date_timeofday is not None else None
     day = date_timeofday.day if date_timeofday is not None else None
     timeofday_key = date_timeofday.timeofday_key if date_timeofday is not None else None
-    assert calendar_ocr == calendar_ocr_exp, f"OCR: {calendar_ocr}"
     assert date_key == date_key_exp, f"OCR: {calendar_ocr}"
     assert year == year_exp, f"OCR: {calendar_ocr}"
     assert day == day_exp, f"OCR: {calendar_ocr}"
