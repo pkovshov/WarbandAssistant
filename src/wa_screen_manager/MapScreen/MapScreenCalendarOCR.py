@@ -4,7 +4,7 @@ import numpy as np
 from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR
 
 
-class CalendarOCR(BaseOCR):
+class MapScreenCalendarOCR(BaseOCR):
     def __init__(self):
         from wa_screen_manager import config
         from . import map_screen_config

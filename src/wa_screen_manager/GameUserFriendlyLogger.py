@@ -1,12 +1,12 @@
-from collections import namedtuple
+import calendar as pycalendar
 import logging
-from typing import Mapping, Optional, Tuple
+from typing import Mapping
 
 from wa_language import LangValParser
-import numpy as np
 from typeguard import typechecked
 
 from wa_language.model import troop_keys
+from wa_language.model import calendar_model
 from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogScreenEvent
 from wa_screen_manager.MapScreen.MapScreenEvent import MapScreenEvent
 
@@ -20,7 +20,17 @@ class DialogScreenLogger:
 
     @typechecked
     def on_map_screen(self, event: MapScreenEvent):
-        self.__logger.info("calendar_ocr: " + repr(event.calendar_ocr))
+        text = "Map: "
+        if event.date_timeofday:
+            year = event.date_timeofday.year
+            month = pycalendar.month_name[calendar_model.month(event.date_timeofday.date_key)]
+            day = event.date_timeofday.day
+            timeofday = self.__lang[event.date_timeofday.timeofday_key]
+            text += f"{month[:3]} {day:02d}, {year} - {timeofday}"
+        else:
+            text += repr(event.calendar_ocr)
+            text += " (FALSE NEGATIVE)"
+        self.__logger.info(text)
 
     @typechecked
     def on_dialog_screen(self, event: DialogScreenEvent):

@@ -7,8 +7,9 @@ from typeguard import typechecked
 from wa_language import LangValParser
 from wa_screen_manager.BaseScreen.BaseSampler import BaseSampleReadingSampler
 from wa_screen_manager.SampleMatch import SampleMatch
-from .MapScreenEvent import MapScreenEvent
-from .CalendarOCR import CalendarOCR
+from .MapScreenEvent import MapScreenEvent, DateTimeofday
+from .MapScreenCalendarOCR import MapScreenCalendarOCR
+from .MapScreenCalendarFuzzy import MapScreenCalendarFuzzy
 
 
 class MapScreenSampler(BaseSampleReadingSampler):
@@ -36,7 +37,8 @@ class MapScreenManager:
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
         self.__screen_sample = MapScreenSampler()
-        self.__calendar_ocr = CalendarOCR()
+        self.__calendar_ocr = MapScreenCalendarOCR()
+        self.__calendar_fuzzy = MapScreenCalendarFuzzy(lang)
         self.__listeners = []
         # if write_to_dataset:
         #     self.add_event_listener(DialogScreenDatasetProcessor(playername=playername).process)
@@ -54,8 +56,10 @@ class MapScreenManager:
             self.__prev__event = None
         else:
             calendar_ocr = self.__calendar_ocr.ocr(img)
+            date_timeofday = self.__calendar_fuzzy.calendar(calendar_ocr)
             event = MapScreenEvent(image=img,
-                                   calendar_ocr=calendar_ocr)
+                                   calendar_ocr=calendar_ocr,
+                                   date_timeofday=date_timeofday)
             if event != self.__prev__event:
                 self.__prev__event = event
                 for listener in self.__listeners:
