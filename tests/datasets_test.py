@@ -8,6 +8,7 @@ import path_conf
 from wa_types import Box, Resolution
 from wa_datasets.DialogScreen.DialogTitleDataset import DialogTitleDataset
 from wa_datasets.DialogScreen.DialogRelationDataset import DialogRelationDataset
+from wa_datasets.MapScreen.MapCalendarDataset import MapCalendarDataset
 
 # Create the output directory if it doesn't exist
 os.makedirs(path_conf.test_output, exist_ok=True)
@@ -22,7 +23,8 @@ for item in os.listdir(path_conf.test_output):
 
 # Copy the dialog screen datasets to test_output
 for dataset in [DialogTitleDataset.NAME,
-                DialogRelationDataset.NAME]:
+                DialogRelationDataset.NAME,
+                MapCalendarDataset.NAME]:
     src_path = path.join(path_conf.datasets, dataset)
     dst_path = path.join(path_conf.test_output, dataset)
     shutil.copytree(src_path, dst_path)
@@ -63,4 +65,23 @@ def test_dialog_relations_dataset():
                 relation_ocr="16",
                 relation=16)
     files_count_after = len(os.listdir(dialog_relation_dataset_path))
+    assert files_count_after == files_count_before + 2
+
+
+def test_map_calendar_dataset():
+    map_calendar_dataset_path = path.join(path_conf.datasets,
+                                          MapCalendarDataset.NAME)
+    files_count_before = len(os.listdir(map_calendar_dataset_path))
+    width, height = 400, 200
+    dataset = MapCalendarDataset(resolution=Resolution(width, height),
+                                 crop=Box(0, 0, 50, 50),
+                                 language="en")
+    screenshot = np.zeros((height, width, 3), dtype=np.uint8)
+    dataset.add(screenshot=screenshot,
+                calendar_ocr="date\ntime",
+                date_key="da_key_jan",
+                year=1278,
+                day=20,
+                timeofday_key="da_key_dawn")
+    files_count_after = len(os.listdir(map_calendar_dataset_path))
     assert files_count_after == files_count_before + 2

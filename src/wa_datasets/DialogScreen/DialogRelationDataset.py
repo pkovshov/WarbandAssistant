@@ -5,7 +5,7 @@ import numpy as np
 from typeguard import typechecked
 
 from wa_types import Box, Resolution
-from .DialogScreenBaseDataset import DialogScreenBaseDataset, MetaAndImagePath
+from wa_datasets.BaseImageDataset import BaseImageDataset, MetaAndImagePath
 
 # TODO: convert to a class with type checking
 #       class has to support Mapping type
@@ -29,7 +29,7 @@ MetaKey = namedtuple("MetaKey",
                      "screen_sample_matches")
 
 
-class DialogRelationDataset(DialogScreenBaseDataset):
+class DialogRelationDataset(BaseImageDataset):
     NAME = "dialog_relations"
 
     @typechecked

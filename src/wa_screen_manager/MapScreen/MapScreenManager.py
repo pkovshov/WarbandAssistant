@@ -10,6 +10,7 @@ from wa_screen_manager.SampleMatch import SampleMatch
 from .MapScreenEvent import MapScreenEvent, DateTimeofday
 from .MapScreenCalendarOCR import MapScreenCalendarOCR
 from .MapScreenCalendarFuzzy import MapScreenCalendarFuzzy
+from .MapScreenDatasetProcessor import MapScreenDatasetProcessor
 
 
 class MapScreenSampler(BaseSampleReadingSampler):
@@ -40,8 +41,8 @@ class MapScreenManager:
         self.__calendar_ocr = MapScreenCalendarOCR()
         self.__calendar_fuzzy = MapScreenCalendarFuzzy(lang)
         self.__listeners = []
-        # if write_to_dataset:
-        #     self.add_event_listener(DialogScreenDatasetProcessor(playername=playername).process)
+        if write_to_dataset:
+             self.add_event_listener(MapScreenDatasetProcessor().process)
         self.__prev__event = None
 
     @typechecked

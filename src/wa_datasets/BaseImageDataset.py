@@ -31,7 +31,7 @@ MetaAndImagePath = namedtuple("MetaAndImage",
 GitStatus = namedtuple("GitStatus", "branch, commit, has_modified")
 
 
-class DialogScreenBaseDataset(ABC):
+class BaseImageDataset(ABC):
     @typechecked
     def __init__(self,
                  dataset_dir_name: str,
