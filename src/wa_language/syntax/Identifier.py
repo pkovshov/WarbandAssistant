@@ -46,6 +46,12 @@ class Identifier(Expression):
     def _extract_variables(self):
         return frozenset((self.variable,))
 
+    def _substitute(self, variable: str, value: str):
+        if variable == self.variable:
+            return value
+        else:
+            return self
+
     def __eq__(self, other):
         if isinstance(other, Identifier):
             return self.__item == other.__item

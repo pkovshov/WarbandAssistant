@@ -56,6 +56,17 @@ class Binary(Expression):
     def _extract_variables(self):
         return frozenset((BINARY_CONDITION_VARIABLE,))
 
+    def _substitute(self, variable: str, value: str):
+        if variable == BINARY_CONDITION_VARIABLE:
+            if value == BINARY_CONDITION_VARIABLE_FIRST_VALUE:
+                return self.first
+            elif value == BINARY_CONDITION_VARIABLE_SECOND_VALUE:
+                return self.second
+            else:
+                raise ValueError(f"Substitute {BINARY_CONDITION_VARIABLE} with incorrect value: {value}")
+        else:
+            return self
+
     def __eq__(self, other):
         if isinstance(other, Binary):
             return self.__items == other.__items

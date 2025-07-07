@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple, Union
 
 from typeguard import typechecked
 
@@ -9,9 +9,23 @@ from .Interpolation import Interpolation
 
 class Ternary(Expression):
     @typechecked
-    def __init__(self, src: str):
+    def __init__(self,
+                 src: Union[str, Identifier],
+                 true_part: Optional[Interpolation] = None,
+                 false_part: Optional[Interpolation] = None):
         super().__init__()
-        self.__items = parse_ternary(src)
+        if isinstance(src, Identifier):
+            if true_part is None:
+                raise ValueError("None true_part")
+            if false_part is None:
+                raise ValueError("None false_part")
+            self.__items = src, true_part, false_part
+        else:
+            if true_part is not None:
+                raise ValueError(f"Do not parse due to true_part: {true_part}")
+            if false_part is not None:
+                raise ValueError(f"Do not parse due to false_part: {false_part}")
+            self.__items = parse_ternary(src)
 
     @property
     @typechecked
@@ -33,6 +47,17 @@ class Ternary(Expression):
         true_part_variables = self.true_part.variables
         false_part_variables = self.false_part.variables
         return condition_variables | true_part_variables | false_part_variables
+
+    def _substitute(self, variable: str, value: str):
+        if variable == self.condition.variable:
+            if value == "":
+                return self.false_part
+            else:
+                return self.true_part
+        else:
+            return Ternary(self.condition,
+                           self.true_part.substitute(variable, value),
+                           self.false_part.substitute(variable, value))
 
     def __eq__(self, other):
         if isinstance(other, Ternary):

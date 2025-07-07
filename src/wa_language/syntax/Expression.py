@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import FrozenSet
+from typing import FrozenSet, Union
 
 from typeguard import typechecked
 
@@ -17,6 +17,14 @@ class Expression(ABC):
 
     @abstractmethod
     def _extract_variables(self):
+        raise NotImplemented
+
+    @typechecked
+    def substitute(self, variable: str, value: str) -> Union[str, "Expression"]:
+        return self._substitute(variable, value)
+
+    @abstractmethod
+    def _substitute(self, variable: str, value: str):
         raise NotImplemented
 
     def __repr__(self):

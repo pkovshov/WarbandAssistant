@@ -1,3 +1,5 @@
+from typing import Union
+
 from typeguard import typechecked
 
 from .Expression import Expression
@@ -7,8 +9,11 @@ class Field:
     """A field in the interpolation. See details in package description.
     """
     @typechecked
-    def __init__(self, src: str):
-        self.__expr = parse_field(src)
+    def __init__(self, src: Union[str, Expression]):
+        if isinstance(src, Expression):
+            self.__expr = src
+        else:
+            self.__expr = parse_field(src)
 
     @property
     @typechecked

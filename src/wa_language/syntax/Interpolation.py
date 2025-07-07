@@ -1,8 +1,9 @@
-from typing import FrozenSet, List, Tuple, Union
+from typing import FrozenSet, List, Mapping, Tuple, Union
 
 from typeguard import typechecked
 
 from .Field import Field
+from .Expression import Expression
 
 
 class Interpolation(str):
@@ -75,7 +76,7 @@ class Interpolation(str):
     @property
     @typechecked
     def variables(self) -> FrozenSet[str]:
-        """ Extract all the variables from expression tree
+        """Extract all the variables from expression tree
 
         Tests:
         >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
@@ -90,6 +91,27 @@ class Interpolation(str):
             for field in self.fields:
                 self.__variables |= field.expression.variables
         return self.__variables
+
+    @typechecked
+    def substitute(self, variable: str, value: str) -> "Interpolation":
+        """Substitute all the variables with same name by the given variable
+        >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
+        >>> print(interp.substitute("s1", "Joe Dou"))
+        Joe Dou, {s2} yes {s2}
+        >>> print(interp.substitute("s1", ""))
+        , {s2} yes {reg3}
+        >>> print(interp.substitute("s2", "Ricki"))
+        {s1}, Ricki yes {s1?Ricki:{reg3}}
+        """
+        items = list(self.__items)
+        for idx, item in enumerate(items):
+            if isinstance(item, Field):
+                substitution = item.expression.substitute(variable, value)
+                if isinstance(substitution, Expression):
+                    items[idx] = str(Field(substitution))
+                else:
+                    items[idx] = str(substitution)
+        return Interpolation("".join(items))
 
     @property
     @typechecked
