@@ -15,10 +15,10 @@ from .MapScreenDatasetProcessor import MapScreenDatasetProcessor
 
 class MapScreenSampler(BaseSampleReadingSampler):
     def __init__(self):
-        from .map_screen_config import map_screen_sample_img_path
+        from .map_screen_config import map_screen_blank_img_path
         from wa_screen_manager.config import resolution
         from .map_screen_config import map_screen_sample_boxes
-        super().__init__(sample_img_path=map_screen_sample_img_path,
+        super().__init__(sample_img_path=map_screen_blank_img_path,
                          resolution=resolution,
                          sample_boxes=map_screen_sample_boxes)
 

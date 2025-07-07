@@ -1,13 +1,9 @@
-from abc import ABC, abstractmethod
-import logging
 from typing import Optional, Tuple
 
 import cv2
 import numpy as np
-import pytesseract
 from typeguard import typechecked
 
-from wa_types import Box, Resolution, is_screenshot
 from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR
 
 
