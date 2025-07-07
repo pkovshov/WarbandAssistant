@@ -27,7 +27,7 @@ class MapScreenCalendarOCR(BaseOCR):
         img = cv2.absdiff(self.__blank_img_gray, img)
         img = cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX)
         img = 255 - img
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(6, 6))
         img = clahe.apply(img)
-        img = cv2.GaussianBlur(img, (13, 13), 0.7)
+        img = cv2.GaussianBlur(img, (11, 11), 0.7)
         return img
