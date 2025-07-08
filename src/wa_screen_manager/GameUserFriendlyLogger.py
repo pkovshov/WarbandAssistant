@@ -26,7 +26,7 @@ class DialogScreenLogger:
             month = pycalendar.month_name[calendar_model.month(event.date_timeofday.date_key)]
             day = event.date_timeofday.day
             timeofday = self.__lang[event.date_timeofday.timeofday_key]
-            text += f"{month[:3]} {day:02d}, {year} - {timeofday}"
+            text += f"{month[:3]} {day}, {year} - {timeofday}"
         else:
             text += repr(event.calendar_ocr)
             text += " (FALSE NEGATIVE)"

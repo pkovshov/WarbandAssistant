@@ -21,6 +21,9 @@ class MapScreenCalendarOCR(BaseOCR):
 
     @typechecked
     def _preprocess(self, crop_img: np.ndarray) -> np.ndarray:
+        # TODO: Try to return back to simple grayscale algorithm
+        #       that was changed in commit 2b1ad3f4 on diff-with-blank algorith.
+        #       We try to tune threshold and thresholding types.
         # grayscale
         img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
         # diff with blank
