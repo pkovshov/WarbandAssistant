@@ -14,10 +14,6 @@ class MapScreenCalendarOCR(BaseOCR):
         super().__init__(resolution=config.resolution,
                          crop_box=crop_box,
                          whitelist=config.whitelist_characters)
-        blank_image = cv2.imread(map_screen_config.map_screen_blank_img_path)
-        blank_image = blank_image[crop_box.slice]
-        blank_image = cv2.cvtColor(blank_image, cv2.COLOR_BGR2GRAY)
-        self.__blank_img_gray = blank_image
 
     @typechecked
     def _preprocess(self, crop_img: np.ndarray) -> np.ndarray:

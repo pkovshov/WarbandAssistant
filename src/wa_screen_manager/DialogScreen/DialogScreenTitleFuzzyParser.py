@@ -16,7 +16,7 @@ SCORE = 1
 KEY = 2
 
 
-class DialogScreenFuzzy:
+class DialogScreenTitleFuzzyParser:
     @typechecked
     def __init__(self, lang: Mapping[str, LangValParser.Interpolation]):
         from . import dialog_screen_config
@@ -28,19 +28,23 @@ class DialogScreenFuzzy:
         self.__prev_title_keys = None
 
     @typechecked
-    def title_key(self, title_ocr: str) -> Tuple[str, ...]:
-        result = self.__cached_title(title_ocr)
-        if result is None:
-            return ()
-        return result.keys
+    def prep(self, title_ocr: str) -> str:
+        # Game adds colon ':' to the end of dialog title
+        # Note that colon character is not part of language resources
+        return (title_ocr[:-1]
+                if len(title_ocr) > 0 and title_ocr[-1] == ":"
+                else title_ocr)
 
-    def __cached_title(self, title_ocr: str) -> Optional[Result]:
+    @typechecked
+    def keys(self, title_ocr: str) -> Tuple[str, ...]:
         if title_ocr != self.__prev_title_ocr:
             self.__prev_title_ocr = title_ocr
-            self.__prev_title_keys = self.__fuzzy_title(title_ocr)
+            prepped_title_ocr = self.prep(title_ocr)
+            self.__prev_title_keys = self.__fuzzy_title(prepped_title_ocr)
         return self.__prev_title_keys
 
-    def __fuzzy_title(self, title_ocr: str) -> Optional[Result]:
+    @typechecked
+    def __fuzzy_title(self, title_ocr: str) -> Tuple[str, ...]:
         choices = self.__titles
         # token set ratio with score cutoff
         matches = fz.process.extract(query=title_ocr,
@@ -49,7 +53,7 @@ class DialogScreenFuzzy:
                                      choices=choices,
                                      limit=len(choices))
         if not matches:
-            return None
+            return tuple()
         # build choices from matches
         choices = {key: choices[key] for _, _, key in matches}
         # sort matches by ratio
@@ -68,4 +72,4 @@ class DialogScreenFuzzy:
                 break
         # build result
         keys = tuple(key for _, _, key in matches)
-        return Result(best_score, keys)
+        return keys

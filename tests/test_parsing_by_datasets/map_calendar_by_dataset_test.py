@@ -5,7 +5,7 @@ import pytest
 from wa_language.LangLoader import load_lang
 from wa_datasets.MapScreen.MapCalendarDataset import MapCalendarDataset, VERIFICATION_SCREEN_TEATING
 from wa_screen_manager.MapScreen.MapScreenCalendarOCR import MapScreenCalendarOCR
-from wa_screen_manager.MapScreen.MapScreenCalendarFuzzy import MapScreenCalendarFuzzy
+from wa_screen_manager.MapScreen.MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
 
 
 def load_image_and_restore_crop(image_path, resolution, crop):
@@ -23,7 +23,7 @@ dataset = MapCalendarDataset(lazy_load=True)
 
 ocr = MapScreenCalendarOCR()
 
-fuzzy = MapScreenCalendarFuzzy(lang)
+parser = MapScreenCalendarFuzzyParser(lang)
 
 idx_meta_image = []
 
@@ -54,8 +54,9 @@ def test_dialog_title_dataset(idx,
                               day_exp,
                               timeofday_key_exp,
                               image):
+    ocr.ocr(image)  # Dry run to simulate two identical images in a row
     calendar_ocr = ocr.ocr(image)
-    date_timeofday = fuzzy.calendar(calendar_ocr)
+    date_timeofday = parser.calendar(calendar_ocr)
     date_key = date_timeofday.date_key if date_timeofday is not None else None
     year = date_timeofday.year if date_timeofday is not None else None
     day = date_timeofday.day if date_timeofday is not None else None

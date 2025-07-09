@@ -12,15 +12,24 @@ TEXT = 0
 SCORE = 1
 KEY = 2
 
-class MapScreenCalendarFuzzy:
+class MapScreenCalendarFuzzyParser:
     @typechecked
     def __init__(self, lang: Mapping[str, LangValParser.Interpolation]):
         self.__logger = logging.getLogger(__name__)
         self.__date_lang = {key: val for key, val in lang.items() if is_date_key(key)}
         self.__timeofday_lang = {key: val for key, val in lang.items() if is_timeofday_key(key)}
+        self.__prev_calendar_ocr = None
+        self.__pref_date_timeofday = None
 
     @typechecked
     def calendar(self, calendar_ocr: str) -> Optional[DateTimeofday]:
+        if calendar_ocr != self.__prev_calendar_ocr:
+            self.__prev_calendar_ocr = calendar_ocr
+            self.__pref_date_timeofday = self.__fuzzy_calendar(calendar_ocr)
+        return self.__pref_date_timeofday
+
+    @typechecked
+    def __fuzzy_calendar(self, calendar_ocr: str) -> Optional[DateTimeofday]:
         split = calendar_ocr.split("\n")
         if len(split) != 2:
             return None

@@ -9,7 +9,7 @@ from wa_screen_manager.BaseScreen.BaseSampler import BaseSampleReadingSampler
 from wa_screen_manager.SampleMatch import SampleMatch
 from .MapScreenEvent import MapScreenEvent
 from .MapScreenCalendarOCR import MapScreenCalendarOCR, NonStable
-from .MapScreenCalendarFuzzy import MapScreenCalendarFuzzy
+from .MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
 from .MapScreenDatasetProcessor import MapScreenDatasetProcessor
 
 
@@ -39,7 +39,7 @@ class MapScreenManager:
         self.__lang = lang
         self.__screen_sample = MapScreenSampler()
         self.__calendar_ocr = MapScreenCalendarOCR()
-        self.__calendar_fuzzy = MapScreenCalendarFuzzy(lang)
+        self.__calendar_fuzzy_parser = MapScreenCalendarFuzzyParser(lang)
         self.__listeners = []
         if write_to_dataset:
              self.add_event_listener(MapScreenDatasetProcessor().process)
@@ -60,7 +60,7 @@ class MapScreenManager:
             if calendar_ocr is NonStable:
                 self.__prev__event = None
             else:
-                date_timeofday = self.__calendar_fuzzy.calendar(calendar_ocr)
+                date_timeofday = self.__calendar_fuzzy_parser.calendar(calendar_ocr)
                 event = MapScreenEvent(image=img,
                                        calendar_ocr=calendar_ocr,
                                        date_timeofday=date_timeofday)

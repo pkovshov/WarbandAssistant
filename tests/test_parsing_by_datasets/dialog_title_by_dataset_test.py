@@ -6,7 +6,7 @@ from wa_language.LangLoader import load_lang
 from wa_datasets.DialogScreen.DialogTitleDataset import (DialogTitleDataset,
                                                          VERIFICATION_NOT_A_DIALOG_TITLE)
 from wa_screen_manager.DialogScreen.DialogScreenOCRs import DialogScreenTitleOCR
-from wa_screen_manager.DialogScreen.DialogScreenFuzzy import DialogScreenFuzzy
+from wa_screen_manager.DialogScreen.DialogScreenTitleFuzzyParser import DialogScreenTitleFuzzyParser
 
 
 def load_image_and_restore_crop(image_path, resolution, crop):
@@ -24,7 +24,7 @@ dataset = DialogTitleDataset(lazy_load=True)
 
 ocr = DialogScreenTitleOCR()
 
-fuzzy = DialogScreenFuzzy(lang)
+parser = DialogScreenTitleFuzzyParser(lang)
 
 idx_meta_image = []
 
@@ -43,6 +43,7 @@ for idx, (meta, image_path) in dataset.meta_and_image_path().items():
 
 @pytest.mark.parametrize("idx, meta, image", idx_meta_image)
 def test_dialog_title_dataset(idx, meta, image):
-    title_ocr, title = ocr.title(image)
-    title_keys = fuzzy.title_key(title)
+    ocr.ocr(image)  # Dry run to simulate two identical images in a row
+    title_ocr = ocr.ocr(image)
+    title_keys = parser.keys(title_ocr)
     assert title_keys == tuple(meta.keys), f"OCR: {title_ocr}"
