@@ -1,10 +1,10 @@
-from typing import Optional, Tuple
+from typing import Optional, Union, Tuple
 
 import cv2
 import numpy as np
 from typeguard import typechecked
 
-from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR
+from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR, NonStableType, NonStable
 
 
 class DialogScreenTitleOCR(BaseOCR):
@@ -22,14 +22,16 @@ class DialogScreenTitleOCR(BaseOCR):
         self.__threshold = dialog_screen_config.title_threshold
 
     @typechecked
-    def title(self, img: np.ndarray) -> Tuple[str, str]:
+    def title(self, img: np.ndarray) -> Tuple[Union[str, NonStableType], Optional[str]]:
         title_ocr = self.ocr(img)
         return title_ocr, self._postprocess_title(title_ocr)
 
     @typechecked
-    def _postprocess_title(self, title_ocr: str) -> str:
+    def _postprocess_title(self, title_ocr: Union[str, NonStableType]) -> Optional[str]:
         # Game adds colon ':' to the end of dialog title
         # Note that colon character is not part of language resources
+        if title_ocr is NonStable:
+            return None
         return (title_ocr[:-1]
                 if len(title_ocr) > 0 and title_ocr[-1] == ":"
                 else title_ocr)
@@ -63,12 +65,14 @@ class DialogScreenRelationOCR(BaseOCR):
         self.__blank_img_gray = blank_image
 
     @typechecked
-    def relation(self, img: np.ndarray) -> Tuple[str, Optional[int]]:
+    def relation(self, img: np.ndarray) -> Tuple[Union[str, NonStableType], Optional[int]]:
         relation_ocr = self.ocr(img)
         return relation_ocr, self._postprocess_relation(relation_ocr)
 
     @typechecked
-    def _postprocess_relation(self, relation_ocr: str) -> Optional[int]:
+    def _postprocess_relation(self, relation_ocr: Union[str, NonStableType]) -> Optional[int]:
+        if relation_ocr is NonStable:
+            return None
         try:
             return int(relation_ocr)
         except ValueError:

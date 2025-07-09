@@ -1,11 +1,20 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 import logging
+from typing import Union
 
 import numpy as np
 import pytesseract
 from typeguard import typechecked
 
 from wa_types import Box, Resolution, is_screenshot
+
+
+class NonStableType(Enum):
+    NonStable = "NonStable"
+
+
+NonStable = NonStableType.NonStable
 
 
 class BaseOCR(ABC):
@@ -22,14 +31,16 @@ class BaseOCR(ABC):
         self.__prev_text_ocr = None
 
     @typechecked
-    def ocr(self, img: np.ndarray) -> str:
+    def ocr(self, img: np.ndarray) -> Union[str, NonStableType]:
         assert is_screenshot(img, self.__resolution)
         crop_img = img[self.__crop_slice]
         if not np.array_equal(crop_img, self.__prev_crop_img):
-            self.__prev_crop_img = crop_img
+            self.__prev_text_ocr = NonStable
+        elif self.__prev_text_ocr is NonStable:
             preprocessed_img = self._preprocess(crop_img)
             text_ocr = self._tesseract_ocr(preprocessed_img)
             self.__prev_text_ocr = text_ocr
+        self.__prev_crop_img = crop_img
         return self.__prev_text_ocr
 
     @typechecked

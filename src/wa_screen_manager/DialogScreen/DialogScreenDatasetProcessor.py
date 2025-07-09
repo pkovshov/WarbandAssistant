@@ -30,7 +30,7 @@ class DialogScreenDatasetProcessor:
         self.__dialog_title_dataset.add(screenshot=event.image,
                                         sample_matches=True,
                                         title_ocr=event.title_ocr,
-                                        title_fuzzy_score=event.title_fuzzy_score,
+                                        title_fuzzy_score=None,
                                         title_keys=event.title_keys)
         if event.relation_ocr is not None:
             self.__dialog_relation_dataset.add(screenshot=event.image,

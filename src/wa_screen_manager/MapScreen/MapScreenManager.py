@@ -7,8 +7,8 @@ from typeguard import typechecked
 from wa_language import LangValParser
 from wa_screen_manager.BaseScreen.BaseSampler import BaseSampleReadingSampler
 from wa_screen_manager.SampleMatch import SampleMatch
-from .MapScreenEvent import MapScreenEvent, DateTimeofday
-from .MapScreenCalendarOCR import MapScreenCalendarOCR
+from .MapScreenEvent import MapScreenEvent
+from .MapScreenCalendarOCR import MapScreenCalendarOCR, NonStable
 from .MapScreenCalendarFuzzy import MapScreenCalendarFuzzy
 from .MapScreenDatasetProcessor import MapScreenDatasetProcessor
 
@@ -57,12 +57,15 @@ class MapScreenManager:
             self.__prev__event = None
         else:
             calendar_ocr = self.__calendar_ocr.ocr(img)
-            date_timeofday = self.__calendar_fuzzy.calendar(calendar_ocr)
-            event = MapScreenEvent(image=img,
-                                   calendar_ocr=calendar_ocr,
-                                   date_timeofday=date_timeofday)
-            if event != self.__prev__event:
-                self.__prev__event = event
-                for listener in self.__listeners:
-                    listener(event)
+            if calendar_ocr is NonStable:
+                self.__prev__event = None
+            else:
+                date_timeofday = self.__calendar_fuzzy.calendar(calendar_ocr)
+                event = MapScreenEvent(image=img,
+                                       calendar_ocr=calendar_ocr,
+                                       date_timeofday=date_timeofday)
+                if event != self.__prev__event:
+                    self.__prev__event = event
+                    for listener in self.__listeners:
+                        listener(event)
         return screen_sample_matches

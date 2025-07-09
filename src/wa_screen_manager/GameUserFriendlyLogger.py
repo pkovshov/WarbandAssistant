@@ -16,7 +16,6 @@ class DialogScreenLogger:
     def __init__(self, lang: Mapping[str, LangValParser.Interpolation]):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
-        self.__cache = None
 
     @typechecked
     def on_map_screen(self, event: MapScreenEvent):

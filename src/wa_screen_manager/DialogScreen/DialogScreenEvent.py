@@ -10,19 +10,14 @@ class DialogScreenEvent:
                  image: np.ndarray,
                  title_ocr: str,
                  title: str,
-                 # TODO: remove title_fuzzy_score
-                 title_fuzzy_score: Optional[float],
                  title_keys: Tuple[str, ...],
                  relation_ocr: Optional[str],
                  relation: Optional[int]):
-        if len(title_keys) == 0:
-            assert title_fuzzy_score is None
         if relation_ocr is None:
             assert relation is None
         self.__image = image
         self.__title_ocr = title_ocr
         self.__title = title
-        self.__title_fuzzy_score = title_fuzzy_score
         self.__title_keys = title_keys
         self.__relation_ocr = relation_ocr
         self.__relation = relation
@@ -46,10 +41,6 @@ class DialogScreenEvent:
     @property
     @typechecked
     def title(self) -> str: return self.__title
-
-    @property
-    @typechecked
-    def title_fuzzy_score(self) -> Optional[float]: return self.__title_fuzzy_score
 
     @property
     @typechecked

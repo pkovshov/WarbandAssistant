@@ -8,7 +8,7 @@ from wa_language import LangValParser
 from wa_screen_manager.SampleMatch import SampleMatch
 from .DialogScreenEvent import DialogScreenEvent
 from .DialogScreenSamplers import DialogScreenScreenSampler, DialogScreenRelationSampler
-from .DialogScreenOCRs import DialogScreenTitleOCR, DialogScreenRelationOCR
+from .DialogScreenOCRs import DialogScreenTitleOCR, DialogScreenRelationOCR, NonStable
 from .DialogScreenFuzzy import DialogScreenFuzzy
 from .DialogScreenDatasetProcessor import DialogScreenDatasetProcessor
 
@@ -50,23 +50,25 @@ class DialogScreenManager:
             self.__prev__event = None
         else:
             title_ocr, title = self.__title_ocr.title(img)
-            score = self.__title_fuzzy.title_score(title)
-            keys = self.__title_fuzzy.title_key(title)
-            relation_sampler_matches = self.__relation_sampler.check(img)
-            if relation_sampler_matches:
-                relation_ocr, relation = self.__relation_ocr.relation(img)
-                assert relation_ocr is not None
+            if title_ocr is NonStable:
+                self.__prev__event = None
             else:
-                relation_ocr, relation = None, None
-            event = DialogScreenEvent(image=img,
-                                      title_ocr=title_ocr,
-                                      title=title,
-                                      title_fuzzy_score=score,
-                                      title_keys=keys,
-                                      relation_ocr=relation_ocr,
-                                      relation=relation)
-            if event != self.__prev__event:
-                self.__prev__event = event
-                for listener in self.__listeners:
-                    listener(event)
+                keys = self.__title_fuzzy.title_key(title)
+                relation_sampler_matches = self.__relation_sampler.check(img)
+                if relation_sampler_matches:
+                    relation_ocr, relation = self.__relation_ocr.relation(img)
+                    if relation_ocr is NonStable:
+                        relation_ocr = None
+                else:
+                    relation_ocr, relation = None, None
+                event = DialogScreenEvent(image=img,
+                                          title_ocr=title_ocr,
+                                          title=title,
+                                          title_keys=keys,
+                                          relation_ocr=relation_ocr,
+                                          relation=relation)
+                if event != self.__prev__event:
+                    self.__prev__event = event
+                    for listener in self.__listeners:
+                        listener(event)
         return screen_sample_matches

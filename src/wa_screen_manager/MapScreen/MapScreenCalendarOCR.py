@@ -3,7 +3,7 @@ import numpy as np
 
 from typeguard import typechecked
 
-from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR
+from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR, NonStable
 
 
 class MapScreenCalendarOCR(BaseOCR):
