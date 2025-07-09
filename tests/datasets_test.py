@@ -68,7 +68,7 @@ def test_dialog_relations_dataset():
     assert files_count_after == files_count_before + 2
 
 
-def test_map_calendar_dataset():
+def test_map_calendars_dataset():
     map_calendar_dataset_path = path.join(path_conf.datasets,
                                           MapCalendarDataset.NAME)
     files_count_before = len(os.listdir(map_calendar_dataset_path))
@@ -85,3 +85,28 @@ def test_map_calendar_dataset():
                 timeofday_key="da_key_dawn")
     files_count_after = len(os.listdir(map_calendar_dataset_path))
     assert files_count_after == files_count_before + 2
+
+
+def test_map_calendars_dataset_collects_all_false_negative():
+    map_calendar_dataset_path = path.join(path_conf.datasets,
+                                          MapCalendarDataset.NAME)
+    files_count_before = len(os.listdir(map_calendar_dataset_path))
+    width, height = 400, 200
+    dataset = MapCalendarDataset(resolution=Resolution(width, height),
+                                 crop=Box(0, 0, 50, 50),
+                                 language="en")
+    screenshot = np.zeros((height, width, 3), dtype=np.uint8)
+    dataset.add(screenshot=screenshot,
+                calendar_ocr="wrong_ocr",
+                date_key=None,
+                year=None,
+                day=None,
+                timeofday_key=None)
+    dataset.add(screenshot=screenshot,
+                calendar_ocr="wrong_ocr",
+                date_key=None,
+                year=None,
+                day=None,
+                timeofday_key=None)
+    files_count_after = len(os.listdir(map_calendar_dataset_path))
+    assert files_count_after == files_count_before + 4

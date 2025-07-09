@@ -1,4 +1,5 @@
 from collections import namedtuple
+import random
 from typing import Optional
 
 import numpy as np
@@ -9,6 +10,7 @@ from wa_datasets.BaseImageDataset import BaseImageDataset, MetaAndImagePath
 
 
 VERIFICATION_SCREEN_TEATING = "Screen tearing"
+VERIFICATION_FALSE_NEGATIVE = "FALSE NEGATIVE"
 
 # TODO: convert to a class with type checking
 #       class has to support Mapping type
@@ -34,7 +36,7 @@ MetaKey = namedtuple("MetaKey",
 
 
 class MapCalendarDataset(BaseImageDataset):
-    NAME = "map_calendar"
+    NAME = "map_calendars"
 
     @typechecked
     def __init__(self,
@@ -62,7 +64,8 @@ class MapCalendarDataset(BaseImageDataset):
         assert self.__resolution is not None
         assert self.__crop is not None
         assert self.__language is not None
-        super().add(MetaItem(verification=None,
+        assert (date_key is None) == (year is None) == (day is None) == (timeofday_key is None)
+        super().add(MetaItem(verification=VERIFICATION_FALSE_NEGATIVE if date_key is None else None,
                              resolution=tuple(self.__resolution),
                              language=self.__language,
                              # yaml does not support saving NamedTuple successors
@@ -88,12 +91,17 @@ class MapCalendarDataset(BaseImageDataset):
 
     @typechecked
     def _meta_to_key(self, meta: MetaItem) -> MetaKey:
+        calendar_ocr = meta.calendar_ocr
+        if meta.verification == VERIFICATION_FALSE_NEGATIVE:
+            # in order to store all the FALSE NEGATIVE cases to dataset
+            # they should have uniq keys
+            calendar_ocr += str(random.randrange(0, 1000000))
         return MetaKey(
                        # crop is loaded by yaml as a list
                        # and is not hashable for such case
                        # so need to convert into hashable tuple
                        crop=tuple(meta.crop),
-                       calendar_ocr=meta.calendar_ocr)
+                       calendar_ocr=calendar_ocr)
 
     @typechecked
     def _preprocess(self, screenshot: np.ndarray) -> np.ndarray:

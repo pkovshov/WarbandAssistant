@@ -18,3 +18,8 @@ commands = [
 commands = [
   ["pytest", "src/wa_language/syntax", "--doctest-modules"],
 ]
+
+[env.rapid]
+commands = [
+  ["pytest", "--doctest-modules", "--ignore", "tests/test_parsing_by_datasets"],
+]
