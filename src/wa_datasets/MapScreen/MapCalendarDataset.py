@@ -7,6 +7,9 @@ from typeguard import typechecked
 from wa_types import Box, Resolution
 from wa_datasets.BaseImageDataset import BaseImageDataset, MetaAndImagePath
 
+
+VERIFICATION_SCREEN_TEATING = "Screen tearing"
+
 # TODO: convert to a class with type checking
 #       class has to support Mapping type
 MetaItem = namedtuple("MetaItem",

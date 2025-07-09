@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from wa_language.LangLoader import load_lang
-from wa_datasets.MapScreen.MapCalendarDataset import MapCalendarDataset
+from wa_datasets.MapScreen.MapCalendarDataset import MapCalendarDataset, VERIFICATION_SCREEN_TEATING
 from wa_screen_manager.MapScreen.MapScreenCalendarOCR import MapScreenCalendarOCR
 from wa_screen_manager.MapScreen.MapScreenCalendarFuzzy import MapScreenCalendarFuzzy
 
@@ -28,6 +28,8 @@ fuzzy = MapScreenCalendarFuzzy(lang)
 idx_meta_image = []
 
 for idx, (meta, image_path) in dataset.meta_and_image_path().items():
+    if meta.verification == VERIFICATION_SCREEN_TEATING:
+        continue
     image = load_image_and_restore_crop(image_path,
                                         meta.resolution,
                                         meta.crop)
