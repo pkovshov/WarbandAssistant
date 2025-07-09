@@ -61,7 +61,9 @@ class DialogScreenManager:
                 relation_ocr, relation = None, None
                 if relation_sampler_matches:
                     relation_ocr = self.__relation_ocr.ocr(img)
-                    if relation_ocr is not NonStable:
+                    if relation_ocr is NonStable:
+                        relation_ocr = None
+                    else:
                         relation = self.__relation_parser.relation(relation_ocr)
                 event = DialogScreenEvent(image=img,
                                           title_ocr=title_ocr,
