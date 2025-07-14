@@ -1,6 +1,5 @@
 from collections import namedtuple
-import random
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 from typeguard import typechecked
@@ -90,18 +89,15 @@ class MapCalendarDataset(BaseImageDataset):
         return MetaItem(**data)
 
     @typechecked
-    def _meta_to_key(self, meta: MetaItem) -> MetaKey:
-        calendar_ocr = meta.calendar_ocr
-        if meta.verification == VERIFICATION_FALSE_NEGATIVE:
-            # in order to store all the FALSE NEGATIVE cases to dataset
-            # they should have uniq keys
-            calendar_ocr += str(random.randrange(0, 1000000))
-        return MetaKey(
-                       # crop is loaded by yaml as a list
-                       # and is not hashable for such case
-                       # so need to convert into hashable tuple
-                       crop=tuple(meta.crop),
-                       calendar_ocr=calendar_ocr)
+    def _meta_to_key(self, meta: MetaItem) -> Tuple[MetaKey, bool]:
+        return (MetaKey(
+                        # crop is loaded by yaml as a list
+                        # and is not hashable for such case
+                        # so need to convert into hashable tuple
+                        crop=tuple(meta.crop),
+                        calendar_ocr=meta.calendar_ocr),
+                # is_soft_key
+                meta.verification == VERIFICATION_FALSE_NEGATIVE)
 
     @typechecked
     def _preprocess(self, screenshot: np.ndarray) -> np.ndarray:

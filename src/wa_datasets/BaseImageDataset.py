@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from collections.abc import Hashable
 from enum import Enum
 import logging
@@ -32,11 +32,24 @@ GitStatus = namedtuple("GitStatus", "branch, commit, has_modified")
 
 
 class BaseImageDataset(ABC):
+    """Manage a directory of images (png files), each accompanied by metadata stored in yaml files.
+
+    The class is designed to avoid application crashes, so it logs warnings or errors instead of raising exceptions.
+    The class supports an extraction key from metadata to prevent duplication of items with the same meta keys.
+    For the soft key the image comparison is used, so soft keys might be not unique.
+    However, a combination of the soft key, and image is unique within the dataset.
+    A None key is not treated as a valid key, so all images with a None meta key are added to the dataset.
+    """
     @typechecked
     def __init__(self,
                  dataset_dir_name: str,
                  new_screenshots_resolution: Optional[Resolution],
                  lazy_load: bool = False):
+        """
+        :param dataset_dir_name: A directory name. The full path is resolved relative to the `path_conf` values.
+        :param new_screenshots_resolution: A resolution of screenshots that would be added to dataset.
+        :param lazy_load: Lazy data load and lazy git status calculation.
+        """
         import path_conf
         self._logger = logging.getLogger(f"{type(self).__module__}.{type(self).__name__}")
         self.__name = dataset_dir_name
@@ -79,10 +92,20 @@ class BaseImageDataset(ABC):
         assert self.__resolution is not None
         assert is_screenshot(screenshot, self.__resolution)
         meta_key = self._meta_to_key(meta)
-        if meta_key in self.__meta_index:
-            return
-        data = self._meta_to_data(meta)
         image = self._preprocess(screenshot)
+        if meta_key is not None:
+            meta_key, is_soft_key = meta_key
+            if meta_key in self.__meta_index:
+                if is_soft_key:
+                    for idx in self.__meta_index[meta_key]:
+                        image_path = path.join(self.__dir_path, self.__idx_to_png(idx))
+                        if np.array_equal(cv2.imread(image_path), image):
+                            self._logger.info(f"{self.__name} HAS {idx}")
+                            return
+                else:
+                    self._logger.info(f"{self.__name} HAS {self.__meta_index[meta_key][0]}")
+                    return
+        data = self._meta_to_data(meta)
         idx = self.__max_idx + 1
         if not self.__write_data(idx, data):
             self._logger.warning(f"meta causes above error: {repr(meta)}")
@@ -91,7 +114,8 @@ class BaseImageDataset(ABC):
             self._logger.warning(f"meta causes above error: {repr(meta)}")
             return
         self.__max_idx = idx
-        self.__meta_index.add(meta_key)
+        self.__meta_index[meta_key].append(idx)
+        self._logger.info(f"{self.__name} ADD {self.__meta_index[meta_key][0]}")
 
     @typechecked
     def replace_meta(self, idx: int, meta: object):
@@ -100,20 +124,22 @@ class BaseImageDataset(ABC):
             self._logger.warning(f"BLOCKED {self.__name} dataset does not support replace_meta")
             return
         if idx not in self.__meta:
-            self._logger.warning(f"DISCARD replacing unknown index {idx}")
+            self._logger.warning(f"DISCARD {self.__name} replacing unknown index {idx}")
             return
         meta_key = self._meta_to_key(meta)
-        if not isinstance(meta_key, Hashable):
-            self._logger.warning(f"DISCARD replacing on meta with non-hashable meta key {repr(meta)}")
-            return
-        if (hash(meta_key) != hash(self._meta_to_key(self.__meta[idx])) and
-            meta_key in self.__meta_index):
-            self._logger.warning(f"DISCARD replacing on non-uniq meta {repr(meta)}")
+        if meta_key is not None:
+            meta_key, is_soft_key = meta_key
+            if not isinstance(meta_key, Hashable):
+                self._logger.warning(f"DISCARD {self.__name} replacing on meta with non-hashable meta key {repr(meta)}")
+                return
+        if (meta_key not in self.__meta_index or
+            idx not in self.__meta_index[meta_key]):
+            self._logger.warning(f"DISCARD {self.__name} replacing with changed meta key {repr(meta)}")
             return
         data = self._meta_to_data(meta)
         if not self.__write_data(idx, data):
             self._logger.warning(f"meta causes above error: {repr(meta)}")
-            self._logger.warning(f"DISCARD replacing due to write error")
+            self._logger.warning(f"DISCARD {self.__name} replacing due to write error")
             return
         self.__meta[idx] = meta
 
@@ -132,11 +158,15 @@ class BaseImageDataset(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def _meta_to_key(self, meta: object) -> Optional[Hashable]:
+    def _meta_to_key(self, meta: object) -> Optional[Tuple[Hashable, bool]]:
         """Create a dataset specific key from dataset specific meta.
 
-        Meta key is uniq for meta items within dataset
-        Return None to exclude passed meta from meta key index"""
+        Hard meta key is uniq for meta items within dataset.
+        A combination of soft meta key and an image is unique within the dataset.
+        Return None to exclude passed meta from meta key index.
+        :returns meta_key, is_soft_key
+        """
+
         raise NotImplemented
 
     @abstractmethod
@@ -211,12 +241,12 @@ class BaseImageDataset(ABC):
             # check that we are working with a file
             file_path = path.join(self.__dir_path, file_name)
             if not os.path.isfile(file_path):
-                self._logger.warning(f"DISCARD {file_name}. Not a file {file_path}")
+                self._logger.warning(f"DISCARD {self.__name} {file_name}. Not a file {file_path}")
                 continue
             # got index and extension
             idx_and_ext = self.__file_name_to_idx_and_ext(file_name)
             if idx_and_ext is None:
-                self._logger.warning(f"DISCARD {file_name}. Incorrect file name format")
+                self._logger.warning(f"DISCARD {self.__name} {file_name}. Incorrect file name format")
                 continue
             idx, ext = idx_and_ext
             # check the extension and append index to corresponding set
@@ -225,17 +255,17 @@ class BaseImageDataset(ABC):
             elif ext == "png":
                 png_idx_set.add(idx)
             else:
-                self._logger.warning(f"DISCARD {file_name}. Incorrect extension")
+                self._logger.warning(f"DISCARD {self.__name} {file_name}. Incorrect extension")
                 continue
         # check that yaml files exist for all the png files
         lone_png_idx_set = png_idx_set - yaml_idx_set
         for idx in lone_png_idx_set:
-            self._logger.warning(f"DISCARD {self.__idx_to_png(idx)}. Absent yaml file")
+            self._logger.warning(f"DISCARD {self.__name} {self.__idx_to_png(idx)}. Absent yaml file")
         # check that png files exist for all the yaml files
         # decline lone yaml files
         lone_yaml_idx_set = yaml_idx_set - png_idx_set
         for idx in lone_yaml_idx_set:
-            self._logger.warning(f"DISCARD {self.__idx_to_yaml(idx)}. Absent png file")
+            self._logger.warning(f"DISCARD {self.__name} {self.__idx_to_yaml(idx)}. Absent png file")
             yaml_idx_set.remove(idx)
         # calculate max index
         self.__max_idx = max(yaml_idx_set) if len(yaml_idx_set) > 0 else 0
@@ -276,7 +306,7 @@ class BaseImageDataset(ABC):
         # all the meta in the dataset
         self.__meta = dict()
         # all the meta keys in the dataset
-        self.__meta_index = set()
+        self.__meta_index = defaultdict(list)
         for idx in sorted(idx_to_data):
             try:
                 meta = self._data_to_meta(idx_to_data[idx])
@@ -286,11 +316,25 @@ class BaseImageDataset(ABC):
                                       traceback.format_exc())
                 continue
             meta_key = self._meta_to_key(meta)
-            assert isinstance(meta_key, Hashable)
-            if meta_key in self.__meta_index:
-                self._logger.warning(f"DISCARD {self.__idx_to_yaml(idx)}. Non-uniq content")
-                continue
-            self.__meta_index.add(meta_key)
+            if meta_key is not None:
+                meta_key, is_soft_key = meta_key
+                assert isinstance(meta_key, Hashable)
+                non_uniq = False
+                if meta_key in self.__meta_index:
+                    if is_soft_key:
+                        image_path = path.join(self.__dir_path, self.__idx_to_png(idx))
+                        image = cv2.imread(image_path)
+                        for dup_idx in self.__meta_index[meta_key]:
+                            image_path = path.join(self.__dir_path, self.__idx_to_png(dup_idx))
+                            if np.array_equal(cv2.imread(image_path), image):
+                                non_uniq = True
+                                break
+                    else:
+                        non_uniq = True
+                if non_uniq:
+                    self._logger.warning(f"DISCARD {self.__name} {self.__idx_to_yaml(idx)}. Non-uniq content")
+                    continue
+            self.__meta_index[meta_key].append(idx)
             self.__meta[idx] = meta
         self.__state = State.META_LOADED
 

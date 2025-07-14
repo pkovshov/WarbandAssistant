@@ -87,7 +87,7 @@ def test_map_calendars_dataset():
     assert files_count_after == files_count_before + 2
 
 
-def test_map_calendars_dataset_collects_all_false_negative():
+def test_map_calendars_dataset_collects_all_uniq_false_negative():
     map_calendar_dataset_path = path.join(path_conf.datasets,
                                           MapCalendarDataset.NAME)
     files_count_before = len(os.listdir(map_calendar_dataset_path))
@@ -95,6 +95,7 @@ def test_map_calendars_dataset_collects_all_false_negative():
     dataset = MapCalendarDataset(resolution=Resolution(width, height),
                                  crop=Box(0, 0, 50, 50),
                                  language="en")
+    # add two false-negative items with same calendar_ocr but different images
     screenshot = np.zeros((height, width, 3), dtype=np.uint8)
     dataset.add(screenshot=screenshot,
                 calendar_ocr="wrong_ocr",
@@ -102,6 +103,7 @@ def test_map_calendars_dataset_collects_all_false_negative():
                 year=None,
                 day=None,
                 timeofday_key=None)
+    screenshot = np.ones((height, width, 3), dtype=np.uint8)
     dataset.add(screenshot=screenshot,
                 calendar_ocr="wrong_ocr",
                 date_key=None,
@@ -110,3 +112,14 @@ def test_map_calendars_dataset_collects_all_false_negative():
                 timeofday_key=None)
     files_count_after = len(os.listdir(map_calendar_dataset_path))
     assert files_count_after == files_count_before + 4
+    # try to add one more false-negative item with non-uniq calendar_ocr and non-uniq images
+    files_count_before = files_count_after
+    screenshot = np.ones((height, width, 3), dtype=np.uint8)
+    dataset.add(screenshot=screenshot,
+                calendar_ocr="wrong_ocr",
+                date_key=None,
+                year=None,
+                day=None,
+                timeofday_key=None)
+    files_count_after = len(os.listdir(map_calendar_dataset_path))
+    assert files_count_after == files_count_before

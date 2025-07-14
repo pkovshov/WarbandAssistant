@@ -89,14 +89,16 @@ class DialogTitleDataset(BaseImageDataset):
         return MetaItem(**data)
 
     @typechecked
-    def _meta_to_key(self, meta: MetaItem) -> MetaKey:
-        return MetaKey(
-                       # crop is loaded by yaml as a list
-                       # and is not hashable for such case
-                       # so need to convert into hashable tuple
-                       crop=tuple(meta.crop),
-                       title_ocr=meta.title_ocr,
-                       sample_matches=meta.sample_matches)
+    def _meta_to_key(self, meta: MetaItem) -> Tuple[MetaKey, bool]:
+        return (MetaKey(
+                        # crop is loaded by yaml as a list
+                        # and is not hashable for such case
+                        # so need to convert into hashable tuple
+                        crop=tuple(meta.crop),
+                        title_ocr=meta.title_ocr,
+                        sample_matches=meta.sample_matches),
+                # is_soft_key
+                False)
 
     @typechecked
     def _preprocess(self, screenshot: np.ndarray) -> np.ndarray:
