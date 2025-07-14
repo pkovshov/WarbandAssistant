@@ -16,17 +16,20 @@ class MapScreenEvent:
     def __init__(self,
                  image: np.ndarray,
                  calendar_ocr: str,
+                 calendar_overlapped: bool,
                  date_timeofday: Optional[DateTimeofday]):
         self.__image = image
         self.__calendar_ocr = calendar_ocr
+        self.__calendar_overlapped = calendar_overlapped
         self.__date_timeofday = date_timeofday
 
     def __eq__(self, other):
         if not isinstance(other, MapScreenEvent):
             return NotImplemented
         # suppose that ocr provides same result for the same image
+        # suppose that fuzzy parser provides same result for the same ocrs
         return (self.__calendar_ocr == other.__calendar_ocr and
-                self.__date_timeofday == other.__date_timeofday)
+                self.__calendar_overlapped == other.__calendar_overlapped)
 
     @property
     @typechecked
@@ -35,6 +38,10 @@ class MapScreenEvent:
     @property
     @typechecked
     def calendar_ocr(self) -> str: return self.__calendar_ocr
+
+    @property
+    @typechecked
+    def calendar_overlapped(self) -> bool: return self.__calendar_overlapped
 
     @property
     @typechecked

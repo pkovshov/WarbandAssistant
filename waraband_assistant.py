@@ -14,7 +14,6 @@ import wa_screen_manager, wa_datasets, wa_language
 
 
 def main(args):
-    from wa_screen_manager import config
     # config logging
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
@@ -24,8 +23,6 @@ def main(args):
     logging.getLogger(__name__).setLevel(log_level)
     # process player name
     playername = args.player
-    if playername is None:
-        playername = config.playername
     # create GameScreenManager
     write_to_dataset = args.dataset
     game_Screen_manager = GameScreenManager(playername=playername,

@@ -79,6 +79,7 @@ def test_map_calendars_dataset():
     screenshot = np.zeros((height, width, 3), dtype=np.uint8)
     dataset.add(screenshot=screenshot,
                 calendar_ocr="date\ntime",
+                calendar_overlapped=False,
                 date_key="da_key_jan",
                 year=1278,
                 day=20,
@@ -99,6 +100,7 @@ def test_map_calendars_dataset_collects_all_uniq_false_negative():
     screenshot = np.zeros((height, width, 3), dtype=np.uint8)
     dataset.add(screenshot=screenshot,
                 calendar_ocr="wrong_ocr",
+                calendar_overlapped=True,
                 date_key=None,
                 year=None,
                 day=None,
@@ -106,6 +108,7 @@ def test_map_calendars_dataset_collects_all_uniq_false_negative():
     screenshot = np.ones((height, width, 3), dtype=np.uint8)
     dataset.add(screenshot=screenshot,
                 calendar_ocr="wrong_ocr",
+                calendar_overlapped=True,
                 date_key=None,
                 year=None,
                 day=None,
@@ -117,6 +120,7 @@ def test_map_calendars_dataset_collects_all_uniq_false_negative():
     screenshot = np.ones((height, width, 3), dtype=np.uint8)
     dataset.add(screenshot=screenshot,
                 calendar_ocr="wrong_ocr",
+                calendar_overlapped=True,
                 date_key=None,
                 year=None,
                 day=None,

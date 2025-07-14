@@ -19,6 +19,7 @@ MetaItem = namedtuple("MetaItem",
                       "language, "                      
                       "crop, "                      
                       "calendar_ocr, "
+                      "calendar_overlapped, "
                       "date_key, "
                       "year, "
                       "day, "
@@ -31,7 +32,8 @@ MetaItem = namedtuple("MetaItem",
 #       class has to support Hashable type
 MetaKey = namedtuple("MetaKey",
                      "crop, "
-                     "calendar_ocr")
+                     "calendar_ocr, "
+                     "calendar_overlapped")
 
 
 class MapCalendarDataset(BaseImageDataset):
@@ -56,10 +58,11 @@ class MapCalendarDataset(BaseImageDataset):
     def add(self,
             screenshot: np.ndarray,
             calendar_ocr: str,
+            calendar_overlapped: bool,
             date_key: Optional[str],
             year: Optional[int],
             day: Optional[int],
-            timeofday_key: Optional[str],):
+            timeofday_key: Optional[str]):
         assert self.__resolution is not None
         assert self.__crop is not None
         assert self.__language is not None
@@ -71,6 +74,7 @@ class MapCalendarDataset(BaseImageDataset):
                              # so need to convert into tuple supported by yaml
                              crop=list(self.__crop),
                              calendar_ocr=calendar_ocr,
+                             calendar_overlapped=calendar_overlapped,
                              date_key=date_key,
                              year=year,
                              day=day,
@@ -95,7 +99,8 @@ class MapCalendarDataset(BaseImageDataset):
                         # and is not hashable for such case
                         # so need to convert into hashable tuple
                         crop=tuple(meta.crop),
-                        calendar_ocr=meta.calendar_ocr),
+                        calendar_ocr=meta.calendar_ocr,
+                        calendar_overlapped=meta.calendar_overlapped),
                 # is_soft_key
                 meta.verification == VERIFICATION_FALSE_NEGATIVE)
 

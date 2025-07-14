@@ -1,6 +1,6 @@
 import calendar as pycalendar
 import logging
-from typing import Mapping
+from typing import Callable, Mapping
 
 from wa_language import LangValParser
 from typeguard import typechecked
@@ -16,20 +16,41 @@ class DialogScreenLogger:
     def __init__(self, lang: Mapping[str, LangValParser.Interpolation]):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
+        self.__listener = None
+        self.__prev_date_timeofday = None
+
+    @property
+    def listener(self):
+        return self.__listener
+
+    @listener.setter
+    @typechecked
+    def listener(self, value: Callable[[str], None]):
+        self.__listener = value
+
+    def on_unknown_screen(self):
+        self.__prev_date_timeofday = None
 
     @typechecked
     def on_map_screen(self, event: MapScreenEvent):
-        text = "Map: "
-        if event.date_timeofday:
-            year = event.date_timeofday.year
-            month = pycalendar.month_name[calendar_model.month(event.date_timeofday.date_key)]
-            day = event.date_timeofday.day
-            timeofday = self.__lang[event.date_timeofday.timeofday_key]
-            text += f"{month[:3]} {day}, {year} - {timeofday}"
-        else:
-            text += repr(event.calendar_ocr)
-            text += " (FALSE NEGATIVE)"
-        self.__logger.info(text)
+        if self.__prev_date_timeofday != event.date_timeofday:
+            self.__prev_date_timeofday = event.date_timeofday
+            text = "Map: "
+            if event.date_timeofday:
+                year = event.date_timeofday.year
+                month = pycalendar.month_name[calendar_model.month(event.date_timeofday.date_key)]
+                day = event.date_timeofday.day
+                timeofday = self.__lang[event.date_timeofday.timeofday_key]
+                text += f"{month[:3]} {day}, {year} - {timeofday}"
+                if event.calendar_overlapped:
+                    text += " (OVERLAPPED)"
+            else:
+                text += repr(event.calendar_ocr)
+                text += " (FALSE NEGATIVE)"
+            if self.__listener:
+                self.__listener(text)
+            else:
+                self.__logger.info(text)
 
     @typechecked
     def on_dialog_screen(self, event: DialogScreenEvent):
@@ -52,4 +73,7 @@ class DialogScreenLogger:
             text += str(event.relation) if event.relation is not None else "?"
         if not event.title_keys:
             text += " (FALSE NEGATIVE)"
-        self.__logger.info(text)
+        if self.__listener:
+            self.__listener(text)
+        else:
+            self.__logger.info(text)

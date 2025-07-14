@@ -10,7 +10,7 @@ class MapScreenCalendarOCR(BaseOCR):
     def __init__(self):
         from wa_screen_manager import config
         from . import map_screen_config
-        crop_box = map_screen_config.calendar_box
+        crop_box = map_screen_config.map_calendar_box
         super().__init__(resolution=config.resolution,
                          crop_box=crop_box,
                          whitelist=config.whitelist_characters)

@@ -100,10 +100,10 @@ class BaseImageDataset(ABC):
                     for idx in self.__meta_index[meta_key]:
                         image_path = path.join(self.__dir_path, self.__idx_to_png(idx))
                         if np.array_equal(cv2.imread(image_path), image):
-                            self._logger.info(f"{self.__name} HAS {idx}")
+                            self._logger.info(f"{self.__name}    has {idx}")
                             return
                 else:
-                    self._logger.info(f"{self.__name} HAS {self.__meta_index[meta_key][0]}")
+                    self._logger.info(f"{self.__name}    has {self.__meta_index[meta_key][0]}")
                     return
         data = self._meta_to_data(meta)
         idx = self.__max_idx + 1
@@ -115,7 +115,7 @@ class BaseImageDataset(ABC):
             return
         self.__max_idx = idx
         self.__meta_index[meta_key].append(idx)
-        self._logger.info(f"{self.__name} ADD {self.__meta_index[meta_key][0]}")
+        self._logger.info(f"{self.__name} ADD    {self.__meta_index[meta_key][0]}")
 
     @typechecked
     def replace_meta(self, idx: int, meta: object):
