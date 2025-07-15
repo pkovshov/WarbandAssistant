@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from os import path
 import pytest
 
 from wa_language import Language
@@ -8,10 +9,13 @@ from wa_datasets.DialogScreen.DialogTitleDataset import (DialogTitleDataset,
 from wa_screen_manager.DialogScreen.DialogScreenOCRs import DialogScreenTitleOCR
 from wa_screen_manager.DialogScreen.DialogScreenTitleFuzzyParser import DialogScreenTitleFuzzyParser
 
+import path_conf
+
+blank = cv2.imread(path.join(path_conf.samples, "dialog_screen_blank.png"))
 
 def load_image_and_restore_crop(image_path, resolution, crop):
     width, height = resolution
-    result = np.zeros((height, width, 3), dtype=np.uint8)
+    result = blank.copy()
     image = cv2.imread(image_path)
     result[crop[1]: crop[3],
            crop[0]: crop[2]] = image
