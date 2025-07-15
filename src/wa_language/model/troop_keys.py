@@ -2,6 +2,7 @@ import re
 
 from typeguard import typechecked
 
+from .KeyChecker import key_checker, MultiKeyChecker
 
 __troop_key_checkers = []
 
@@ -10,15 +11,9 @@ __troop_key_checkers = []
 
 
 def troop_key(func):
-    @typechecked
-    def wrapper(key: str) -> bool:
-        return func(key)
+    wrapper = key_checker(func)
     __troop_key_checkers.append(wrapper)
     return wrapper
-
-
-def is_troop_key(key):
-    return any(checker(key) for checker in __troop_key_checkers)
 
 
 @troop_key
@@ -214,6 +209,9 @@ def is_player_key(key):
     return key == "wa_player"
 
 
+is_troop_key = MultiKeyChecker(tuple(__troop_key_checkers))
+
+
 if __name__ == "__main__":
     print(is_lord_key("b1"))
-    print(is_title("b"))
+    print(is_troop_key("b"))

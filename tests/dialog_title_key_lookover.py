@@ -6,10 +6,11 @@ Focus on those that contain keys suitable for dialog titles.
 from os import path
 
 from wa_language.loader import *
+from wa_language.Language import Language
 import path_conf
 from wa_language.model.troop_keys import *
 
-lang = load_files(path.join(path_conf.language, "troops.csv"))
+lang = Language(load_files(path.join(path_conf.language, "troops.csv")))
 
 
 def print_checker_count(check, caption):

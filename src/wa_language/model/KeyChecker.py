@@ -36,3 +36,17 @@ class KeyChecker:
             self.__lang = lang
             self.__values = tuple(val for key, val in lang.items() if self(key))
         return self.__values
+
+
+def key_checker(func: Callable[[LangKey], bool]) -> KeyChecker:
+    return KeyChecker(func)
+
+
+class MultiKeyChecker(KeyChecker):
+    @typechecked
+    def __init__(self, checkers: Tuple[KeyChecker, ...]):
+        self.__checkers = checkers
+        super().__init__(self.__check)
+
+    def __check(self, key: LangKey) -> bool:
+        return any(checker(key) for checker in self.__checkers)

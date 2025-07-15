@@ -1,5 +1,4 @@
-import itertools
-from typing import FrozenSet, Iterable, List, Mapping, Tuple, Union
+from typing import FrozenSet, List, Tuple, Union
 
 from typeguard import typechecked
 
