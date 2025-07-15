@@ -6,6 +6,7 @@ from typeguard import typechecked
 from .Errors import LangSyntaxError
 from .Field import Field
 from .Expression import Expression
+from .Identifier import Identifier
 
 
 class Interpolation(str):
@@ -77,15 +78,15 @@ class Interpolation(str):
 
     @property
     @typechecked
-    def variables(self) -> FrozenSet[str]:
-        """Extract all the variables from expression tree
+    def variables(self) -> FrozenSet[Identifier]:
+        """Extract all the identifiers from expression tree
 
         Tests:
         >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
-        >>> print(*sorted(interp.variables))
+        >>> print(*sorted(str(ident) for ident in interp.variables))
         reg3 s1 s2
         >>> interp = Interpolation("{shk}, {boy/girl}")
-        >>> print(*sorted(interp.variables))
+        >>> print(*sorted(str(ident) for ident in interp.variables))
         shk wa_binary
         """
         if self.__variables is None:
@@ -95,14 +96,14 @@ class Interpolation(str):
         return self.__variables
 
     @typechecked
-    def substitute(self, variable: str, value: str) -> "Interpolation":
-        """Substitute all the variables with same name by the given variable
+    def substitute(self, variable: Identifier, value: str) -> "Interpolation":
+        """Substitute all the identifiers with same name by the given variable
         >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
-        >>> print(interp.substitute("s1", "Joe Dou"))
+        >>> print(interp.substitute(Identifier("s1"), "Joe Dou"))
         Joe Dou, {s2} yes {s2}
-        >>> print(interp.substitute("s1", ""))
+        >>> print(interp.substitute(Identifier("s1"), ""))
         , {s2} yes {reg3}
-        >>> print(interp.substitute("s2", "Ricki"))
+        >>> print(interp.substitute(Identifier("s2"), "Ricki"))
         {s1}, Ricki yes {s1?Ricki:{reg3}}
         """
         items = list(self.__items)
@@ -115,32 +116,32 @@ class Interpolation(str):
                     items[idx] = str(substitution)
         return Interpolation("".join(items))
 
-    @typechecked
-    def spread(self, variables_and_values: Mapping[str, Iterable[str]]) -> List["Interpolation"]:
-        """Build a list of substitutions
-
-        Tests:
-        >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
-        >>> spread = interp.spread({"s1": ["ko", "ro"], "s2": ["jjj", "erq"]})
-        >>> spread.sort()
-        >>> print(*spread, sep='\\n')
-        ko, erq yes erq
-        ko, jjj yes jjj
-        ro, erq yes erq
-        ro, jjj yes jjj
-        >>> interp = Interpolation("{ma/fa}, {s2} yes {s1?{s2}:{reg3}}")
-        >>> spread = interp.spread({"wa_binary": ["first"], "s2": ["jjj", "erq"]})
-        >>> spread.sort()
-        >>> print(*spread, sep='\\n')
-        ma, erq yes {s1?erq:{reg3}}
-        ma, jjj yes {s1?jjj:{reg3}}
-        """
-        spread_list = [self]
-        for variable, values in variables_and_values.items():
-            for idx, interp in enumerate(spread_list):
-                spread_list[idx] = [interp.substitute(variable, value) for value in values]
-            spread_list = list(itertools.chain.from_iterable(spread_list))
-        return spread_list
+    # @typechecked
+    # def spread(self, variables_and_values: Mapping[str, Iterable[str]]) -> List["Interpolation"]:
+    #     """Build a list of substitutions
+    #
+    #     Tests:
+    #     >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
+    #     >>> spread = interp.spread({"s1": ["ko", "ro"], "s2": ["jjj", "erq"]})
+    #     >>> spread.sort()
+    #     >>> print(*spread, sep='\\n')
+    #     ko, erq yes erq
+    #     ko, jjj yes jjj
+    #     ro, erq yes erq
+    #     ro, jjj yes jjj
+    #     >>> interp = Interpolation("{ma/fa}, {s2} yes {s1?{s2}:{reg3}}")
+    #     >>> spread = interp.spread({"wa_binary": ["first"], "s2": ["jjj", "erq"]})
+    #     >>> spread.sort()
+    #     >>> print(*spread, sep='\\n')
+    #     ma, erq yes {s1?erq:{reg3}}
+    #     ma, jjj yes {s1?jjj:{reg3}}
+    #     """
+    #     spread_list = [self]
+    #     for variable, values in variables_and_values.items():
+    #         for idx, interp in enumerate(spread_list):
+    #             spread_list[idx] = [interp.substitute(variable, value) for value in values]
+    #         spread_list = list(itertools.chain.from_iterable(spread_list))
+    #     return spread_list
 
     @property
     @typechecked

@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import FrozenSet, Optional, Tuple, Union
 
 from typeguard import typechecked
 
@@ -43,14 +43,16 @@ class Ternary(Expression):
     def false_part(self) -> Interpolation:
         return self.__items[2]
 
-    def _extract_variables(self):
+    @typechecked()
+    def _extract_variables(self) -> FrozenSet[Identifier]:
         condition_variables = self.condition.variables
         true_part_variables = self.true_part.variables
         false_part_variables = self.false_part.variables
         return condition_variables | true_part_variables | false_part_variables
 
-    def _substitute(self, variable: str, value: str):
-        if variable == self.condition.variable:
+    @typechecked
+    def _substitute(self, variable: Identifier, value: str) -> Union[Interpolation, "Ternary"]:
+        if variable == self.condition:
             if value == "":
                 return self.false_part
             else:

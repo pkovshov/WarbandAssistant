@@ -9,8 +9,7 @@ class Expression(ABC):
         self.__variables = None
 
     @property
-    @typechecked
-    def variables(self) -> FrozenSet[str]:
+    def variables(self) -> FrozenSet["Identifier"]:
         if self.__variables is None:
             self.__variables = self._extract_variables()
         return self.__variables
@@ -19,8 +18,7 @@ class Expression(ABC):
     def _extract_variables(self):
         raise NotImplemented
 
-    @typechecked
-    def substitute(self, variable: str, value: str) -> Union[str, "Expression"]:
+    def substitute(self, variable: "Identifier", value: str) -> Union[str, "Expression"]:
         return self._substitute(variable, value)
 
     @abstractmethod

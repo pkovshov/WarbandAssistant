@@ -2,6 +2,7 @@ from enum import Enum
 
 from typeguard import typechecked
 
+from wa_language.syntax.Identifier import Identifier
 
 __date_key_to_month = {
     "str_january_reg1_reg2": 1,
@@ -30,8 +31,8 @@ def month(date_key: str):
 
 
 class DateVariables(Enum):
-    Year = "reg2"
-    Day = "reg1"
+    Year = Identifier("reg2")
+    Day = Identifier("reg1")
 
 
 MIN_YEAR = 1257

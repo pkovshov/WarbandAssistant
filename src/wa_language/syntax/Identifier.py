@@ -1,4 +1,5 @@
 import re
+from typing import FrozenSet, Union
 
 from typeguard import typechecked
 
@@ -44,11 +45,13 @@ class Identifier(Expression):
     def variable(self) -> str:
         return self.__item
 
-    def _extract_variables(self):
-        return frozenset((self.variable,))
+    @typechecked
+    def _extract_variables(self) -> FrozenSet["Identifier"]:
+        return frozenset((self,))
 
-    def _substitute(self, variable: str, value: str):
-        if variable == self.variable:
+    @typechecked
+    def _substitute(self, variable: "Identifier", value: str) -> Union[str, "Identifier"]:
+        if variable == self:
             return value
         else:
             return self

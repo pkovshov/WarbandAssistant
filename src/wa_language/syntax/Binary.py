@@ -1,11 +1,12 @@
-from typing import Tuple
+from typing import FrozenSet, Union, Tuple
 
 from typeguard import typechecked
 
 from .Errors import LangSyntaxError
 from .Expression import Expression
+from .Identifier import Identifier
 
-BINARY_CONDITION_VARIABLE = "wa_binary"
+BINARY_CONDITION_VARIABLE = Identifier("wa_binary")
 BINARY_CONDITION_VARIABLE_FIRST_VALUE = "first"
 BINARY_CONDITION_VARIABLE_SECOND_VALUE = "second"
 
@@ -54,10 +55,12 @@ class Binary(Expression):
     def second(self) -> str:
         return self.__items[1]
 
-    def _extract_variables(self):
+    @typechecked
+    def _extract_variables(self) -> FrozenSet[Identifier]:
         return frozenset((BINARY_CONDITION_VARIABLE,))
 
-    def _substitute(self, variable: str, value: str):
+    @typechecked
+    def _substitute(self, variable: Identifier, value: str) -> Union[str, "Binary"]:
         if variable == BINARY_CONDITION_VARIABLE:
             if value == BINARY_CONDITION_VARIABLE_FIRST_VALUE:
                 return self.first
