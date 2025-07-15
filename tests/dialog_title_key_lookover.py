@@ -5,7 +5,7 @@ Focus on those that contain keys suitable for dialog titles.
 
 from os import path
 
-from wa_language.LangLoader import *
+from wa_language.loader import *
 import path_conf
 from wa_language.model.troop_keys import *
 
@@ -25,6 +25,7 @@ def print_checker_troop(check):
           val + ":",
           sum(1 for key in lang if check(key)),
           val)
+
 
 def print_checker(check, caption):
     print(str(caption) + ":")

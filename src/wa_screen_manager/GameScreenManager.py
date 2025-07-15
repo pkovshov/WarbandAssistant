@@ -7,7 +7,7 @@ import mss
 import numpy as np
 from typeguard import typechecked
 
-from wa_language import LangLoader
+from wa_language import Lang
 from wa_language.LangValParser import Interpolation
 from .SampleMatch import SampleMatch
 from .DialogScreen.DialogScreenManager import DialogScreenManager
@@ -77,7 +77,7 @@ class GameScreenManager:
 
     @typechecked
     def _load_lang(self, playername: Optional[str]) -> Mapping[str, Interpolation]:
-        lang = LangLoader.load_lang()
+        lang = Lang.load()
         # TODO: someone need to warn if playername is blank string like '  '
         #       such name could broke fuzzy
         # TODO: warn if playername equal with other dialog titles (lorn names for example)
