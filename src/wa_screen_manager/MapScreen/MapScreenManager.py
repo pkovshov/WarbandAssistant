@@ -76,13 +76,12 @@ class MapScreenManager:
             else:
                 calendar_sample_matches = self.__calendar_sample.check(img)
                 date_timeofday = self.__calendar_fuzzy_parser.calendar(calendar_ocr)
-                if calendar_sample_matches or date_timeofday is not None:
-                    event = MapScreenEvent(image=img,
-                                           calendar_ocr=calendar_ocr,
-                                           calendar_overlapped=not calendar_sample_matches,
-                                           date_timeofday=date_timeofday)
-                    if event != self.__prev__event:
-                        self.__prev__event = event
-                        for listener in self.__listeners:
-                            listener(event)
+                event = MapScreenEvent(image=img,
+                                       calendar_ocr=calendar_ocr,
+                                       calendar_overlapped=not calendar_sample_matches,
+                                       date_timeofday=date_timeofday)
+                if event != self.__prev__event:
+                    self.__prev__event = event
+                    for listener in self.__listeners:
+                        listener(event)
         return screen_sample_matches

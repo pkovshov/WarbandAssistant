@@ -50,6 +50,7 @@ class GameScreenManager:
                 user_friendly_messages.append(val)
 
             self.__user_friendly_logger.listener = on_user_friendly_message
+            self.__logger.info("Unknown")
             while True:
                 scr = sct.grab(monitor)
                 img = np.array(scr)[:, :, :3]  # BGRA -> BGR

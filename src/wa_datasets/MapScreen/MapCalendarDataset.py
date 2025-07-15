@@ -8,7 +8,7 @@ from wa_types import Box, Resolution
 from wa_datasets.BaseImageDataset import BaseImageDataset, MetaAndImagePath
 
 
-VERIFICATION_SCREEN_TEATING = "Screen tearing"
+VERIFICATION_SCREEN_TEARING = "Screen tearing"
 VERIFICATION_FALSE_NEGATIVE = "FALSE NEGATIVE"
 
 # TODO: convert to a class with type checking

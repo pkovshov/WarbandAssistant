@@ -18,6 +18,16 @@ class MapScreenEvent:
                  calendar_ocr: str,
                  calendar_overlapped: bool,
                  date_timeofday: Optional[DateTimeofday]):
+        """
+        :param image: An origin screenshot
+        :param calendar_ocr: Result of calendar OCR.
+        :param calendar_overlapped: Marks that calendar sampler does not match.
+               That means a calendar is overlapped by caption of map object.
+               For such case a date_timeofday value is not reliable.
+               So, we need additional semantic analysis of date_timeofday value.
+        :param date_timeofday: A fuzzy-parsed result of calendar OCR.
+               Could be None if fuzzy-parcer does not provide any result with acceptable scores.
+        """
         self.__image = image
         self.__calendar_ocr = calendar_ocr
         self.__calendar_overlapped = calendar_overlapped

@@ -17,6 +17,9 @@ class MapScreenCalendarFuzzyParser:
     def __init__(self, lang: Mapping[str, LangValParser.Interpolation]):
         self.__logger = logging.getLogger(__name__)
         self.__date_lang = {key: val for key, val in lang.items() if is_date_key(key)}
+        self.__month_spread = {key: val.substitute(DateVariables.Year.value, "")
+                                       .substitute(DateVariables.Day.value, "")
+                               for key, val in self.__date_lang.items()}
         self.__timeofday_lang = {key: val for key, val in lang.items() if is_timeofday_key(key)}
         self.__prev_calendar_ocr = None
         self.__pref_date_timeofday = None
@@ -33,7 +36,7 @@ class MapScreenCalendarFuzzyParser:
         split = calendar_ocr.split("\n")
         if len(split) != 2:
             return None
-        score_cutoff = 80
+        score_cutoff = 60
         date_ocr, timeofday_ocr = split
         # find the best timeofday key
         # apply score cutoff
@@ -48,7 +51,7 @@ class MapScreenCalendarFuzzyParser:
         # find the best date key
         date_match = fz.process.extractOne(query=date_ocr,
                                            scorer=fz.fuzz.ratio,
-                                           choices=self.__date_lang)
+                                           choices=self.__month_spread)
         date_key = date_match[KEY]
         date_val = self.__date_lang[date_key]
         # build year spread

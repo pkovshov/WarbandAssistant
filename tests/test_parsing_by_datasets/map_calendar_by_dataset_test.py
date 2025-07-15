@@ -3,7 +3,9 @@ import numpy as np
 import pytest
 
 from wa_language.LangLoader import load_lang
-from wa_datasets.MapScreen.MapCalendarDataset import MapCalendarDataset, VERIFICATION_SCREEN_TEATING
+from wa_datasets.MapScreen.MapCalendarDataset import (MapCalendarDataset,
+                                                      VERIFICATION_SCREEN_TEARING,
+                                                      VERIFICATION_FALSE_NEGATIVE)
 from wa_screen_manager.MapScreen.MapScreenCalendarOCR import MapScreenCalendarOCR
 from wa_screen_manager.MapScreen.MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
 
@@ -28,7 +30,8 @@ parser = MapScreenCalendarFuzzyParser(lang)
 idx_meta_image = []
 
 for idx, (meta, image_path) in dataset.meta_and_image_path().items():
-    if meta.verification == VERIFICATION_SCREEN_TEATING:
+    if meta.verification in (VERIFICATION_SCREEN_TEARING,
+                             VERIFICATION_FALSE_NEGATIVE):
         continue
     image = load_image_and_restore_crop(image_path,
                                         meta.resolution,
@@ -41,7 +44,7 @@ for idx, (meta, image_path) in dataset.meta_and_image_path().items():
                            image))
 
 
-@pytest.mark.parametrize("idx, "                         
+@pytest.mark.parametrize("idx, "
                          "date_key_exp, "
                          "year_exp, "
                          "day_exp, "

@@ -33,6 +33,8 @@ class DialogScreenLogger:
 
     @typechecked
     def on_map_screen(self, event: MapScreenEvent):
+        if event.date_timeofday is None and event.calendar_overlapped:
+            return
         if self.__prev_date_timeofday != event.date_timeofday:
             self.__prev_date_timeofday = event.date_timeofday
             text = "Map: "
