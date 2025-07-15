@@ -17,7 +17,7 @@ class LangKey(str):
     pass
 
 
-class Language(Mapping):
+class Language(Mapping[LangKey, LangValue]):
     @typechecked()
     def __init__(self, data: dict[str, str]):
         self.__logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
