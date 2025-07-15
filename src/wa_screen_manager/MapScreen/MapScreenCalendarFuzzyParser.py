@@ -4,7 +4,7 @@ from typing import Mapping, Optional
 import rapidfuzz as fz
 from typeguard import typechecked
 
-from wa_language import LangValParser
+from wa_language.Language import Language
 from wa_language.model.calendar_model import is_date_key, DateVariables, MIN_YEAR, is_timeofday_key
 from .MapScreenEvent import DateTimeofday
 
@@ -14,7 +14,7 @@ KEY = 2
 
 class MapScreenCalendarFuzzyParser:
     @typechecked
-    def __init__(self, lang: Mapping[str, LangValParser.Interpolation]):
+    def __init__(self, lang: Language):
         self.__logger = logging.getLogger(__name__)
         self.__date_lang = {key: val for key, val in lang.items() if is_date_key(key)}
         self.__month_spread = {key: val.substitute(DateVariables.Year.value, "")

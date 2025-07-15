@@ -2,6 +2,7 @@ import re
 
 from typeguard import typechecked
 
+from .Errors import LangSyntaxError
 from .Expression import Expression
 
 
@@ -31,7 +32,7 @@ class Identifier(Expression):
     True
     >>> Identifier("2")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     """
     @typechecked
     def __init__(self, src: str):
@@ -85,25 +86,23 @@ def parse_identifier(src: str) -> str:
     'G'
     >>> parse_identifier("5")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     >>> parse_identifier("86")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     >>> parse_identifier("s6:")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     >>> parse_identifier("s6?")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     """
     if re.fullmatch("([a-z]|[A-Z]|_)([a-z]|[A-Z]|_|[0-9])*", src):
         return src
     else:
-        raise ValueError("Not an identifier: " + repr(src))
+        raise LangSyntaxError("Not an identifier: " + repr(src))
 
 
 if __name__ == "__main__":
     import doctest
     doctest.testmod(optionflags=doctest.IGNORE_EXCEPTION_DETAIL)
-
-

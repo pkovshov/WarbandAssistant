@@ -7,8 +7,7 @@ import mss
 import numpy as np
 from typeguard import typechecked
 
-from wa_language import Lang
-from wa_language.LangValParser import Interpolation
+from wa_language import Language
 from .SampleMatch import SampleMatch
 from .DialogScreen.DialogScreenManager import DialogScreenManager
 from .MapScreen.MapScreenManager import MapScreenManager
@@ -19,7 +18,15 @@ class GameScreenManager:
     @typechecked
     def __init__(self, playername: Optional[str] = None, write_to_dataset: Optional[bool] = False):
         self.__logger = logging.getLogger(__name__)
-        lang = self._load_lang(playername=playername)
+        # TODO: someone need to warn if playername is blank string like '  '
+        #       such name could broke fuzzy
+        # TODO: warn if playername equal with other dialog titles (lorn names for example)
+        #       or maybe is part of other dialog titles (Merchant for example)
+        #       Also it needs to process such cases in DialogScreen
+        special_language = None
+        if playername is not None:
+            special_language = {"wa_player": playername}
+        lang = Language.load(special_language)
         self.__map_screen_manger = MapScreenManager(lang, write_to_dataset)
         self.__dialog_screen_manger = DialogScreenManager(lang, write_to_dataset, playername)
         self.__user_friendly_logger = DialogScreenLogger(lang)
@@ -72,19 +79,3 @@ class GameScreenManager:
                     on_match_screen_manager()
                 if user_friendly_messages:
                     self.__logger.info(user_friendly_messages.pop())
-
-
-
-    @typechecked
-    def _load_lang(self, playername: Optional[str]) -> Mapping[str, Interpolation]:
-        lang = Lang.load()
-        # TODO: someone need to warn if playername is blank string like '  '
-        #       such name could broke fuzzy
-        # TODO: warn if playername equal with other dialog titles (lorn names for example)
-        #       or maybe is part of other dialog titles (Merchant for example)
-        #       Also it needs to process such cases in DialogScreen
-        # TODO: extend load_files with a param accepting a dict with special keys
-        # update lang with special keys
-        if playername is not None:
-            lang = lang | {"wa_player": Interpolation(playername, raw=True)}
-        return MappingProxyType(lang)

@@ -2,6 +2,7 @@ from typing import Optional, Tuple, Union
 
 from typeguard import typechecked
 
+from .Errors import LangSyntaxError
 from .Expression import Expression
 from .Identifier import Identifier
 from .Interpolation import Interpolation
@@ -16,15 +17,15 @@ class Ternary(Expression):
         super().__init__()
         if isinstance(src, Identifier):
             if true_part is None:
-                raise ValueError("None true_part")
+                raise LangSyntaxError("None true_part")
             if false_part is None:
-                raise ValueError("None false_part")
+                raise LangSyntaxError("None false_part")
             self.__items = src, true_part, false_part
         else:
             if true_part is not None:
-                raise ValueError(f"Do not parse due to true_part: {true_part}")
+                raise LangSyntaxError(f"Do not parse due to true_part: {true_part}")
             if false_part is not None:
-                raise ValueError(f"Do not parse due to false_part: {false_part}")
+                raise LangSyntaxError(f"Do not parse due to false_part: {false_part}")
             self.__items = parse_ternary(src)
 
     @property
@@ -84,10 +85,10 @@ def parse_ternary(src: str) -> Tuple[Identifier, Interpolation, Interpolation]:
     (Identifier('reg7'), Interpolation('them'), Interpolation('him'))
     """
     if src.find("?") < 0:
-        raise ValueError("Not an ternary: " + repr(src))
+        raise LangSyntaxError("Not a ternary: " + repr(src))
     split = src.split("?", maxsplit=1)
     if len(split) != 2:
-        raise ValueError("Not an ternary: " + repr(src))
+        raise LangSyntaxError("Not a ternary: " + repr(src))
     condition, tail = split
     tail = split[1]
     depth = 0
@@ -100,15 +101,15 @@ def parse_ternary(src: str) -> Tuple[Identifier, Interpolation, Interpolation]:
         elif char == "}":
             depth -= 1
         if depth < 0:
-            raise ValueError("Not an ternary: " + repr(src))
+            raise LangSyntaxError("Not an ternary: " + repr(src))
     else:
-        raise ValueError("Not an ternary: " + repr(src))
+        raise LangSyntaxError("Not an ternary: " + repr(src))
     true_expr = tail[:pos]
     false_expr = tail[pos+1:]
     try:
         return Identifier(condition), Interpolation(true_expr), Interpolation(false_expr)
-    except ValueError:
-        raise ValueError("Not an ternary: " + repr(src))
+    except LangSyntaxError:
+        raise LangSyntaxError("Not a ternary: " + repr(src))
 
 
 if __name__ == "__main__":

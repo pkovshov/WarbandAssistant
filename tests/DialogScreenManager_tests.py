@@ -5,14 +5,14 @@ import numpy as np
 from typeguard import TypeCheckError
 
 from wa_types import Box, Resolution
-from wa_language import Lang
+from wa_language import Language
 from wa_screen_manager.DialogScreen.DialogScreenManager import DialogScreenManager
 from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogScreenEvent
 from wa_datasets.DialogScreen.DialogTitleDataset import DialogTitleDataset, VERIFICATION_NOT_A_DIALOG_TITLE
 from wa_datasets.DialogScreen.DialogRelationDataset import DialogRelationDataset
 from path_conf import samples as samples_dir_path
 
-lang = Lang.load()
+lang = Language.load()
 
 dialog_titles_dataset = DialogTitleDataset(lazy_load=True)
 dialog_relations_dataset = DialogRelationDataset(lazy_load=True)

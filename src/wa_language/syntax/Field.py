@@ -2,6 +2,7 @@ from typing import Union
 
 from typeguard import typechecked
 
+from .Errors import LangSyntaxError
 from .Expression import Expression
 
 
@@ -47,13 +48,13 @@ def parse_field(src: str) -> Expression:
     Binary('lad/lass')
     >>> parse_field("reg14")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     >>> parse_field("{x?x?x}")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     """
     if src[0] != "{" or src[-1] != "}":
-        raise ValueError("Not a field: " + repr(src))
+        raise LangSyntaxError("Not a field: " + repr(src))
     expr = src[1:-1]
     from .expression_parser import parse_expression
     return parse_expression(expr)

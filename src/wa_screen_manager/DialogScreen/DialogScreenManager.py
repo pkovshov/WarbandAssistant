@@ -1,10 +1,10 @@
 import logging
-from typing import Callable, Mapping, Optional
+from typing import Callable, Optional
 
 import numpy as np
 from typeguard import typechecked
 
-from wa_language import LangValParser
+from wa_language.Language import Language
 from wa_screen_manager.SampleMatch import SampleMatch
 from .DialogScreenEvent import DialogScreenEvent
 from .DialogScreenSamplers import DialogScreenScreenSampler, DialogScreenRelationSampler
@@ -24,7 +24,7 @@ class DialogScreenManager:
     """
     @typechecked
     def __init__(self,
-                 lang: Mapping[str, LangValParser.Interpolation],
+                 lang: Language,
                  write_to_dataset: bool = False,
                  playername: Optional[str] = None):
         self.__logger = logging.getLogger(__name__)

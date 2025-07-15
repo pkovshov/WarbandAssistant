@@ -3,6 +3,7 @@ from typing import FrozenSet, Iterable, List, Mapping, Tuple, Union
 
 from typeguard import typechecked
 
+from .Errors import LangSyntaxError
 from .Field import Field
 from .Expression import Expression
 
@@ -41,7 +42,7 @@ class Interpolation(str):
     True
     >>> interp = Interpolation("{s")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     >>> interp = Interpolation("{s", True)
     >>> interp.items
     ('{s',)
@@ -216,7 +217,7 @@ def parse_interpolation(src: str) -> List[Union[str, Field]]:
                 items.append(Field(src[prev_pos:curr_pos+1]))
                 prev_pos = curr_pos + 1
     if depth != 0:
-        raise ValueError("Not an interpolation: " + repr(src))
+        raise LangSyntaxError("Not an interpolation: " + repr(src))
     if prev_pos != len(src):
         items.append(src[prev_pos:])
     return items

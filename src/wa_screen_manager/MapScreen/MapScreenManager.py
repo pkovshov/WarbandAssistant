@@ -4,7 +4,7 @@ from typing import Callable, Mapping, Optional
 import numpy as np
 from typeguard import typechecked
 
-from wa_language import LangValParser
+from wa_language.Language import Language
 from wa_screen_manager.BaseScreen.BaseSampler import BaseSampleReadingSampler
 from wa_screen_manager.SampleMatch import SampleMatch
 from .MapScreenEvent import MapScreenEvent
@@ -46,7 +46,7 @@ class MapScreenManager:
     """
     @typechecked
     def __init__(self,
-                 lang: Mapping[str, LangValParser.Interpolation],
+                 lang: Language,
                  write_to_dataset: bool = False):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang

@@ -1,1 +1,0 @@
-from wa_language.syntax.Interpolation import Interpolation

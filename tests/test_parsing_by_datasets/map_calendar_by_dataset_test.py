@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import pytest
 
-from wa_language import Lang
+from wa_language import Language
 from wa_datasets.MapScreen.MapCalendarDataset import (MapCalendarDataset,
                                                       VERIFICATION_SCREEN_TEARING,
                                                       VERIFICATION_FALSE_NEGATIVE)
@@ -19,7 +19,7 @@ def load_image_and_restore_crop(image_path, resolution, crop):
     return result
 
 
-lang = Lang.load()
+lang = Language.load()
 
 dataset = MapCalendarDataset(lazy_load=True)
 

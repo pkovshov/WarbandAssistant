@@ -5,7 +5,7 @@ from typing import Mapping, Optional, Tuple
 import rapidfuzz as fz
 from typeguard import typechecked
 
-from wa_language import LangValParser
+from wa_language.Language import Language
 from wa_language.model.troop_keys import is_troop_key
 
 
@@ -18,7 +18,7 @@ KEY = 2
 
 class DialogScreenTitleFuzzyParser:
     @typechecked
-    def __init__(self, lang: Mapping[str, LangValParser.Interpolation]):
+    def __init__(self, lang: Language):
         from . import dialog_screen_config
         self.__logger = logging.getLogger(__name__)
         self.__title_score_cutoff = dialog_screen_config.fuzzy_title_score_cutoff

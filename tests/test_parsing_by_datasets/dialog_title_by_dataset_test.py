@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import pytest
 
-from wa_language import Lang
+from wa_language import Language
 from wa_datasets.DialogScreen.DialogTitleDataset import (DialogTitleDataset,
                                                          VERIFICATION_NOT_A_DIALOG_TITLE)
 from wa_screen_manager.DialogScreen.DialogScreenOCRs import DialogScreenTitleOCR
@@ -18,7 +18,7 @@ def load_image_and_restore_crop(image_path, resolution, crop):
     return result
 
 
-lang = Lang.load()
+lang = Language.load()
 
 dataset = DialogTitleDataset(lazy_load=True)
 

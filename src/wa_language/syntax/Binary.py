@@ -2,6 +2,7 @@ from typing import Tuple
 
 from typeguard import typechecked
 
+from .Errors import LangSyntaxError
 from .Expression import Expression
 
 BINARY_CONDITION_VARIABLE = "wa_binary"
@@ -36,7 +37,7 @@ class Binary(Expression):
     True
     >>> Binary("sir/madam/her")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     """
     @typechecked
     def __init__(self, src: str):
@@ -63,7 +64,7 @@ class Binary(Expression):
             elif value == BINARY_CONDITION_VARIABLE_SECOND_VALUE:
                 return self.second
             else:
-                raise ValueError(f"Substitute {BINARY_CONDITION_VARIABLE} with incorrect value: {value}")
+                raise LangSyntaxError(f"Substitute {BINARY_CONDITION_VARIABLE} with incorrect value: {value}")
         else:
             return self
 
@@ -96,21 +97,21 @@ def parse_binary(src: str) -> Tuple[str, str]:
     ('', '')
     >>> parse_binary("Greeting.")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     >>> parse_binary("he/she/her")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     >>> parse_binary("{reg1}/ok")
     Traceback (most recent call last):
-    ValueError: ...
+    wa_language.syntax.Errors.LangSyntaxError: ...
     """
     if src.find("{") > 0 or src.find("}") > 0:
-        raise ValueError("Not a binary: " + repr(src))
+        raise LangSyntaxError("Not a binary: " + repr(src))
     if src.find("/") < 0:
-        raise ValueError("Not a binary: " + repr(src))
+        raise LangSyntaxError("Not a binary: " + repr(src))
     split = src.split("/")
     if len(split) != 2:
-        raise ValueError("Not a binary: " + repr(src))
+        raise LangSyntaxError("Not a binary: " + repr(src))
     return split[0], split[1]
 
 

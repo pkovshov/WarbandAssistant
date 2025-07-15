@@ -1,0 +1,2 @@
+class LangSyntaxError(Exception):
+    pass

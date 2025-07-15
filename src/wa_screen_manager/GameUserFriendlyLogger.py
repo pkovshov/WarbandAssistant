@@ -1,8 +1,8 @@
 import calendar as pycalendar
 import logging
-from typing import Callable, Mapping
+from typing import Callable
 
-from wa_language import LangValParser
+from wa_language.Language import Language
 from typeguard import typechecked
 
 from wa_language.model import troop_keys
@@ -13,7 +13,7 @@ from wa_screen_manager.MapScreen.MapScreenEvent import MapScreenEvent
 
 class DialogScreenLogger:
     @typechecked
-    def __init__(self, lang: Mapping[str, LangValParser.Interpolation]):
+    def __init__(self, lang: Language):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
         self.__listener = None

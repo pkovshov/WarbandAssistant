@@ -1,7 +1,7 @@
-from wa_language import Lang
+from wa_language import Language
 from wa_language.syntax.Ternary import Ternary
 
-lang = Lang.load()
+lang = Language.load()
 for key, val in lang.items():
     for field in val.fields:
         expression = field.expression

@@ -1,5 +1,6 @@
 from typeguard import typechecked
 
+from .Errors import LangSyntaxError
 from .Binary import Binary
 from .Expression import Expression
 from .Identifier import Identifier
@@ -10,14 +11,14 @@ from .Ternary import Ternary
 def parse_expression(expr: str) -> Expression:
     try:
         return Identifier(expr)
-    except ValueError:
+    except LangSyntaxError:
         pass
     try:
         return Binary(expr)
-    except ValueError:
+    except LangSyntaxError:
         pass
     try:
         return Ternary(expr)
-    except ValueError:
+    except LangSyntaxError:
         pass
-    raise ValueError("Not an expression: " + repr(expr))
+    raise LangSyntaxError("Not an expression: " + repr(expr))
