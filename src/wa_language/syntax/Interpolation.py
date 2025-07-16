@@ -148,7 +148,9 @@ class Interpolation(str):
         return self.__raw
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({repr(str(self))})"
+        return "{}({}{})".format(self.__class__.__name__,
+                                 repr(str(self)),
+                                 ", raw = True" if self.__raw else "")
 
 
 @typechecked

@@ -5,6 +5,7 @@ import numpy as np
 from typeguard import typechecked
 
 from wa_types import Box, Resolution
+from wa_language.Language import LangKey
 from wa_datasets.BaseImageDataset import BaseImageDataset, MetaAndImagePath
 
 
@@ -59,10 +60,10 @@ class MapCalendarDataset(BaseImageDataset):
             screenshot: np.ndarray,
             calendar_ocr: str,
             calendar_overlapped: bool,
-            date_key: Optional[str],
+            date_key: Optional[LangKey],
             year: Optional[int],
             day: Optional[int],
-            timeofday_key: Optional[str]):
+            timeofday_key: Optional[LangKey]):
         assert self.__resolution is not None
         assert self.__crop is not None
         assert self.__language is not None
@@ -75,10 +76,10 @@ class MapCalendarDataset(BaseImageDataset):
                              crop=list(self.__crop),
                              calendar_ocr=calendar_ocr,
                              calendar_overlapped=calendar_overlapped,
-                             date_key=date_key,
+                             date_key=str(date_key),
                              year=year,
                              day=day,
-                             timeofday_key=timeofday_key,
+                             timeofday_key=str(timeofday_key),
                              git_branch=self.git_status.branch,
                              git_commit=self.git_status.commit,
                              git_has_modified=self.git_status.has_modified),

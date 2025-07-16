@@ -10,11 +10,25 @@ from .syntax.Interpolation import Interpolation
 
 
 class LangValue(Interpolation):
+    """
+    Tests:
+    >>> print(repr(LangValue("{reg1?Herro:{reg2}}")))
+    LangValue('{reg1?Herro:{reg2}}')
+    >>> print(repr(LangValue("{reg1?Herro:{reg2", raw = True)))
+    LangValue('{reg1?Herro:{reg2', raw = True)
+    """
     pass
 
 
 class LangKey(str):
-    pass
+    """
+    Tests:
+    >>> print(repr(LangKey("wa_player")))
+    LangKey('wa_player')
+    """
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__, repr(str(self)))
+
 
 
 class Language(Mapping[LangKey, LangValue]):

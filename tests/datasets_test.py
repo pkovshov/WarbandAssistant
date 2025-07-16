@@ -6,6 +6,7 @@ import numpy as np
 
 import path_conf
 from wa_types import Box, Resolution
+from wa_language.Language import LangKey
 from wa_datasets.DialogScreen.DialogTitleDataset import DialogTitleDataset
 from wa_datasets.DialogScreen.DialogRelationDataset import DialogRelationDataset
 from wa_datasets.MapScreen.MapCalendarDataset import MapCalendarDataset
@@ -46,7 +47,7 @@ def test_dialog_titles_dataset():
                 sample_matches=True,
                 title_ocr="Marry Wong",
                 title_fuzzy_score=None,
-                title_keys=())
+                title_keys=(LangKey("kl_marry"), LangKey("kl_wong")))
     files_count_after = len(os.listdir(dialog_title_dataset_path))
     assert files_count_after == files_count_before + 2
 
@@ -80,10 +81,10 @@ def test_map_calendars_dataset():
     dataset.add(screenshot=screenshot,
                 calendar_ocr="date\ntime",
                 calendar_overlapped=False,
-                date_key="da_key_jan",
+                date_key=LangKey("da_key_jan"),
                 year=1278,
                 day=20,
-                timeofday_key="da_key_dawn")
+                timeofday_key=LangKey("da_key_dawn"))
     files_count_after = len(os.listdir(map_calendar_dataset_path))
     assert files_count_after == files_count_before + 2
 

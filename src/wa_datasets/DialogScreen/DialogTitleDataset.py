@@ -5,6 +5,7 @@ import numpy as np
 from typeguard import typechecked
 
 from wa_types import Box, Resolution
+from wa_language.Language import LangKey
 from wa_datasets.BaseImageDataset import BaseImageDataset, MetaAndImagePath
 
 
@@ -60,7 +61,7 @@ class DialogTitleDataset(BaseImageDataset):
             sample_matches: bool,
             title_ocr: str,
             title_fuzzy_score: Optional[float],
-            title_keys: Tuple[str, ...]):
+            title_keys: Tuple[LangKey, ...]):
         assert self.__resolution is not None
         assert self.__crop is not None
         assert self.__language is not None
@@ -74,7 +75,7 @@ class DialogTitleDataset(BaseImageDataset):
                              sample_matches=sample_matches,
                              title_ocr=title_ocr,
                              fuzzy_score=title_fuzzy_score,
-                             keys=title_keys,
+                             keys=tuple(str(key) for key in title_keys),
                              git_branch=self.git_status.branch,
                              git_commit=self.git_status.commit,
                              git_has_modified=self.git_status.has_modified),
