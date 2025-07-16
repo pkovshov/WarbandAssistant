@@ -44,6 +44,7 @@ class Language(Mapping[LangKey, LangValue]):
                 langval = LangValue(val, raw=True)
             self.__data[LangKey(key)] = langval
 
+    @typechecked
     def __getitem__(self, key: LangKey) -> LangValue:
         return self.__data[key]
 
