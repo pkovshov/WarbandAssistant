@@ -14,9 +14,9 @@ commands = [
   ["pytest", "--doctest-modules"],
 ]
 
-[env.lang_syntax]
+[env.lang]
 commands = [
-  ["pytest", "src/wa_language/syntax", "--doctest-modules"],
+  ["pytest", "src/wa_language", "--doctest-modules"],
 ]
 
 [env.rapid]

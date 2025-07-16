@@ -15,13 +15,13 @@ lang = Language(load_files(path.join(path_conf.language, "troops.csv")))
 
 def print_checker_count(check, caption):
     print(str(caption) + ":",
-          sum(1 for key in lang if check(key)),
-          lang[next(key for key in lang if check(key))])
+          len(check.values(lang)),
+          check.values(lang)[0])
     print()
 
 
 def print_checker_troop(check):
-    val = lang[next(key for key in lang if check(key))]
+    val = check.values(lang)[0]
     print("troop",
           val + ":",
           sum(1 for key in lang if check(key)),
@@ -63,7 +63,7 @@ print_checker_count(is_ransom_broker_key, "Ransom Brokers")
 print_checker_count(is_minstrel_key, "Minstrels")
 print_checker_count(is_book_merchant_key, "Book Merchant")
 print_checker_count(is_ramun_slave_trader_key, "Ramun the slave trader")
-print_checker_count(is_tavern_farmer_key, "Tavern Farmer")
+print_checker_count(is_quest_farmer_key, "Tavern Farmer")
 print_checker_count(is_drunk_key, "Drunks")
 print_checker_count(is_hired_assassin_key, "Hired Assassins")
 print_checker_count(is_town_walker_key, "Townspeople")
