@@ -5,7 +5,7 @@ import rapidfuzz as fz
 from typeguard import typechecked
 
 from wa_language.Language import Language
-from wa_language.model.calendar_model import is_date_key, DateVariables, MIN_YEAR, is_timeofday_key
+from wa_language.model.calendar_model import is_date_key, is_timeofday_key, DateValueModel
 from .MapScreenEvent import DateTimeofday
 
 TEXT = 0
@@ -16,11 +16,12 @@ class MapScreenCalendarFuzzyParser:
     @typechecked
     def __init__(self, lang: Language):
         self.__logger = logging.getLogger(__name__)
-        self.__date_lang = {key: val for key, val in lang.items() if is_date_key(key)}
-        self.__month_spread = {key: val.substitute(DateVariables.Year.value, "")
-                                       .substitute(DateVariables.Day.value, "")
+        self.__timeofday_lang = is_timeofday_key(lang)
+        self.__date_lang = is_date_key(lang)
+        self.__date_model = DateValueModel()
+        self.__month_spread = {key: val.substitute(DateValueModel.YEAR_VAR, "")
+                                       .substitute(DateValueModel.DAY_VAR, "")
                                for key, val in self.__date_lang.items()}
-        self.__timeofday_lang = {key: val for key, val in lang.items() if is_timeofday_key(key)}
         self.__prev_calendar_ocr = None
         self.__pref_date_timeofday = None
 
@@ -53,19 +54,17 @@ class MapScreenCalendarFuzzyParser:
                                            scorer=fz.fuzz.ratio,
                                            choices=self.__month_spread)
         date_key = date_match[KEY]
-        date_val = self.__date_lang[date_key]
         # build year spread
-        year_spread = {year: date_val.substitute(DateVariables.Year.value, str(year))
-                       for year in range(MIN_YEAR, MIN_YEAR+21)}
+        year_spread = self.__date_model.spread(self.__date_lang[date_key],
+                                               DateValueModel.YEAR_VAR)
         # find the best year for found date key
         date_match = fz.process.extractOne(query=date_ocr,
                                            scorer=fz.fuzz.ratio,
                                            choices=year_spread)
         year = date_match[KEY]
-        date_val = date_val.substitute(DateVariables.Year.value, str(year))
         # build day spread
-        day_spread = {day: date_val.substitute(DateVariables.Day.value, str(day))
-                      for day in range(1, 32)}
+        day_spread = self.__date_model.spread(date_match[TEXT],
+                                              DateValueModel.DAY_VAR)
         # find the best day for found date key and year
         # apply score cutoff
         date_match = fz.process.extractOne(query=date_ocr,

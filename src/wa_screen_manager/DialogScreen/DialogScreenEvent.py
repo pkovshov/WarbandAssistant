@@ -3,6 +3,8 @@ from typing import Optional, Tuple
 import numpy as np
 from typeguard import typechecked
 
+from wa_language.Language import LangKey
+
 
 class DialogScreenEvent:
     @typechecked
@@ -10,7 +12,7 @@ class DialogScreenEvent:
                  image: np.ndarray,
                  title_ocr: str,
                  title: str,
-                 title_keys: Tuple[str, ...],
+                 title_keys: Tuple[LangKey, ...],
                  relation_ocr: Optional[str],
                  relation: Optional[int]):
         if relation_ocr is None:

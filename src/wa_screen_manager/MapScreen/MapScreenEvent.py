@@ -3,12 +3,14 @@ from typing import Optional, NamedTuple
 import numpy as np
 from typeguard import typechecked
 
+from wa_language.Language import LangKey
+
 
 class DateTimeofday(NamedTuple):
-    date_key: str
+    date_key: LangKey
     year: int
     day: int
-    timeofday_key: str
+    timeofday_key: LangKey
 
 
 class MapScreenEvent:

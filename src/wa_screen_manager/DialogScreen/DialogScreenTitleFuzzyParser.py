@@ -23,7 +23,7 @@ class DialogScreenTitleFuzzyParser:
         self.__logger = logging.getLogger(__name__)
         self.__title_score_cutoff = dialog_screen_config.fuzzy_title_score_cutoff
         self.__logger.info(f"title_score_cutoff = {self.__title_score_cutoff}")
-        self.__titles = {key: val for key, val in lang.items() if is_troop_key(key)}
+        self.__titles = is_troop_key(lang)
         self.__prev_title_ocr = None
         self.__prev_title_keys = None
 
