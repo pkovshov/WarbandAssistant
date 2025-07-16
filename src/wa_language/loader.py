@@ -18,9 +18,12 @@ def load_files(*args: str, special_language: Optional[Dict[str, str]] = None, en
     :return: A dictionary loaded from the files and optionally extended with the additional language if provided.
     """
     language = special_language.copy() if special_language else {}
-    source = ({key: "special_language" for key in special_language}
+    source = ({key: "special_language:" for key in special_language}
               if special_language
               else {})
+    if '' in language:
+        logger.warning(f"special_language: Empty key. Discard line: |{language['']}")
+        del language['']
     dup_keys = set()
     source_str = lambda file_path, number: f"{file_path}:{number}"
     for file_path in args:
