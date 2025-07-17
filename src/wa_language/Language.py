@@ -58,6 +58,11 @@ class Language(Mapping[LangKey, LangValue]):
     def __len__(self) -> int:
         return len(self.__data)
 
+    def __eq__(self, other) -> bool:
+        # Comparison is an expensive operation.
+        # Since Language is immutable, it's sufficient to check by instance identity.
+        raise NotImplemented("Use operator is instead of ==")
+
 
 class LangContentError(Exception):
     pass
