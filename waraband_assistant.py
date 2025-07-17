@@ -22,8 +22,8 @@ def main(args):
     logging.getLogger(wa_datasets.__name__).setLevel(log_level)
     logging.getLogger(wa_language.__name__).setLevel(log_level)
     logging.getLogger(__name__).setLevel(log_level)
-    game_Screen_manager = GameScreenManager(playername=args.playername,
-                                            playersex=args.playersex,
+    game_Screen_manager = GameScreenManager(player_name=args.playername,
+                                            player_sex=args.playersex,
                                             write_to_dataset=args.dataset)
     # run
     monitor = args.monitor

@@ -3,6 +3,10 @@ from typing import Any, Dict, Iterable
 from typeguard import typechecked
 
 from wa_language.syntax.Identifier import Identifier
+from wa_language.syntax.Binary import (Binary,
+                                       BINARY_CONDITION_VARIABLE,
+                                       BINARY_CONDITION_VARIABLE_FIRST_VALUE,
+                                       BINARY_CONDITION_VARIABLE_SECOND_VALUE)
 from wa_language.syntax.Interpolation import Interpolation
 
 
@@ -19,8 +23,17 @@ class LangValueModel:
     def spread(self, lang_value: Interpolation, lang_var: Identifier) -> Dict[Any, Interpolation]:
         if lang_var not in self.__model:
             raise LangModelError("Spread with variable {repr(str(var))} absent in spread {self.__spread}")
-        if lang_var not in lang_value.variables:
-            raise LangModelError("Spread with variable {repr(str(var))} absent in lang value {repr(str(value))}")
+        # if lang_var not in lang_value.variables:
+        #     raise LangModelError("Spread with variable {repr(str(var))} absent in lang value {repr(str(value))}")
         spread_dict = {substitution: lang_value.substitute(lang_var, str(substitution))
                        for substitution in self.__model[lang_var]}
         return spread_dict
+
+class SexLangValueModel(LangValueModel):
+    def __init__(self):
+        super().__init__({BINARY_CONDITION_VARIABLE: (BINARY_CONDITION_VARIABLE_FIRST_VALUE,
+                                                      BINARY_CONDITION_VARIABLE_SECOND_VALUE)})
+
+    @typechecked
+    def spread(self, lang_value: Interpolation) -> Dict[Any, Interpolation]:
+        return super().spread(lang_value, BINARY_CONDITION_VARIABLE)

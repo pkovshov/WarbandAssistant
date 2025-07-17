@@ -1,15 +1,13 @@
 from collections import namedtuple
 import logging
-from typing import Mapping, Optional, Tuple
+from typing import Tuple
 
 import rapidfuzz as fz
 from typeguard import typechecked
 
-from wa_language.Language import Language
+from wa_language.Language import Language, LangKey
 from wa_language.model.troop_keys import is_troop_key
 
-
-Result = namedtuple("Result", "score, keys")
 
 TEXT = 0
 SCORE = 1
@@ -36,7 +34,7 @@ class DialogScreenTitleFuzzyParser:
                 else title_ocr)
 
     @typechecked
-    def keys(self, title_ocr: str) -> Tuple[str, ...]:
+    def keys(self, title_ocr: str) -> Tuple[LangKey, ...]:
         if title_ocr != self.__prev_title_ocr:
             self.__prev_title_ocr = title_ocr
             prepped_title_ocr = self.prep(title_ocr)
@@ -44,7 +42,7 @@ class DialogScreenTitleFuzzyParser:
         return self.__prev_title_keys
 
     @typechecked
-    def __fuzzy_title(self, title_ocr: str) -> Tuple[str, ...]:
+    def __fuzzy_title(self, title_ocr: str) -> Tuple[LangKey, ...]:
         choices = self.__titles
         # token set ratio with score cutoff
         matches = fz.process.extract(query=title_ocr,
@@ -70,6 +68,6 @@ class DialogScreenTitleFuzzyParser:
             if match[TEXT] != best_text:
                 self.__logger.warning(f"best matches have different texts: '{best_text}' and 'match[TEXT]'")
                 break
-        # build result
+        # Note: use Tuple instead of FrozenSen due to it should be faster
         keys = tuple(key for _, _, key in matches)
         return keys

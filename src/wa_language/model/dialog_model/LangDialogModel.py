@@ -1,4 +1,4 @@
-from typing import Dict, FrozenSet, Set
+from typing import Dict, Set, Tuple
 
 from typeguard import typechecked
 
@@ -17,7 +17,7 @@ class LangDialogModel:
         self.__lang = lang
         self.__player_sex = player_sex
 
-        self.__title_checker_to_body_keys: Dict[KeyChecker, LangKey] = {}
+        self.__title_checker_to_body_keys: Dict[KeyChecker, Tuple[LangKey, ...]] = {}
         self.__body_lang: Dict[LangKey, Interpolation] = {}
 
         self.__add_kings_bodies()
@@ -25,12 +25,18 @@ class LangDialogModel:
 
         self.__body_lang = self.substitute_sex_to_lang(self.__body_lang)
 
+    @property
+    def lang(self): return self.__lang
+
+    @property
+    def player_sex(self): return self.__player_sex
+
     @typechecked
-    def get_body_keys(self, lang_key: LangKey) -> Optional[FrozenSet[LangKey]]:
+    def get_body_keys(self, title_key: LangKey) -> Tuple[LangKey, ...]:
         for title_checker, body_keys in self.__title_checker_to_body_keys.items():
-            if lang_key in title_checker:
+            if title_key in title_checker:
                 return body_keys
-        return None
+        return tuple()
 
     @typechecked
     def get_value(self, key: LangKey) -> Optional[Interpolation]:
@@ -47,7 +53,7 @@ class LangDialogModel:
             self.__body_lang[key] = val
             body_keys.add(key)
         # add king_title_checker
-        body_keys = frozenset(body_keys)
+        body_keys = tuple(body_keys)
         self.__title_checker_to_body_keys[king_title_checker] = body_keys
 
     def __add_lords_bodies(self):
@@ -61,7 +67,7 @@ class LangDialogModel:
             self.__body_lang[key] = val
             body_keys.add(key)
         # add lord_title_checker
-        body_keys = frozenset(body_keys)
+        body_keys = tuple(body_keys)
         self.__title_checker_to_body_keys[lord_title_checker] = body_keys
 
     @typechecked

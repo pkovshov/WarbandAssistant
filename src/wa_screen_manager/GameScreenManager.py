@@ -18,8 +18,8 @@ from .GameUserFriendlyLogger import DialogScreenLogger
 class GameScreenManager:
     @typechecked
     def __init__(self,
-                 playername: Optional[str] = None,
-                 playersex: Optional[PlayerSex] = None,
+                 player_name: Optional[str] = None,
+                 player_sex: Optional[PlayerSex] = None,
                  write_to_dataset: Optional[bool] = False):
         self.__logger = logging.getLogger(__name__)
         # TODO: someone need to warn if playername is blank string like '  '
@@ -28,17 +28,17 @@ class GameScreenManager:
         #       or maybe is part of other dialog titles (Merchant for example)
         #       Also it needs to process such cases in DialogScreen
         special_language = None
-        if playername is not None:
-            special_language = {"wa_player": playername}
+        if player_name is not None:
+            special_language = {"wa_player": player_name}
         lang = Language.load(special_language)
         self.__map_screen_manger = MapScreenManager(lang, write_to_dataset)
-        self.__dialog_screen_manger = DialogScreenManager(lang, write_to_dataset, playername)
+        self.__dialog_screen_manger = DialogScreenManager(lang, write_to_dataset, player_name, player_sex)
         self.__user_friendly_logger = DialogScreenLogger(lang)
         self.__map_screen_manger.add_event_listener(self.__user_friendly_logger.on_map_screen)
         self.__dialog_screen_manger.add_event_listener(self.__user_friendly_logger.on_dialog_screen)
         self.__logger.info("Player: name {}, sex {}"
-                           .format("NOT defined" if playername is None else f"= {repr(playername)}",
-                                   "NOT defined" if playersex is None else f"= {playersex.value}"))
+                           .format("NOT defined" if player_name is None else f"= {repr(player_name)}",
+                                   "NOT defined" if player_sex is None else f"= {player_sex.value}"))
 
     @typechecked
     def run(self, monitor_idx: int):

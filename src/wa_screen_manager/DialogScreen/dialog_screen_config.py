@@ -12,10 +12,11 @@ dialog_screen_sample_boxes = (
 )
 
 title_box = Box(668, 72, 1819, 118)
-title_threshold = 98
 fuzzy_title_score_cutoff = 75
 
 relation_box = Box(98, 420, 312, 450)
 relation_sample_boxes = (
     (Box(58, 346, 120, 365), Box(481, 639, 537, 647)),
 )
+
+body_box = Box(668, 154, 1819, 600)
