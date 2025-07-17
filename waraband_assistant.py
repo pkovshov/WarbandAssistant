@@ -9,6 +9,7 @@ scrip_dir_path = os.path.abspath(os.path.dirname(__file__))
 os.chdir(scrip_dir_path)
 sys.path.append(os.path.abspath(os.path.join(scrip_dir_path, 'src')))
 
+from wa_language.model.types import PlayerSex
 from wa_screen_manager.GameScreenManager import GameScreenManager
 import wa_screen_manager, wa_datasets, wa_language
 
@@ -21,15 +22,12 @@ def main(args):
     logging.getLogger(wa_datasets.__name__).setLevel(log_level)
     logging.getLogger(wa_language.__name__).setLevel(log_level)
     logging.getLogger(__name__).setLevel(log_level)
-    # process player name
-    playername = args.player
-    # create GameScreenManager
-    write_to_dataset = args.dataset
-    game_Screen_manager = GameScreenManager(playername=playername,
-                                            write_to_dataset=write_to_dataset)
+    game_Screen_manager = GameScreenManager(playername=args.playername,
+                                            playersex=args.playersex,
+                                            write_to_dataset=args.dataset)
     # run
     monitor = args.monitor
-    print("START", "datasets", "ON" if write_to_dataset else "OFF")
+    print("START", "datasets", "ON" if args.dataset else "OFF")
     try:
         game_Screen_manager.run(monitor)
     except KeyboardInterrupt:
@@ -49,9 +47,16 @@ parser.add_argument("-m", "--monitor",
                     help="The number of the monitor to be captured (starting from 1, default is 1).",
                     metavar="2")
 parser.add_argument("-p", "--player",
-                    action="append", type=str, default=[],
+                    dest='playername', action="append", type=str, default=[],
                     help="A player name",
                     metavar="'Sid Neil'")
+parser_sex_group = parser.add_mutually_exclusive_group()
+parser_sex_group.add_argument('-male', '--male',
+                              dest='playersex', action='store_const', const=PlayerSex.MALE,
+                              help='Male player sex')
+parser_sex_group.add_argument('-female', '--female',
+                              dest='playersex', action='store_const', const=PlayerSex.FEMALE,
+                              help='Female player sex')
 parser.set_defaults(func=main)
 
 
@@ -60,7 +65,7 @@ if __name__ == "__main__":
     if sys_args.monitor is not None and len(sys_args.monitor) > 1:
         parser.error("argument -m/--monitor cannot be specified twice.")
     sys_args.monitor = sys_args.monitor[0] if sys_args.monitor else 1
-    if sys_args.player is not None and len(sys_args.player) > 1:
-        parser.error("argument -m/--monitor cannot be specified twice.")
-    sys_args.player = sys_args.player[0] if sys_args.player else None
+    if sys_args.playername is not None and len(sys_args.playername) > 1:
+        parser.error("argument -p/--player cannot be specified twice.")
+    sys_args.playername = sys_args.playername[0] if sys_args.playername else None
     sys_args.func(sys_args)

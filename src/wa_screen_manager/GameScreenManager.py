@@ -8,6 +8,7 @@ import numpy as np
 from typeguard import typechecked
 
 from wa_language import Language
+from wa_language.model.types import PlayerSex
 from .SampleMatch import SampleMatch
 from .DialogScreen.DialogScreenManager import DialogScreenManager
 from .MapScreen.MapScreenManager import MapScreenManager
@@ -16,7 +17,10 @@ from .GameUserFriendlyLogger import DialogScreenLogger
 
 class GameScreenManager:
     @typechecked
-    def __init__(self, playername: Optional[str] = None, write_to_dataset: Optional[bool] = False):
+    def __init__(self,
+                 playername: Optional[str] = None,
+                 playersex: Optional[PlayerSex] = None,
+                 write_to_dataset: Optional[bool] = False):
         self.__logger = logging.getLogger(__name__)
         # TODO: someone need to warn if playername is blank string like '  '
         #       such name could broke fuzzy
@@ -32,10 +36,9 @@ class GameScreenManager:
         self.__user_friendly_logger = DialogScreenLogger(lang)
         self.__map_screen_manger.add_event_listener(self.__user_friendly_logger.on_map_screen)
         self.__dialog_screen_manger.add_event_listener(self.__user_friendly_logger.on_dialog_screen)
-        if playername is None:
-            self.__logger.info(f"playername NOT defined")
-        else:
-            self.__logger.info(f"playername = {repr(playername)}")
+        self.__logger.info("Player: name {}, sex {}"
+                           .format("NOT defined" if playername is None else f"= {repr(playername)}",
+                                   "NOT defined" if playersex is None else f"= {playersex.value}"))
 
     @typechecked
     def run(self, monitor_idx: int):
