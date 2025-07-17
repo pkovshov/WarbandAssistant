@@ -13,13 +13,11 @@ from wa_language.model.types import PlayerSex, LordPersonality
 from wa_language.Language import LangKey
 from wa_language.model.LangKeyChecker import key_checker
 
-
-__comment_intro_by_player_sex = {
-    PlayerSex.MALE: key_checker(lambda key: (key.startswith("str_comment_intro_famous_") or
+__comment_intro_common_checker = key_checker(lambda key: (key.startswith("str_comment_intro_famous_") or
                                              key.startswith("str_comment_intro_noble_") or
-                                             key.startswith("str_comment_intro_common_"))),
-    PlayerSex.FEMALE: key_checker(lambda key: key.startswith("str_comment_intro_female_"))
-}
+                                             key.startswith("str_comment_intro_common_")))
+
+__comment_intro_female_only_checker = key_checker(lambda key: key.startswith("str_comment_intro_female_"))
 
 __comment_intro_filter_by_lord_personality = {
     LordPersonality.MARTIAL: key_checker(lambda key: "martial" in key),
@@ -35,11 +33,11 @@ __comment_intro_filter_king = key_checker(lambda key: "liege" in key)
 
 
 @typechecked
-def build_lord_comment_intro_checker(lord_personality: Optional[LordPersonality] = None,
-                                     player_sex: Optional[PlayerSex] = None):
-    checker = (__comment_intro_by_player_sex[player_sex]
-               if player_sex
-               else key_checker(__comment_intro_by_player_sex.values()))
+def build_lord_comment_intro_key_checker(lord_personality: Optional[LordPersonality] = None,
+                                         player_sex: Optional[PlayerSex] = None):
+    checker = (__comment_intro_common_checker
+               if player_sex is PlayerSex.MALE
+               else key_checker(__comment_intro_common_checker, __comment_intro_female_only_checker))
     if lord_personality is not None:
         checker = key_checker(checker, filter=__comment_intro_filter_by_lord_personality[lord_personality])
     else:
@@ -48,10 +46,10 @@ def build_lord_comment_intro_checker(lord_personality: Optional[LordPersonality]
 
 
 @typechecked
-def build_king_comment_intro_checker(player_sex: Optional[PlayerSex] = None):
-    checker = (__comment_intro_by_player_sex[player_sex]
-               if player_sex
-               else key_checker(__comment_intro_by_player_sex.values()))
+def build_king_comment_intro_key_checker(player_sex: Optional[PlayerSex] = None):
+    checker = (__comment_intro_common_checker
+               if player_sex is PlayerSex.MALE
+               else key_checker(__comment_intro_common_checker, __comment_intro_female_only_checker))
     return key_checker(checker, filter=__comment_intro_filter_king)
 
 

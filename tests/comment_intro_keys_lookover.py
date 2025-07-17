@@ -4,15 +4,16 @@ from wa_language.model.dialog_model.comment_intro_keys import *
 
 lang = load()
 
+VAL_CROP = 120
 
 print("=" * 80)
 print("=", "King")
 print("=" * 80)
 for player_sex in (None, PlayerSex.MALE, PlayerSex.FEMALE):
     print("player_sex:", None if player_sex is None else player_sex.name)
-    checker = build_king_comment_intro_checker(player_sex)(lang)
+    checker = build_king_comment_intro_key_checker(player_sex)(lang)
     for key, val in checker.items():
-        print(f"{key}|{val[:80]}")
+        print(f"{key}|{val[:VAL_CROP]}")
     print(len(checker))
     print()
 
@@ -21,9 +22,9 @@ print("=", "Lords")
 print("=" * 80)
 for player_sex in (None, PlayerSex.MALE, PlayerSex.FEMALE):
     print("player_sex:", None if player_sex is None else player_sex.name)
-    checker = build_lord_comment_intro_checker(player_sex=player_sex)(lang)
+    checker = build_lord_comment_intro_key_checker(player_sex=player_sex)(lang)
     for key, val in checker.items():
-        print(f"{key}|{val[:80]}")
+        print(f"{key}|{val[:VAL_CROP]}")
     print(len(checker))
     print()
 
@@ -33,9 +34,9 @@ for lord_personality in LordPersonality:
     print("=" * 80)
     for player_sex in (None, PlayerSex.MALE, PlayerSex.FEMALE):
         print("player_sex:", None if player_sex is None else player_sex.name)
-        checker = build_lord_comment_intro_checker(lord_personality=lord_personality,
-                                                   player_sex=player_sex)(lang)
+        checker = build_lord_comment_intro_key_checker(lord_personality=lord_personality,
+                                                       player_sex=player_sex)(lang)
         for key, val in checker.items():
-            print(f"{key}|{val[:80]}")
+            print(f"{key}|{val[:VAL_CROP]}")
         print(len(checker))
         print()

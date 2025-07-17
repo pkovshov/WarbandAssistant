@@ -14,3 +14,7 @@ class LordPersonality(Enum):
     SADISTIC = "sadistic"
     GOODNATURED = "goodnatured"
     UPSTANDING = "upstanding"
+
+
+class LangModelError(Exception):
+    pass

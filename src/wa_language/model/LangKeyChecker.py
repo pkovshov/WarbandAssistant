@@ -272,6 +272,13 @@ class KeyChecker:
                 (self.__check(key) if self.__check else True))
 
     @typechecked
+    def lang(self, language: Language) -> "LangKeyChecker":
+        if language is not self.__lang:
+            self.__lang = language
+            self.__lang_key_checker = LangKeyChecker(language, self)
+        return self.__lang_key_checker
+
+    @typechecked
     def __call__(self, lang: Language) -> "LangKeyChecker":
         if lang is not self.__lang:
             self.__lang = lang
