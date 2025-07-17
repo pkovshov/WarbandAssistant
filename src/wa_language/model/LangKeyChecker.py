@@ -122,6 +122,25 @@ True
 >>> hash(is_good_mult) == hash(is_good)
 True
 
+>>> is_not_good_hero = KeyChecker(is_hero, exclude=is_good)
+>>> LangKey("bad") in is_not_good_hero
+True
+>>> LangKey("good") in is_not_good_hero
+False
+>>> print(*is_not_good_hero(lang).values(), sep=", ")
+Ursula
+>>> KeyChecker(is_not_good_hero) is is_not_good_hero
+True
+>>> is_not_good_hero_same = KeyChecker(is_hero, exclude=is_good)
+>>> is_not_good_hero_same is is_not_good_hero
+False
+>>> set(is_not_good_hero_same(lang).values()) == set(is_not_good_hero(lang).values())
+True
+>>> is_not_good_hero_same == is_not_good_hero
+True
+>>> hash(is_not_good_hero_same) == hash(is_not_good_hero)
+True
+
 >>> KeyChecker(1)
 Traceback (most recent call last):
 TypeError: ...
@@ -141,7 +160,7 @@ Robin Hood, Ursula
 True
 """
 
-from typing import Callable, Iterable, Iterator, Mapping
+from typing import Callable, Iterable, Iterator, Mapping, Optional
 
 from typeguard import typechecked
 
@@ -149,24 +168,31 @@ from wa_language.Language import Language, LangKey, LangValue
 
 
 class KeyChecker:
-    def __new__(cls, *args):
-        if len(args) == 1 and isinstance(args[0], KeyChecker):
+    def __new__(cls, *args, **kwargs):
+        if len(args) == 1 and len(kwargs) == 0 and isinstance(args[0], KeyChecker):
             return args[0]
         else:
             return super().__new__(cls)
 
-    def __init__(self, *args):
-        if len(args) == 0:
-            raise TypeError("KeyChecker expected at least 1 argument, got 0")
+    @typechecked
+    def __init__(self, *args, exclude: Optional["KeyChecker"] = None):
+        if len(args) == 1 and args[0] is self:
+            return  # do nothing to avoid maximum recursion depth exceeded
         self.__lang = None
+        self.__exclude = exclude
         checkers = []
+        if len(args) == 0:
+            self.__check = None
+            return
         if len(args) == 1:
             checker = args[0]
-            if checker is self:
-                return  # do nothing to avoid maximum recursion depth exceeded
-            elif isinstance(checker, str):
+            if isinstance(checker, str):
                 self.__str = checker
                 self.__check = self.__check_str
+                return
+            elif isinstance(checker, KeyChecker):
+                self.__checkers = checker,
+                self.__check = self.__check_tuple
                 return
             elif isinstance(checker, Callable):
                 self.__check = checker
@@ -196,7 +222,8 @@ class KeyChecker:
 
     @typechecked
     def __contains__(self, key: LangKey) -> bool:
-        return self.__check(key)
+        return ((self.__check(key) if self.__check else True) and
+                (key not in self.__exclude if self.__exclude else True))
 
     @typechecked
     def __call__(self, lang: Language) -> "LangKeyChecker":
@@ -208,6 +235,8 @@ class KeyChecker:
     def __eq__(self, other):
         if not isinstance(other, KeyChecker):
             return NotImplemented
+        if self.__exclude != other.__exclude:
+            return False
         try:
             return self.__str == other.__str
         except AttributeError:
@@ -218,12 +247,12 @@ class KeyChecker:
 
     def __hash__(self):
         try:
-            return hash(self.__str)
+            return hash((self.__str, self.__exclude))
         except AttributeError:
             try:
-                return hash(self.__checkers)
+                return hash((self.__checkers, self.__exclude))
             except AttributeError:
-                return hash(self.__check)
+                return hash((self.__check, self.__exclude))
 
 
 class LangKeyChecker(Mapping[LangKey, LangValue]):
