@@ -1,6 +1,6 @@
 """
 Tests:
->>> lang = Language(dict(a="Anna", b="Boris", good="Robin Hood", bad="Ursula"))
+>>> lang = Language(dict(a="Anna", b="Boris", good="Robin Hood", bad="Ursula", fool="Pippin Took"))
 
 >>> is_alphabet = key_checker("alpha", "beta", "gama")
 >>> LangKey("alpha") in is_alphabet
@@ -8,7 +8,7 @@ True
 >>> LangKey("alpha") in is_alphabet(lang)
 False
 
->>> is_hero = KeyChecker(lambda key: key in ("good", "bad"))
+>>> is_hero = KeyChecker(lambda key: key in ("good", "bad", "fool"))
 >>> "dom" in is_hero
 Traceback (most recent call last):
 typeguard.TypeCheckError: ...
@@ -16,8 +16,8 @@ typeguard.TypeCheckError: ...
 False
 >>> LangKey("good") in is_hero
 True
->>> print(*is_hero(lang).values(), sep=", ")
-Robin Hood, Ursula
+>>> print(*sorted(is_hero(lang).values()), sep=", ")
+Pippin Took, Robin Hood, Ursula
 
 >>> is_good = KeyChecker("good")
 >>> LangKey("good") in is_good
@@ -41,13 +41,13 @@ True
 >>> hash(is_good_2) == hash(is_good)
 True
 
->>> is_hero_mult = KeyChecker(["good", "bad"])
+>>> is_hero_mult = KeyChecker(["good", "bad", "fool"])
 >>> LangKey("dom") in is_hero_mult
 False
 >>> LangKey("good") in is_hero_mult
 True
->>> print(*is_hero_mult(lang).values(), sep=", ")
-Robin Hood, Ursula
+>>> print(*sorted(is_hero_mult(lang).values()), sep=", ")
+Pippin Took, Robin Hood, Ursula
 >>> set(is_hero_mult(lang).values()) == set(is_hero(lang).values())
 True
 >>> is_hero_mult == is_hero
@@ -55,13 +55,13 @@ False
 >>> hash(is_hero_mult) == hash(is_hero)  # Might be True for hash collision case
 False
 
->>> is_hero_mult_2 = KeyChecker("good", "bad")
+>>> is_hero_mult_2 = KeyChecker("good", "bad", "fool")
 >>> LangKey("dom") in is_hero_mult_2
 False
 >>> LangKey("good") in is_hero_mult_2
 True
->>> print(*is_hero_mult_2(lang).values(), sep=", ")
-Robin Hood, Ursula
+>>> print(*sorted(is_hero_mult_2(lang).values()), sep=", ")
+Pippin Took, Robin Hood, Ursula
 >>> is_hero_mult_2 is is_hero_mult
 False
 >>> set(is_hero_mult_2(lang).values()) == set(is_hero_mult(lang).values())
@@ -71,13 +71,13 @@ True
 >>> hash(is_hero_mult_2) == hash(is_hero_mult)
 True
 
->>> is_hero_mult_3 = KeyChecker(is_good, "bad")
+>>> is_hero_mult_3 = KeyChecker(is_good, "bad", lambda x: x=="fool")
 >>> LangKey("dom") in is_hero_mult_3
 False
 >>> LangKey("good") in is_hero_mult_3
 True
->>> print(*is_hero_mult_3(lang).values(), sep=", ")
-Robin Hood, Ursula
+>>> print(*sorted(is_hero_mult_3(lang).values()), sep=", ")
+Pippin Took, Robin Hood, Ursula
 >>> is_hero_mult_3 is is_hero_mult
 False
 >>> is_hero_mult_3(lang) is is_hero_mult(lang)
@@ -86,18 +86,18 @@ False
 True
 >>> set(is_hero_mult_3(lang).values()) == set(is_hero_mult(lang).values())
 True
->>> is_hero_mult_3 == is_hero_mult
-True
->>> hash(is_hero_mult_3) == hash(is_hero_mult)
-True
+>>> is_hero_mult_3 == is_hero_mult  # due to lambda
+False
+>>> hash(is_hero_mult_3) == hash(is_hero_mult)  # due to lambda
+False
 
->>> is_hero_mult_4 = KeyChecker((lambda val: val == "good"), "bad")
+>>> is_hero_mult_4 = KeyChecker((lambda val: val == "good"), "bad", "fool")
 >>> LangKey("dom") in is_hero_mult_4
 False
 >>> LangKey("good") in is_hero_mult_4
 True
->>> print(*is_hero_mult_4(lang).values(), sep=", ")
-Robin Hood, Ursula
+>>> print(*sorted(is_hero_mult_4(lang).values()), sep=", ")
+Pippin Took, Robin Hood, Ursula
 >>> set(is_hero_mult_4(lang).values()) == set(is_hero_mult(lang).values())
 True
 >>> is_hero_mult_4 == is_hero_mult  # due to KeyChecker("good") != KeyChecker(lambda val: val == "good")
@@ -125,10 +125,12 @@ True
 >>> is_not_good_hero = KeyChecker(is_hero, exclude=is_good)
 >>> LangKey("bad") in is_not_good_hero
 True
+>>> LangKey("fool") in is_not_good_hero
+True
 >>> LangKey("good") in is_not_good_hero
 False
->>> print(*is_not_good_hero(lang).values(), sep=", ")
-Ursula
+>>> print(*sorted(is_not_good_hero(lang).values()), sep=", ")
+Pippin Took, Ursula
 >>> KeyChecker(is_not_good_hero) is is_not_good_hero
 True
 >>> is_not_good_hero_same = KeyChecker(is_hero, exclude=is_good)
@@ -139,6 +141,48 @@ True
 >>> is_not_good_hero_same == is_not_good_hero
 True
 >>> hash(is_not_good_hero_same) == hash(is_not_good_hero)
+True
+
+>>> is_oo_hero = KeyChecker(is_hero, filter=KeyChecker(lambda x: "oo" in x))
+>>> LangKey("bad") in is_oo_hero
+False
+>>> LangKey("fool") in is_oo_hero
+True
+>>> LangKey("good") in is_oo_hero
+True
+>>> print(*sorted(is_oo_hero(lang).values()), sep=", ")
+Pippin Took, Robin Hood
+>>> KeyChecker(is_oo_hero) is is_oo_hero
+True
+>>> is_oo_hero_same = KeyChecker(is_hero, filter=KeyChecker(lambda x: "oo" in x))
+>>> is_oo_hero_same is is_oo_hero
+False
+>>> set(is_oo_hero_same(lang).values()) == set(is_oo_hero(lang).values())
+True
+>>> is_oo_hero_same == is_oo_hero  # due to same labda functions are not equal
+False
+>>> hash(is_oo_hero_same) == hash(is_oo_hero)  # due to same labda functions are not equal
+False
+
+>>> is_not_good_fool_hero = KeyChecker(is_hero, exclude=is_good, filter=KeyChecker("fool"))
+>>> LangKey("bad") in is_not_good_fool_hero
+False
+>>> LangKey("fool") in is_not_good_fool_hero
+True
+>>> LangKey("good") in is_not_good_fool_hero
+False
+>>> print(*is_not_good_fool_hero(lang).values(), sep=", ")
+Pippin Took
+>>> KeyChecker(is_not_good_fool_hero) is is_not_good_fool_hero
+True
+>>> is_not_good_fool_hero_same = KeyChecker(is_hero, exclude=is_good, filter=KeyChecker("fool"))
+>>> is_not_good_fool_hero_same is is_not_good_fool_hero
+False
+>>> set(is_not_good_fool_hero_same(lang).values()) == set(is_not_good_fool_hero(lang).values())
+True
+>>> is_not_good_fool_hero_same == is_not_good_fool_hero
+True
+>>> hash(is_not_good_fool_hero_same) == hash(is_not_good_fool_hero)
 True
 
 >>> KeyChecker(1)
@@ -175,10 +219,11 @@ class KeyChecker:
             return super().__new__(cls)
 
     @typechecked
-    def __init__(self, *args, exclude: Optional["KeyChecker"] = None):
+    def __init__(self, *args, filter: Optional["KeyChecker"] = None, exclude: Optional["KeyChecker"] = None):
         if len(args) == 1 and args[0] is self:
             return  # do nothing to avoid maximum recursion depth exceeded
         self.__lang = None
+        self.__filter = filter
         self.__exclude = exclude
         checkers = []
         if len(args) == 0:
@@ -222,8 +267,9 @@ class KeyChecker:
 
     @typechecked
     def __contains__(self, key: LangKey) -> bool:
-        return ((self.__check(key) if self.__check else True) and
-                (key not in self.__exclude if self.__exclude else True))
+        return ((key in self.__filter if self.__filter else True) and
+                (key not in self.__exclude if self.__exclude else True) and
+                (self.__check(key) if self.__check else True))
 
     @typechecked
     def __call__(self, lang: Language) -> "LangKeyChecker":
@@ -235,6 +281,8 @@ class KeyChecker:
     def __eq__(self, other):
         if not isinstance(other, KeyChecker):
             return NotImplemented
+        if self.__filter != other.__filter:
+            return False
         if self.__exclude != other.__exclude:
             return False
         try:
@@ -246,13 +294,14 @@ class KeyChecker:
                 return self.__check == other.__check
 
     def __hash__(self):
+        filter_and_exclude = self.__filter, self.__exclude
         try:
-            return hash((self.__str, self.__exclude))
+            return hash((self.__str, filter_and_exclude))
         except AttributeError:
             try:
-                return hash((self.__checkers, self.__exclude))
+                return hash((self.__checkers, filter_and_exclude))
             except AttributeError:
-                return hash((self.__check, self.__exclude))
+                return hash((self.__check, filter_and_exclude))
 
 
 class LangKeyChecker(Mapping[LangKey, LangValue]):
@@ -275,5 +324,5 @@ class LangKeyChecker(Mapping[LangKey, LangValue]):
         return len(self.__data)
 
 
-def key_checker(*args) -> KeyChecker:
-    return KeyChecker(*args)
+def key_checker(*args, filter=None, exclude=None):
+    return KeyChecker(*args, filter=filter, exclude=exclude)
