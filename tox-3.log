@@ -1,0 +1,128 @@
+smoke: commands[0]> pytest --doctest-modules --ignore tests/test_parsing_by_datasets
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+cachedir: .tox/smoke/.pytest_cache
+rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
+plugins: typeguard-4.4.4
+collected 18 items
+
+src/wa_language/Language.py ..                                           [ 11%]
+src/wa_language/model/LangKeyChecker.py .                                [ 16%]
+src/wa_language/syntax/Binary.py ..                                      [ 27%]
+src/wa_language/syntax/Field.py .                                        [ 33%]
+src/wa_language/syntax/Identifier.py ..                                  [ 44%]
+src/wa_language/syntax/Interpolation.py ....                             [ 66%]
+src/wa_language/syntax/Ternary.py .                                      [ 72%]
+src/wa_types/Box.py .                                                    [ 77%]
+tests/datasets_test.py ....                                              [100%]
+
+============================= 18 passed in 10.67s ==============================
+smoke: OK ✔ in 11.08 seconds
+by_dialog_titles_ds: commands[0]> pytest tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+cachedir: .tox/by_dialog_titles_ds/.pytest_cache
+rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
+plugins: typeguard-4.4.4
+collected 212 items
+
+tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py ......... [  4%]
+.............................................................F.......... [ 38%]
+.......F................................................................ [ 72%]
+...........................................................              [100%]
+
+=================================== FAILURES ===================================
+_______________ test_dialog_title_dataset[000222-meta70-image70] _______________
+
+idx = '000222'
+meta = MetaItem(verification=None, resolution=[1920, 1080], language='en', playername='Ulrich', crop=[668, 74, 1819, 114], sa...rp_knight_6_1_pl'], git_branch='master', git_commit='07fb8f13c2320f6bb26dd5efacabf30789856cef', git_has_modified=False)
+image = array([[[ 44,  69, 105],
+        [ 46,  72, 108],
+        [ 45,  71, 106],
+        ...,
+        [ 54,  81, 124],
+     ...  ...,
+        [ 28,  42,  67],
+        [ 85,  94, 117],
+        [ 96, 108, 126]]], shape=(1080, 1920, 3), dtype=uint8)
+
+    @pytest.mark.parametrize("idx, meta, image", idx_meta_image)
+    def test_dialog_title_dataset(idx, meta, image):
+        ocr.ocr(image)  # Dry run to simulate two identical images in a row
+        title_ocr = ocr.ocr(image)
+        title_keys = parser.keys(title_ocr)
+>       assert title_keys == tuple(meta.keys), f"OCR: {title_ocr}"
+E       AssertionError: OCR: Emir Ugqais:
+E       assert () == ('trp_knight_6_1_pl',)
+E         
+E         Right contains one more item: 'trp_knight_6_1_pl'
+E         Use -v to get more diff
+
+tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py:53: AssertionError
+_______________ test_dialog_title_dataset[000242-meta88-image88] _______________
+
+idx = '000242'
+meta = MetaItem(verification=None, resolution=[1920, 1080], language='en', playername='Ulrich', crop=[668, 72, 1819, 116], sa...rp_knight_6_1_pl'], git_branch='master', git_commit='a29bdc177a8c1c0a776c80daadd9d047929464f7', git_has_modified=False)
+image = array([[[ 44,  69, 105],
+        [ 46,  72, 108],
+        [ 45,  71, 106],
+        ...,
+        [ 54,  81, 124],
+     ...  ...,
+        [ 28,  42,  67],
+        [ 85,  94, 117],
+        [ 96, 108, 126]]], shape=(1080, 1920, 3), dtype=uint8)
+
+    @pytest.mark.parametrize("idx, meta, image", idx_meta_image)
+    def test_dialog_title_dataset(idx, meta, image):
+        ocr.ocr(image)  # Dry run to simulate two identical images in a row
+        title_ocr = ocr.ocr(image)
+        title_keys = parser.keys(title_ocr)
+>       assert title_keys == tuple(meta.keys), f"OCR: {title_ocr}"
+E       AssertionError: OCR: Emir Ugqais:
+E       assert () == ('trp_knight_6_1_pl',)
+E         
+E         Right contains one more item: 'trp_knight_6_1_pl'
+E         Use -v to get more diff
+
+tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py:53: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py::test_dialog_title_dataset[000222-meta70-image70]
+FAILED tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py::test_dialog_title_dataset[000242-meta88-image88]
+======================== 2 failed, 210 passed in 21.87s ========================
+by_dialog_titles_ds: exit 1 (22.11 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py pid=1519118
+by_dialog_titles_ds: FAIL ✖ in 22.12 seconds
+by_dialog_relations_ds: commands[0]> pytest tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+cachedir: .tox/by_dialog_relations_ds/.pytest_cache
+rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
+plugins: typeguard-4.4.4
+collected 33 items
+
+tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py ...... [ 18%]
+...........................                                              [100%]
+
+============================== 33 passed in 3.26s ==============================
+by_dialog_relations_ds: OK ✔ in 3.46 seconds
+by_map_calendars_ds: commands[0]> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+cachedir: .tox/by_map_calendars_ds/.pytest_cache
+rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
+plugins: typeguard-4.4.4
+collected 336 items
+
+tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py ......... [  2%]
+........................................................................ [ 24%]
+........................................................................ [ 45%]
+........................................................................ [ 66%]
+........................................................................ [ 88%]
+.......................................                                  [100%]
+
+============================= 336 passed in 31.21s =============================
+  smoke: OK (11.08=setup[0.03]+cmd[11.05] seconds)
+  by_dialog_titles_ds: FAIL code 1 (22.12=setup[0.00]+cmd[22.11] seconds)
+  by_dialog_relations_ds: OK (3.46=setup[0.01]+cmd[3.46] seconds)
+  by_map_calendars_ds: OK (31.44=setup[0.01]+cmd[31.43] seconds)
+  evaluation failed :( (68.14 seconds)
