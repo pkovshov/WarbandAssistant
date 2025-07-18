@@ -35,7 +35,7 @@ MetaKey = namedtuple("MetaKey",
                      "sample_matches")
 
 
-class DialogTitleDataset(BaseImageDataset):
+class DialogTitlesDataset(BaseImageDataset):
     NAME = "dialog_titles"
 
     @typechecked
@@ -43,13 +43,13 @@ class DialogTitleDataset(BaseImageDataset):
                  resolution: Optional[Resolution] = None,
                  crop: Optional[Box] = None,
                  language: Optional[str] = None,
-                 playername: Optional[str] = None,
+                 player_name: Optional[str] = None,
                  lazy_load: bool = False):
-        super().__init__(DialogTitleDataset.NAME, resolution, lazy_load)
+        super().__init__(self.NAME, resolution, lazy_load)
         self.__resolution = resolution
         self.__crop = crop
         self.__language = language
-        self.__playername = playername
+        self.__player_name = player_name
 
     @typechecked
     def meta_and_image_path(self) -> Optional[dict[int, MetaAndImagePath[MetaItem, str]]]:
@@ -58,7 +58,7 @@ class DialogTitleDataset(BaseImageDataset):
     @typechecked
     def add(self,
             screenshot: np.ndarray,
-            sample_matches: bool,
+            screen_sample_matches: bool,
             title_ocr: str,
             title_fuzzy_score: Optional[float],
             title_keys: Tuple[LangKey, ...]):
@@ -68,11 +68,11 @@ class DialogTitleDataset(BaseImageDataset):
         super().add(MetaItem(verification=None,
                              resolution=tuple(self.__resolution),
                              language=self.__language,
-                             playername=self.__playername,
+                             playername=self.__player_name,
                              # yaml does not support saving NamedTuple successors
                              # so need to convert into tuple supported by yaml
                              crop=list(self.__crop),
-                             sample_matches=sample_matches,
+                             sample_matches=screen_sample_matches,
                              title_ocr=title_ocr,
                              fuzzy_score=title_fuzzy_score,
                              keys=tuple(str(key) for key in title_keys),

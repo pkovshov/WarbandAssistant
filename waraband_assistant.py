@@ -24,10 +24,13 @@ def main(args):
     logging.getLogger(__name__).setLevel(log_level)
     game_Screen_manager = GameScreenManager(player_name=args.playername,
                                             player_sex=args.playersex,
-                                            write_to_dataset=args.dataset)
+                                            datasets=args.datasets)
     # run
     monitor = args.monitor
-    print("START", "datasets", "ON" if args.dataset else "OFF")
+    if args.datasets:
+        print("START", "datasets:", ", ".join(args.datasets))
+    else:
+        print("START", "datasets", "OFF")
     try:
         game_Screen_manager.run(monitor)
     except KeyboardInterrupt:
@@ -35,13 +38,28 @@ def main(args):
         print("STOP")
 
 
+class UniqueOnceAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if getattr(namespace, self.dest, None) is not None:
+            parser.error(f"Option {option_string} specified more than once")
+        setattr(namespace, self.dest, values)
+
+
+DATASET_ALIASES = {
+    "dr": "dialog_relations",
+    "dt": "dialog_titles",
+    "mc": "map_calendars",
+}
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose",
                     action="store_true",
                     help="Enable verbose mode to print debug-level logs.")
-parser.add_argument("-ds", "--dataset",
-                    action="store_true",
-                    help="Enable writing data to datasets.")
+parser.add_argument("-ds", "--datasets",
+                    action=UniqueOnceAction, nargs="*",
+                    help="Datasets to use. Available: " +
+                         ", ".join(f"{val} ({key})" for key, val in DATASET_ALIASES.items()) + ". "
+                         "If not specified, defaults to all the datasets.")
 parser.add_argument("-m", "--monitor",
                     action="append", type=int, default=[],
                     help="The number of the monitor to be captured (starting from 1, default is 1).",
@@ -68,4 +86,15 @@ if __name__ == "__main__":
     if sys_args.playername is not None and len(sys_args.playername) > 1:
         parser.error("argument -p/--player cannot be specified twice.")
     sys_args.playername = sys_args.playername[0] if sys_args.playername else None
+    if sys_args.datasets is None:
+        sys_args.datasets = []
+    elif len(sys_args.datasets) == 0:
+        sys_args.datasets = list(DATASET_ALIASES.values())
+    else:
+        for idx, val in enumerate(sys_args.datasets):
+            if val in DATASET_ALIASES:
+                sys_args.datasets[idx] = val = DATASET_ALIASES[val]
+            if val not in DATASET_ALIASES.values():
+                parser.error(f"Invalid dataset or alias: '{val}'")
+        sys_args.datasets = list(set(sys_args.datasets))
     sys_args.func(sys_args)

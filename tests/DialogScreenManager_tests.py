@@ -8,14 +8,14 @@ from wa_types import Box, Resolution
 from wa_language import Language
 from wa_screen_manager.DialogScreen.DialogScreenManager import DialogScreenManager
 from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogScreenEvent
-from wa_datasets.DialogScreen.DialogTitleDataset import DialogTitleDataset, VERIFICATION_NOT_A_DIALOG_TITLE
-from wa_datasets.DialogScreen.DialogRelationDataset import DialogRelationDataset
+from wa_datasets.DialogTitlesDataset import DialogTitlesDataset, VERIFICATION_NOT_A_DIALOG_TITLE
+from wa_datasets.DialogRelationsDataset import DialogRelationsDataset
 from path_conf import samples as samples_dir_path
 
 lang = Language.load()
 
-dialog_titles_dataset = DialogTitleDataset(lazy_load=True)
-dialog_relations_dataset = DialogRelationDataset(lazy_load=True)
+dialog_titles_dataset = DialogTitlesDataset(lazy_load=True)
+dialog_relations_dataset = DialogRelationsDataset(lazy_load=True)
 
 dialog_blank_image_path = path.join(samples_dir_path, "dialog_screen_blank.png")
 dialog_blank_img = cv2.imread(dialog_blank_image_path)

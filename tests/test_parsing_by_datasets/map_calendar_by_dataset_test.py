@@ -3,9 +3,9 @@ import numpy as np
 import pytest
 
 from wa_language import Language
-from wa_datasets.MapScreen.MapCalendarDataset import (MapCalendarDataset,
-                                                      VERIFICATION_SCREEN_TEARING,
-                                                      VERIFICATION_FALSE_NEGATIVE)
+from wa_datasets.MapCalendarsDataset import (MapCalendarsDataset,
+                                             VERIFICATION_SCREEN_TEARING,
+                                             VERIFICATION_FALSE_NEGATIVE)
 from wa_screen_manager.MapScreen.MapScreenCalendarOCR import MapScreenCalendarOCR
 from wa_screen_manager.MapScreen.MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
 
@@ -21,7 +21,7 @@ def load_image_and_restore_crop(image_path, resolution, crop):
 
 lang = Language.load()
 
-dataset = MapCalendarDataset(lazy_load=True)
+dataset = MapCalendarsDataset(lazy_load=True)
 
 ocr = MapScreenCalendarOCR()
 

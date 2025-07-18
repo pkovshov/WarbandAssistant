@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from wa_language import Language
-from wa_datasets.DialogScreen.DialogRelationDataset import DialogRelationDataset
+from wa_datasets.DialogRelationsDataset import DialogRelationsDataset
 from wa_screen_manager.DialogScreen.DialogScreenOCRs import DialogScreenRelationOCR
 from wa_screen_manager.DialogScreen.DialogScreenRelationParser import DialogScreenRelationParser
 
@@ -19,7 +19,7 @@ def load_image_and_restore_crop(image_path, resolution, crop):
 
 lang = Language.load()
 
-dataset = DialogRelationDataset(lazy_load=True)
+dataset = DialogRelationsDataset(lazy_load=True)
 
 ocr = DialogScreenRelationOCR()
 

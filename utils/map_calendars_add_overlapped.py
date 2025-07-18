@@ -1,8 +1,8 @@
 from collections import namedtuple
 
-from wa_datasets.MapScreen.MapCalendarDataset import MapCalendarDataset
+from wa_datasets.MapCalendarsDataset import MapCalendarsDataset
 
-dataset = MapCalendarDataset(lazy_load=True)
+dataset = MapCalendarsDataset(lazy_load=True)
 
 MetaItem = namedtuple("MetaItem",
                       "verification, "
@@ -21,6 +21,7 @@ MetaItem = namedtuple("MetaItem",
 
 for idx, (meta, _) in dataset.meta_and_image_path().items():
     data = dataset._meta_to_data(meta)
-    data["calendar_overlapped"] = None
+    if "calendar_overlapped" not in data:
+        data["calendar_overlapped"] = None
     meta = MetaItem(**data)
     dataset.replace_meta(idx, meta)

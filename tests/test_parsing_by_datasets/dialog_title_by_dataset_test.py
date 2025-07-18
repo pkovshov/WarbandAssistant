@@ -4,8 +4,8 @@ from os import path
 import pytest
 
 from wa_language import Language
-from wa_datasets.DialogScreen.DialogTitleDataset import (DialogTitleDataset,
-                                                         VERIFICATION_NOT_A_DIALOG_TITLE)
+from wa_datasets.DialogTitlesDataset import (DialogTitlesDataset,
+                                             VERIFICATION_NOT_A_DIALOG_TITLE)
 from wa_screen_manager.DialogScreen.DialogScreenOCRs import DialogScreenTitleOCR
 from wa_screen_manager.DialogScreen.DialogScreenTitleFuzzyParser import DialogScreenTitleFuzzyParser
 
@@ -24,7 +24,7 @@ def load_image_and_restore_crop(image_path, resolution, crop):
 
 lang = Language.load()
 
-dataset = DialogTitleDataset(lazy_load=True)
+dataset = DialogTitlesDataset(lazy_load=True)
 
 ocr = DialogScreenTitleOCR()
 

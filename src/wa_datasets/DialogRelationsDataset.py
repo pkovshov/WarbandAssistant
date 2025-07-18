@@ -29,7 +29,7 @@ MetaKey = namedtuple("MetaKey",
                      "screen_sample_matches")
 
 
-class DialogRelationDataset(BaseImageDataset):
+class DialogRelationsDataset(BaseImageDataset):
     NAME = "dialog_relations"
 
     @typechecked
@@ -38,7 +38,7 @@ class DialogRelationDataset(BaseImageDataset):
                  crop: Optional[Box] = None,
                  language: Optional[str] = None,
                  lazy_load: bool = False):
-        super().__init__(DialogRelationDataset.NAME, resolution, lazy_load)
+        super().__init__(self.NAME, resolution, lazy_load)
         self.__resolution = resolution
         self.__crop = crop
         self.__language = language

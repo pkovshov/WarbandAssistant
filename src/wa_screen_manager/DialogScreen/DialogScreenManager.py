@@ -13,7 +13,6 @@ from .DialogScreenOCRs import DialogScreenTitleOCR, DialogScreenRelationOCR, Dia
 from .DialogScreenTitleFuzzyParser import DialogScreenTitleFuzzyParser
 from .DialogScreenRelationParser import DialogScreenRelationParser
 from .DialogBodyFuzzyParser import DialogBodyFuzzyParser
-from .DialogScreenDatasetProcessor import DialogScreenDatasetProcessor
 
 
 class DialogScreenManager:
@@ -27,8 +26,6 @@ class DialogScreenManager:
     @typechecked
     def __init__(self,
                  lang: Language,
-                 write_to_dataset: bool = False,
-                 player_name: Optional[str] = None,
                  player_sex: Optional[PlayerSex] = None):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
@@ -41,8 +38,6 @@ class DialogScreenManager:
         self.__body_ocr = DialogBodyOCR()
         self.__body_parser = DialogBodyFuzzyParser(lang, player_sex)
         self.__listeners = []
-        if write_to_dataset:
-            self.add_event_listener(DialogScreenDatasetProcessor(playername=player_name).process)
         self.__prev__event = None
 
     @typechecked

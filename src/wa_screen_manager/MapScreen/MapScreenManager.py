@@ -10,7 +10,6 @@ from wa_screen_manager.SampleMatch import SampleMatch
 from .MapScreenEvent import MapScreenEvent
 from .MapScreenCalendarOCR import MapScreenCalendarOCR, NonStable
 from .MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
-from .MapScreenDatasetProcessor import MapScreenDatasetProcessor
 
 
 # TODO: use BaseSampler to prevent reading map_screen_blank_img_path twice
@@ -46,8 +45,7 @@ class MapScreenManager:
     """
     @typechecked
     def __init__(self,
-                 lang: Language,
-                 write_to_dataset: bool = False):
+                 lang: Language):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
         self.__screen_sample = MapScreenSampler()
@@ -55,8 +53,6 @@ class MapScreenManager:
         self.__calendar_ocr = MapScreenCalendarOCR()
         self.__calendar_fuzzy_parser = MapScreenCalendarFuzzyParser(lang)
         self.__listeners = []
-        if write_to_dataset:
-             self.add_event_listener(MapScreenDatasetProcessor().process)
         self.__prev__event = None
 
     @typechecked

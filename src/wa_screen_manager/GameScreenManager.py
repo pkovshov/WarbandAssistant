@@ -1,7 +1,6 @@
 import itertools
 import logging
-from types import MappingProxyType
-from typing import Mapping, Optional
+from typing import List, Optional
 
 import mss
 import numpy as np
@@ -13,29 +12,39 @@ from .SampleMatch import SampleMatch
 from .DialogScreen.DialogScreenManager import DialogScreenManager
 from .MapScreen.MapScreenManager import MapScreenManager
 from .GameUserFriendlyLogger import DialogScreenLogger
+from .DatasetProcessors import MasterDatasetsProcessor
 
 
 class GameScreenManager:
     @typechecked
     def __init__(self,
-                 player_name: Optional[str] = None,
-                 player_sex: Optional[PlayerSex] = None,
-                 write_to_dataset: Optional[bool] = False):
+                 player_name: Optional[str],
+                 player_sex: Optional[PlayerSex],
+                 datasets: Optional[List[str]]):
         self.__logger = logging.getLogger(__name__)
         # TODO: someone need to warn if playername is blank string like '  '
         #       such name could broke fuzzy
         # TODO: warn if playername equal with other dialog titles (lorn names for example)
         #       or maybe is part of other dialog titles (Merchant for example)
         #       Also it needs to process such cases in DialogScreen
+        # build language
         special_language = None
         if player_name is not None:
             special_language = {"wa_player": player_name}
         lang = Language.load(special_language)
-        self.__map_screen_manger = MapScreenManager(lang, write_to_dataset)
-        self.__dialog_screen_manger = DialogScreenManager(lang, write_to_dataset, player_name, player_sex)
+        # create screen managers
+        self.__map_screen_manger = MapScreenManager(lang)
+        self.__dialog_screen_manger = DialogScreenManager(lang, player_sex)
+        # create datasets processor that listens to screen manager
+        if datasets:
+            datasets_processor = MasterDatasetsProcessor(datasets=datasets, player_name=player_name)
+            self.__map_screen_manger.add_event_listener(datasets_processor.on_map_screen)
+            self.__dialog_screen_manger.add_event_listener(datasets_processor.on_dialog_screen)
+        # create user-friendly logger that listens to screen managers
         self.__user_friendly_logger = DialogScreenLogger(lang)
         self.__map_screen_manger.add_event_listener(self.__user_friendly_logger.on_map_screen)
         self.__dialog_screen_manger.add_event_listener(self.__user_friendly_logger.on_dialog_screen)
+        # log initial parameters
         self.__logger.info("Player: name {}, sex {}"
                            .format("NOT defined" if player_name is None else f"= {repr(player_name)}",
                                    "NOT defined" if player_sex is None else f"= {player_sex.value}"))
@@ -80,5 +89,5 @@ class GameScreenManager:
                             break
                 elif unknown_screen_manager:
                     on_match_screen_manager()
-                if user_friendly_messages:
+                while user_friendly_messages:
                     self.__logger.info(user_friendly_messages.pop())

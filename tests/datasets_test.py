@@ -7,9 +7,9 @@ import numpy as np
 import path_conf
 from wa_types import Box, Resolution
 from wa_language.Language import LangKey
-from wa_datasets.DialogScreen.DialogTitleDataset import DialogTitleDataset
-from wa_datasets.DialogScreen.DialogRelationDataset import DialogRelationDataset
-from wa_datasets.MapScreen.MapCalendarDataset import MapCalendarDataset
+from wa_datasets.DialogTitlesDataset import DialogTitlesDataset
+from wa_datasets.DialogRelationsDataset import DialogRelationsDataset
+from wa_datasets.MapCalendarsDataset import MapCalendarsDataset
 
 # Create the output directory if it doesn't exist
 os.makedirs(path_conf.test_output, exist_ok=True)
@@ -23,9 +23,9 @@ for item in os.listdir(path_conf.test_output):
         os.remove(item_path)
 
 # Copy the dialog screen datasets to test_output
-for dataset in [DialogTitleDataset.NAME,
-                DialogRelationDataset.NAME,
-                MapCalendarDataset.NAME]:
+for dataset in [DialogTitlesDataset.NAME,
+                DialogRelationsDataset.NAME,
+                MapCalendarsDataset.NAME]:
     src_path = path.join(path_conf.datasets, dataset)
     dst_path = path.join(path_conf.test_output, dataset)
     shutil.copytree(src_path, dst_path)
@@ -35,16 +35,16 @@ path_conf.datasets = path_conf.test_output
 
 def test_dialog_titles_dataset():
     dialog_title_dataset_path = path.join(path_conf.datasets,
-                                          DialogTitleDataset.NAME)
+                                          DialogTitlesDataset.NAME)
     files_count_before = len(os.listdir(dialog_title_dataset_path))
     width, height = 400, 200
-    dataset = DialogTitleDataset(resolution=Resolution(width, height),
+    dataset = DialogTitlesDataset(resolution=Resolution(width, height),
                                  crop=Box(0, 0, 50, 50),
                                  language="en",
-                                 playername="John Doe")
+                                 player_name="John Doe")
     screenshot = np.zeros((height, width, 3), dtype=np.uint8)
     dataset.add(screenshot=screenshot,
-                sample_matches=True,
+                screen_sample_matches=True,
                 title_ocr="Marry Wong",
                 title_fuzzy_score=None,
                 title_keys=(LangKey("kl_marry"), LangKey("kl_wong")))
@@ -54,10 +54,10 @@ def test_dialog_titles_dataset():
 
 def test_dialog_relations_dataset():
     dialog_relation_dataset_path = path.join(path_conf.datasets,
-                                             DialogRelationDataset.NAME)
+                                             DialogRelationsDataset.NAME)
     files_count_before = len(os.listdir(dialog_relation_dataset_path))
     width, height = 400, 200
-    dataset = DialogRelationDataset(resolution=Resolution(width, height),
+    dataset = DialogRelationsDataset(resolution=Resolution(width, height),
                                     crop=Box(0, 0, 50, 50),
                                     language="en")
     screenshot = np.zeros((height, width, 3), dtype=np.uint8)
@@ -71,10 +71,10 @@ def test_dialog_relations_dataset():
 
 def test_map_calendars_dataset():
     map_calendar_dataset_path = path.join(path_conf.datasets,
-                                          MapCalendarDataset.NAME)
+                                          MapCalendarsDataset.NAME)
     files_count_before = len(os.listdir(map_calendar_dataset_path))
     width, height = 400, 200
-    dataset = MapCalendarDataset(resolution=Resolution(width, height),
+    dataset = MapCalendarsDataset(resolution=Resolution(width, height),
                                  crop=Box(0, 0, 50, 50),
                                  language="en")
     screenshot = np.zeros((height, width, 3), dtype=np.uint8)
@@ -91,10 +91,10 @@ def test_map_calendars_dataset():
 
 def test_map_calendars_dataset_collects_all_uniq_false_negative():
     map_calendar_dataset_path = path.join(path_conf.datasets,
-                                          MapCalendarDataset.NAME)
+                                          MapCalendarsDataset.NAME)
     files_count_before = len(os.listdir(map_calendar_dataset_path))
     width, height = 400, 200
-    dataset = MapCalendarDataset(resolution=Resolution(width, height),
+    dataset = MapCalendarsDataset(resolution=Resolution(width, height),
                                  crop=Box(0, 0, 50, 50),
                                  language="en")
     # add two false-negative items with same calendar_ocr but different images
