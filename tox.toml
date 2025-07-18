@@ -1,4 +1,9 @@
-env_list = ["all"]
+env_list = [
+    "smoke",
+    "by_dialog_titles_ds",
+    "by_dialog_relations_ds",
+    "by_map_calendars_ds"
+]
 
 [env_run_base]
 deps = [
@@ -9,17 +14,27 @@ setenv = [
     {PYTHONPATH = "{toxinidir}/src"}
 ]
 
-[env.all]
+[env.by_dialog_titles_ds]
 commands = [
-  ["pytest", "--doctest-modules"],
+  ["pytest", "tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py"],
+]
+
+[env.by_dialog_relations_ds]
+commands = [
+  ["pytest", "tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py"],
+]
+
+[env.by_map_calendars_ds]
+commands = [
+  ["pytest", "tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py"],
+]
+
+[env.smoke]
+commands = [
+  ["pytest", "--doctest-modules", "--ignore", "tests/test_parsing_by_datasets"],
 ]
 
 [env.lang]
 commands = [
   ["pytest", "src/wa_language", "--doctest-modules"],
-]
-
-[env.rapid]
-commands = [
-  ["pytest", "--doctest-modules", "--ignore", "tests/test_parsing_by_datasets"],
 ]
