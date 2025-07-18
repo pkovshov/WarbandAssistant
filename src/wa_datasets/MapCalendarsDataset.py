@@ -37,7 +37,7 @@ MetaKey = namedtuple("MetaKey",
                      "calendar_overlapped")
 
 
-class MapCalendarDataset(BaseImageDataset):
+class MapCalendarsDataset(BaseImageDataset):
     NAME = "map_calendars"
 
     @typechecked
@@ -46,7 +46,7 @@ class MapCalendarDataset(BaseImageDataset):
                  crop: Optional[Box] = None,
                  language: Optional[str] = None,
                  lazy_load: bool = False):
-        super().__init__(MapCalendarDataset.NAME, resolution, lazy_load)
+        super().__init__(self.NAME, resolution, lazy_load)
         self.__resolution = resolution
         self.__crop = crop
         self.__language = language
