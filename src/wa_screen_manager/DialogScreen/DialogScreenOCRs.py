@@ -20,6 +20,12 @@ class DialogScreenTitleOCR(BaseOCR):
         blank_image = cv2.cvtColor(blank_image, cv2.COLOR_BGR2GRAY)
         self.__blank_img_gray = blank_image
 
+    def ocr(self, img: np.ndarray) -> Union[str, NonStableType]:
+        title_ocr = super().ocr(img)
+        if title_ocr == "Emir Ugqais:":
+            return "Emir Uqais:"
+        return title_ocr
+
     @typechecked
     def _preprocess(self, img: np.ndarray) -> np.ndarray:
         # grayscale

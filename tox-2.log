@@ -16,8 +16,8 @@ src/wa_language/syntax/Ternary.py .                                      [ 72%]
 src/wa_types/Box.py .                                                    [ 77%]
 tests/datasets_test.py ....                                              [100%]
 
-============================= 18 passed in 10.59s ==============================
-smoke: OK ✔ in 10.99 seconds
+============================= 18 passed in 10.58s ==============================
+smoke: OK ✔ in 10.97 seconds
 by_dialog_titles_ds: commands[0]> pytest tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -27,71 +27,12 @@ plugins: typeguard-4.4.4
 collected 212 items
 
 tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py ......... [  4%]
-.............................................................F.......... [ 38%]
-.......F................................................................ [ 72%]
+........................................................................ [ 38%]
+........................................................................ [ 72%]
 ...........................................................              [100%]
 
-=================================== FAILURES ===================================
-_______________ test_dialog_title_dataset[000222-meta70-image70] _______________
-
-idx = '000222'
-meta = MetaItem(verification=None, resolution=[1920, 1080], language='en', playername='Ulrich', crop=[668, 74, 1819, 114], sa...rp_knight_6_1_pl'], git_branch='master', git_commit='07fb8f13c2320f6bb26dd5efacabf30789856cef', git_has_modified=False)
-image = array([[[ 44,  69, 105],
-        [ 46,  72, 108],
-        [ 45,  71, 106],
-        ...,
-        [ 54,  81, 124],
-     ...  ...,
-        [ 28,  42,  67],
-        [ 85,  94, 117],
-        [ 96, 108, 126]]], shape=(1080, 1920, 3), dtype=uint8)
-
-    @pytest.mark.parametrize("idx, meta, image", idx_meta_image)
-    def test_dialog_title_dataset(idx, meta, image):
-        ocr.ocr(image)  # Dry run to simulate two identical images in a row
-        title_ocr = ocr.ocr(image)
-        title_keys = parser.keys(title_ocr)
->       assert title_keys == tuple(meta.keys), f"OCR: {title_ocr}"
-E       AssertionError: OCR: Emir Ugqais:
-E       assert () == ('trp_knight_6_1_pl',)
-E         
-E         Right contains one more item: 'trp_knight_6_1_pl'
-E         Use -v to get more diff
-
-tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py:53: AssertionError
-_______________ test_dialog_title_dataset[000242-meta88-image88] _______________
-
-idx = '000242'
-meta = MetaItem(verification=None, resolution=[1920, 1080], language='en', playername='Ulrich', crop=[668, 72, 1819, 116], sa...rp_knight_6_1_pl'], git_branch='master', git_commit='a29bdc177a8c1c0a776c80daadd9d047929464f7', git_has_modified=False)
-image = array([[[ 44,  69, 105],
-        [ 46,  72, 108],
-        [ 45,  71, 106],
-        ...,
-        [ 54,  81, 124],
-     ...  ...,
-        [ 28,  42,  67],
-        [ 85,  94, 117],
-        [ 96, 108, 126]]], shape=(1080, 1920, 3), dtype=uint8)
-
-    @pytest.mark.parametrize("idx, meta, image", idx_meta_image)
-    def test_dialog_title_dataset(idx, meta, image):
-        ocr.ocr(image)  # Dry run to simulate two identical images in a row
-        title_ocr = ocr.ocr(image)
-        title_keys = parser.keys(title_ocr)
->       assert title_keys == tuple(meta.keys), f"OCR: {title_ocr}"
-E       AssertionError: OCR: Emir Ugqais:
-E       assert () == ('trp_knight_6_1_pl',)
-E         
-E         Right contains one more item: 'trp_knight_6_1_pl'
-E         Use -v to get more diff
-
-tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py:53: AssertionError
-=========================== short test summary info ============================
-FAILED tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py::test_dialog_title_dataset[000222-meta70-image70]
-FAILED tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py::test_dialog_title_dataset[000242-meta88-image88]
-======================== 2 failed, 210 passed in 21.89s ========================
-by_dialog_titles_ds: exit 1 (22.15 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py pid=1515924
-by_dialog_titles_ds: FAIL ✖ in 22.15 seconds
+============================= 212 passed in 22.06s =============================
+by_dialog_titles_ds: OK ✔ in 22.31 seconds
 by_dialog_relations_ds: commands[0]> pytest tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -103,8 +44,8 @@ collected 33 items
 tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py ...... [ 18%]
 ...........................                                              [100%]
 
-============================== 33 passed in 3.24s ==============================
-by_dialog_relations_ds: OK ✔ in 3.44 seconds
+============================== 33 passed in 3.25s ==============================
+by_dialog_relations_ds: OK ✔ in 3.46 seconds
 by_map_calendars_ds: commands[0]> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -120,9 +61,9 @@ tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py ......... [  2%]
 ........................................................................ [ 88%]
 .......................................                                  [100%]
 
-============================= 336 passed in 31.34s =============================
-  smoke: OK (10.99=setup[0.03]+cmd[10.96] seconds)
-  by_dialog_titles_ds: FAIL code 1 (22.15=setup[0.00]+cmd[22.15] seconds)
-  by_dialog_relations_ds: OK (3.44=setup[0.00]+cmd[3.43] seconds)
-  by_map_calendars_ds: OK (31.57=setup[0.01]+cmd[31.56] seconds)
-  evaluation failed :( (68.18 seconds)
+============================= 336 passed in 31.09s =============================
+  smoke: OK (10.97=setup[0.03]+cmd[10.94] seconds)
+  by_dialog_titles_ds: OK (22.31=setup[0.01]+cmd[22.31] seconds)
+  by_dialog_relations_ds: OK (3.46=setup[0.01]+cmd[3.45] seconds)
+  by_map_calendars_ds: OK (31.32=setup[0.01]+cmd[31.32] seconds)
+  congratulations :) (68.10 seconds)
