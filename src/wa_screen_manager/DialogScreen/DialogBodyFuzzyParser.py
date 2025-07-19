@@ -42,11 +42,9 @@ class DialogBodyFuzzyParser:
     @typechecked
     def bound(self, body_ocr: str, title_keys: Tuple[LangKey, ...]) -> Tuple[DialogBodyBound, ...]:
         if body_ocr != self.__prev_body_ocr or title_keys != self.__prev_title_keys:
-            self.__logger.info("start")
             self.__prev_body_ocr = body_ocr
             self.__prev_title_keys = title_keys
             self.__prev_body_bound = self.__bound(body_ocr, title_keys)
-            self.__logger.info(self.__prev_body_bound)
         return self.__prev_body_bound
 
     def __bound(self, body_ocr: str, title_keys: Tuple[LangKey, ...]) -> Tuple[DialogBodyBound, ...]:
