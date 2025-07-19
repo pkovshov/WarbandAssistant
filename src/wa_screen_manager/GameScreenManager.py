@@ -92,4 +92,4 @@ class GameScreenManager:
                 elif unknown_screen_manager:
                     on_match_screen_manager()
                 while user_friendly_messages:
-                    self.__logger.info(user_friendly_messages.pop())
+                    self.__logger.info(user_friendly_messages.pop(0))

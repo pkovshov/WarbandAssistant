@@ -38,6 +38,12 @@ class DialogScreenLogger:
     def listener(self, value: Callable[[str], None]):
         self.__listener = value
 
+    def __log(self, text: str):
+        if self.__listener:
+            self.__listener(text)
+        else:
+            self.__logger.info(text)
+
     def on_unknown_screen(self):
         self.__prev_map_date_timeofday = None
         self.__prev_dialog_title_ocr = None
@@ -62,19 +68,19 @@ class DialogScreenLogger:
             else:
                 text += repr(event.calendar_ocr)
                 text += " (FALSE NEGATIVE)"
-            if self.__listener:
-                self.__listener(text)
-            else:
-                self.__logger.info(text)
+            self.__log(text)
 
     @typechecked
     def on_dialog_screen(self, event: DialogScreenEvent):
-        if (event.body_ocr is not None and
+        # log title and body
+        if (event.title_ocr is not None and
+            event.body_ocr is not None and
                 (event.body_ocr != self.__prev_dialog_body_ocr or
                  event.title_ocr != self.__prev_dialog_title_ocr)):
             self.__prev_dialog_body_ocr = event.body_ocr
             self.__prev_dialog_title_ocr = event.title_ocr
             self.__prev_dialog_relation = None
+            # build title text
             text = "Dialog: "
             if event.title_keys:
                 title_key = event.title_keys[0]
@@ -91,6 +97,7 @@ class DialogScreenLogger:
                 text += repr(event.title_ocr_prep)
                 text += " (FN!)"
             text += ": "
+            # build body text
             if event.body_bounds:
                 body_key = event.body_bounds[0].key
                 if body_key in comment_intro_checker:
@@ -113,17 +120,17 @@ class DialogScreenLogger:
                     text += f" ({body_key})"
             else:
                 text += repr(event.body_ocr)
-            # send lo listener or log
-            if self.__listener:
-                self.__listener(text)
-            else:
-                self.__logger.info(text)
-        if event.relation_ocr is not None and event.relation != self.__prev_dialog_relation:
+            self.__log(text)
+        # log relation
+        if (
+            event.relation_ocr is not None and
+            event.title_ocr is not None and
+            event.body_ocr is not None and
+            event.body_ocr == self.__prev_dialog_body_ocr and
+            event.title_ocr == self.__prev_dialog_title_ocr and
+            event.relation != self.__prev_dialog_relation
+        ):
             self.__prev_dialog_relation = event.relation
             text = " "*len("Dialog: ")
             text += "Relation: " + str(event.relation) if event.relation is not None else "?"
-            # send lo listener or log
-            if self.__listener:
-                self.__listener(text)
-            else:
-                self.__logger.info(text)
+            self.__log(text)
