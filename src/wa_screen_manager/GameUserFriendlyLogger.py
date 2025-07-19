@@ -95,7 +95,7 @@ class DialogScreenLogger:
                     text += val
             else:
                 text += repr(event.title_ocr_prep)
-                text += " (FN!)"
+                text += " (FNE)"
             text += ": "
             # build body text
             if event.body_bounds:

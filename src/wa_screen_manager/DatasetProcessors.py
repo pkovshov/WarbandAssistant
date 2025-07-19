@@ -29,10 +29,12 @@ class DialogBodyProcessor:
                                              player_sex=player_sex,
                                              blank_img_path=path.join(path_conf.samples,
                                                                       dialog_screen_config.dialog_screen_blank_img_path))
+        self.__prev_body_ocr = None
 
     @typechecked
     def process(self, event: DialogScreenEvent):
-        if event.body_ocr is not None:
+        if event.body_ocr is not None and event.body_ocr != self.__prev_body_ocr:
+            self.__prev_body_ocr = event.body_ocr
             self.__dataset.add(screenshot=event.image,
                                screen_sample_matches=True,
                                title_keys=event.title_keys,
