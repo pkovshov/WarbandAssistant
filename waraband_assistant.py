@@ -46,6 +46,7 @@ class UniqueOnceAction(argparse.Action):
 
 
 DATASET_ALIASES = {
+    "db": "dialog_bodies",
     "dr": "dialog_relations",
     "dt": "dialog_titles",
     "mc": "map_calendars",

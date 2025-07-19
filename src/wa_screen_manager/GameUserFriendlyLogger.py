@@ -69,7 +69,7 @@ class DialogScreenLogger:
             else:
                 text += val
         else:
-            text += repr(event.title)
+            text += repr(event.title_ocr_prep)
         if event.relation_ocr is not None:
             text += " "
             text += str(event.relation) if event.relation is not None else "?"

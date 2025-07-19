@@ -55,8 +55,8 @@ class DialogScreenManager:
             if title_ocr is NonStable:
                 self.__prev__event = None
             else:
-                title_prep = self.__title_parser.prep(title_ocr)
-                title_keys = self.__title_parser.keys(title_ocr)
+                title_ocr_prep = self.__title_parser.prep(title_ocr)
+                title_keys = self.__title_parser.keys(title_ocr_prep)
                 relation_sampler_matches = self.__relation_sampler.check(img)
                 relation_ocr, relation = None, None
                 if relation_sampler_matches:
@@ -66,12 +66,18 @@ class DialogScreenManager:
                     else:
                         relation = self.__relation_parser.relation(relation_ocr)
                 body_ocr = self.__body_ocr.ocr(img)
-                if body_ocr is not NonStable:
-                    body_bound = self.__body_parser.bound(body_ocr=body_ocr, title_keys=title_keys)
+                if body_ocr is NonStable:
+                    body_ocr = None
+                if body_ocr is not None:
+                    body_bounds = self.__body_parser.bound(body_ocr=body_ocr, title_keys=title_keys)
+                else:
+                    body_bounds = tuple()
                 event = DialogScreenEvent(image=img,
                                           title_ocr=title_ocr,
-                                          title=title_prep,
+                                          title_ocr_prep=title_ocr_prep,
                                           title_keys=title_keys,
+                                          body_ocr=body_ocr,
+                                          body_bounds=body_bounds,
                                           relation_ocr=relation_ocr,
                                           relation=relation)
                 if event != self.__prev__event:

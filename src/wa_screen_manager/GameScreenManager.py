@@ -37,7 +37,9 @@ class GameScreenManager:
         self.__dialog_screen_manger = DialogScreenManager(lang, player_sex)
         # create datasets processor that listens to screen manager
         if datasets:
-            datasets_processor = MasterDatasetsProcessor(datasets=datasets, player_name=player_name)
+            datasets_processor = MasterDatasetsProcessor(datasets=datasets,
+                                                         player_name=player_name,
+                                                         player_sex=player_sex)
             self.__map_screen_manger.add_event_listener(datasets_processor.on_map_screen)
             self.__dialog_screen_manger.add_event_listener(datasets_processor.on_dialog_screen)
         # create user-friendly logger that listens to screen managers

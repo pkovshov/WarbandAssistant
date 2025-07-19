@@ -19,4 +19,4 @@ relation_sample_boxes = (
     (Box(58, 346, 120, 365), Box(481, 639, 537, 647)),
 )
 
-body_box = Box(668, 154, 1819, 600)
+body_box = Box(668, 152, 1819, 600)

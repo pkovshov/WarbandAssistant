@@ -1,14 +1,43 @@
 import logging
+from os import path
 from typing import Optional, List
 
 from typeguard import typechecked
 
+import path_conf
+from wa_language.model.types import PlayerSex
+from wa_datasets.DialogBodiesDataset import DialogBodiesDataset
 from wa_datasets.DialogRelationsDataset import DialogRelationsDataset
 from wa_datasets.DialogTitlesDataset import DialogTitlesDataset
 from wa_datasets.MapCalendarsDataset import MapCalendarsDataset
-
 from .DialogScreen.DialogScreenEvent import DialogScreenEvent
 from .MapScreen.MapScreenEvent import MapScreenEvent
+
+
+class DialogBodyProcessor:
+    NAME = DialogBodiesDataset.NAME
+    @typechecked
+    def __init__(self,
+                 player_name: Optional[str],
+                 player_sex: Optional[PlayerSex]):
+        from .DialogScreen import dialog_screen_config
+        from wa_screen_manager import config
+        self.__dataset = DialogBodiesDataset(resolution=config.resolution,
+                                             crop=dialog_screen_config.body_box,
+                                             language=config.language,
+                                             player_name=player_name,
+                                             player_sex=player_sex,
+                                             blank_img_path=path.join(path_conf.samples,
+                                                                      dialog_screen_config.dialog_screen_blank_img_path))
+
+    @typechecked
+    def process(self, event: DialogScreenEvent):
+        if event.body_ocr is not None:
+            self.__dataset.add(screenshot=event.image,
+                               screen_sample_matches=True,
+                               title_keys=event.title_keys,
+                               body_ocr=event.body_ocr,
+                               body_bounds=tuple((bound.key, bound.bind) for bound in event.body_bounds))
 
 
 class DialogRelationDatasetProcessor:
@@ -80,7 +109,12 @@ class MasterDatasetsProcessor:
     @typechecked
     def __init__(self,
                  datasets: List[str],
-                 player_name: Optional[str]):
+                 player_name: Optional[str],
+                 player_sex: Optional[PlayerSex]):
+        self.__dialog_body_processor = (DialogBodyProcessor(player_name=player_name,
+                                                            player_sex=player_sex)
+                                        if DialogBodyProcessor.NAME in datasets
+                                        else None)
         self.__dialog_relation_processor = (DialogRelationDatasetProcessor()
                                             if DialogRelationDatasetProcessor.NAME in datasets
                                             else None)
@@ -93,6 +127,8 @@ class MasterDatasetsProcessor:
 
     @typechecked
     def on_dialog_screen(self, event: DialogScreenEvent):
+        if self.__dialog_body_processor:
+            self.__dialog_body_processor.process(event)
         if self.__dialog_relation_processor:
             self.__dialog_relation_processor.process(event)
         if self.__dialog_title_processor:

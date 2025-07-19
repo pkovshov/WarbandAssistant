@@ -1,9 +1,15 @@
-from typing import Optional, Tuple
+from typing import Any, Mapping, NamedTuple, Optional, Tuple
 
 import numpy as np
 from typeguard import typechecked
 
 from wa_language.Language import LangKey
+from wa_language.syntax.Identifier import Identifier
+
+
+class DialogBodyBound(NamedTuple):
+    key: LangKey
+    bind: Mapping[Identifier, Any]
 
 
 class DialogScreenEvent:
@@ -11,16 +17,21 @@ class DialogScreenEvent:
     def __init__(self,
                  image: np.ndarray,
                  title_ocr: str,
-                 title: str,
+                 title_ocr_prep: str,
                  title_keys: Tuple[LangKey, ...],
+                 body_ocr: Optional[str],
+                 body_bounds: Tuple[DialogBodyBound, ...],
                  relation_ocr: Optional[str],
-                 relation: Optional[int]):
+                 relation: Optional[int],
+                 ):
         if relation_ocr is None:
             assert relation is None
         self.__image = image
         self.__title_ocr = title_ocr
-        self.__title = title
+        self.__title_ocr_prep = title_ocr_prep
         self.__title_keys = title_keys
+        self.__body_ocr = body_ocr
+        self.__body_bounds = body_bounds
         self.__relation_ocr = relation_ocr
         self.__relation = relation
 
@@ -30,6 +41,7 @@ class DialogScreenEvent:
         # suppose that ocr provides same result for the same image
         # suppose that fuzzy provides same result for the same input
         return (self.__title_ocr == other.__title_ocr and
+                self.__body_ocr == other.__body_ocr and
                 self.__relation_ocr == other.__relation_ocr)
 
     @property
@@ -42,11 +54,19 @@ class DialogScreenEvent:
 
     @property
     @typechecked
-    def title(self) -> str: return self.__title
+    def title_ocr_prep(self) -> str: return self.__title_ocr_prep
 
     @property
     @typechecked
-    def title_keys(self) -> Tuple[str, ...]: return self.__title_keys
+    def title_keys(self) -> Tuple[LangKey, ...]: return self.__title_keys
+
+    @property
+    @typechecked
+    def body_ocr(self) -> Optional[str]: return self.__body_ocr
+
+    @property
+    @typechecked
+    def body_bounds(self) -> Tuple[DialogBodyBound, ...]: return self.__body_bounds
 
     @property
     @typechecked

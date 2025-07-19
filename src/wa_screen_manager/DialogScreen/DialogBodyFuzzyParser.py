@@ -7,22 +7,18 @@ import rapidfuzz as fz
 from typeguard import typechecked
 
 from wa_language.Language import Language, LangKey
-from wa_language.syntax.Identifier import Identifier
 from wa_language.syntax.Binary import (BINARY_CONDITION_VARIABLE_FIRST_VALUE,
                                        BINARY_CONDITION_VARIABLE_SECOND_VALUE)
 from wa_language.model.types import PlayerSex
 from wa_language.model.LangModel import SexLangValueModel
 from wa_language.model.dialog_model.LangDialogModel import LangDialogModel
 
+from .DialogScreenEvent import DialogBodyBound
+
 
 TEXT = 0
 SCORE = 1
 KEY = 2
-
-
-class DialogBodyBound(NamedTuple):
-    key: LangKey
-    bind: Mapping[Identifier, Any]
 
 
 class KeyAndSex(NamedTuple):

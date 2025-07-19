@@ -103,7 +103,7 @@ class MapCalendarsDataset(BaseImageDataset):
                         calendar_ocr=meta.calendar_ocr,
                         calendar_overlapped=meta.calendar_overlapped),
                 # is_soft_key
-                meta.verification == VERIFICATION_FALSE_NEGATIVE)
+                False)
 
     @typechecked
     def _preprocess(self, screenshot: np.ndarray) -> np.ndarray:
