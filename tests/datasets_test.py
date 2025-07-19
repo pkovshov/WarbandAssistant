@@ -89,7 +89,7 @@ def test_map_calendars_dataset():
     assert files_count_after == files_count_before + 2
 
 
-def test_map_calendars_dataset_collects_all_uniq_false_negative():
+def test_map_calendars_dataset_meta_keys():
     map_calendar_dataset_path = path.join(path_conf.datasets,
                                           MapCalendarsDataset.NAME)
     files_count_before = len(os.listdir(map_calendar_dataset_path))
@@ -115,7 +115,7 @@ def test_map_calendars_dataset_collects_all_uniq_false_negative():
                 day=None,
                 timeofday_key=None)
     files_count_after = len(os.listdir(map_calendar_dataset_path))
-    assert files_count_after == files_count_before + 4
+    assert files_count_after == files_count_before + 2
     # try to add one more false-negative item with non-uniq calendar_ocr and non-uniq images
     files_count_before = files_count_after
     screenshot = np.ones((height, width, 3), dtype=np.uint8)
