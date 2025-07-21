@@ -1,6 +1,6 @@
 import itertools
 import logging
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 import mss
 import numpy as np
@@ -32,6 +32,8 @@ class GameScreenManager:
         if player_name is not None:
             special_language = {"wa_player": player_name}
         lang = Language.load(special_language)
+        # create unknown screen listeners
+        self.__listeners = []
         # create screen managers
         self.__map_screen_manger = MapScreenManager(lang)
         self.__dialog_screen_manger = DialogScreenManager(lang, player_sex)
@@ -42,6 +44,7 @@ class GameScreenManager:
                                                          player_sex=player_sex)
             self.__map_screen_manger.add_event_listener(datasets_processor.on_map_screen)
             self.__dialog_screen_manger.add_event_listener(datasets_processor.on_dialog_screen)
+            self.add_event_listener(datasets_processor.on_unknown_screen)
         # create user-friendly logger that listens to screen managers
         self.__user_friendly_logger = DialogScreenLogger(lang)
         self.__map_screen_manger.add_event_listener(self.__user_friendly_logger.on_map_screen)
@@ -50,6 +53,11 @@ class GameScreenManager:
         self.__logger.info("Player: name {}, sex {}"
                            .format("NOT defined" if player_name is None else f"= {repr(player_name)}",
                                    "NOT defined" if player_sex is None else f"= {player_sex.value}"))
+
+    @typechecked
+    def add_event_listener(self, listener: Callable[[], None]):
+        if listener not in self.__listeners:
+            self.__listeners.append(listener)
 
     @typechecked
     def run(self, monitor_idx: int):
@@ -67,11 +75,17 @@ class GameScreenManager:
                 nonlocal unknown_screen_manager
                 unknown_screen_manager = False
 
+            def on_unknown_screen():
+                self.__logger.info("Unknown")
+                self.__user_friendly_logger.on_unknown_screen()
+                for listener in self.__listeners:
+                    listener()
+
             def on_user_friendly_message(val):
                 user_friendly_messages.append(val)
 
             self.__user_friendly_logger.listener = on_user_friendly_message
-            self.__logger.info("Unknown")
+            on_unknown_screen()
             while True:
                 scr = sct.grab(monitor)
                 img = np.array(scr)[:, :, :3]  # BGRA -> BGR
@@ -80,8 +94,7 @@ class GameScreenManager:
                     for screen_manager in screen_managers_iter:
                         if screen_manager is current_screen_manager:
                             if not unknown_screen_manager:
-                                self.__logger.info("Unknown")
-                                self.__user_friendly_logger.on_unknown_screen()
+                                on_unknown_screen()
                                 unknown_screen_manager = True
                             break  # we make a full loop
                         match = screen_manager.process(img)

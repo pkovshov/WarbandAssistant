@@ -71,14 +71,20 @@ class DialogTitleDatasetProcessor:
                                                            crop=dialog_screen_config.title_box,
                                                            language=config.language,
                                                            player_name=player_name)
+        self.__prev_title_ocr = None
+
+    def non_dialog_screen(self):
+        self.__prev_title_ocr = None
 
     @typechecked
     def process(self, event: DialogScreenEvent):
-        self.__dialog_titles_dataset.add(screenshot=event.image,
-                                         screen_sample_matches=True,
-                                         title_ocr=event.title_ocr,
-                                         title_fuzzy_score=None,
-                                         title_keys=event.title_keys)
+        if self.__prev_title_ocr != event.title_ocr:
+            self.__prev_title_ocr = event.title_ocr
+            self.__dialog_titles_dataset.add(screenshot=event.image,
+                                             screen_sample_matches=True,
+                                             title_ocr=event.title_ocr,
+                                             title_fuzzy_score=None,
+                                             title_keys=event.title_keys)
 
 
 class MapCalendarDatasetProcessor:
@@ -138,5 +144,11 @@ class MasterDatasetsProcessor:
 
     @typechecked
     def on_map_screen(self, event: MapScreenEvent):
+        if self.__dialog_title_processor:
+            self.__dialog_title_processor.non_dialog_screen()
         if self.__map_calendar_processor:
             self.__map_calendar_processor.process(event)
+
+    def on_unknown_screen(self):
+        if self.__dialog_title_processor:
+            self.__dialog_title_processor.non_dialog_screen()

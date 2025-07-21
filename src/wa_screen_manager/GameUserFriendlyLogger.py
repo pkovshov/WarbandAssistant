@@ -14,6 +14,8 @@ from wa_language.model.dialog_model.comment_intro_keys import (comment_intro_pla
                                                                comment_intro_checker,
                                                                comment_intro_filter_by_lord_personality,
                                                                comment_intro_filter_king)
+from wa_language.model.dialog_model.private_chat_keys import (is_private_chat_key,
+                                                              private_chat_keys_by_lord_personality)
 from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogScreenEvent
 from wa_screen_manager.MapScreen.MapScreenEvent import MapScreenEvent
 
@@ -100,7 +102,14 @@ class DialogScreenLogger:
             # build body text
             if event.body_bounds:
                 body_key = event.body_bounds[0].key
-                if body_key in comment_intro_checker:
+                if body_key in is_private_chat_key:
+                    text += "Private chat"
+                    for personality, checker in private_chat_keys_by_lord_personality.items():
+                        if body_key in checker:
+                            text += f" with {personality.value.capitalize()} lord"
+                            break
+                    text += f" ({body_key})"
+                elif body_key in comment_intro_checker:
                     text += "Intro"
                     if body_key in comment_intro_filter_king:
                         text += " from King"

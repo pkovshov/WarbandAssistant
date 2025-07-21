@@ -10,6 +10,7 @@ from wa_language.syntax.Binary import (BINARY_CONDITION_VARIABLE,
                                        BINARY_CONDITION_VARIABLE_SECOND_VALUE)
 from wa_language.syntax.Interpolation import Interpolation
 from .comment_intro_keys import *
+from .private_chat_keys import *
 from wa_language.model import troop_keys
 
 class LangDialogModel:
@@ -64,6 +65,11 @@ class LangDialogModel:
         # process comment_intro body keys
         lord_comment_intro_lang = build_lord_comment_intro_key_checker(player_sex=self.__player_sex).lang(self.__lang)
         for key, val in lord_comment_intro_lang.items():
+            self.__body_lang[key] = val
+            body_keys.add(key)
+        #TODO: make a sex spread
+        private_chat_key_checker_lang = is_private_chat_key.lang(self.__lang)
+        for key, val in private_chat_key_checker_lang.items():
             self.__body_lang[key] = val
             body_keys.add(key)
         # add lord_title_checker
