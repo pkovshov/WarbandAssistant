@@ -61,35 +61,43 @@ class GameScreenManager(GameScreenEventDispatcher):
         for dispatcher in self.__game_screen_event_dispatchers:
             dispatcher.append_handler(handler)
 
+    @staticmethod
+    def screen_manager_match(*screen_managers):
+        screen_managers_cycle_iter = itertools.cycle(screen_managers)
+        screenshot = yield None
+        # infinite loop
+        while screenshot is not None:
+            # start processing from the last used screen manager
+            # that is strictly needed if it matched the previous screenshot
+            slice_start = len(screen_managers) - 1
+            # end processing after trying all the screen managers
+            slice_end = slice_start + len(screen_managers)
+            # process screenshot
+            for screen_manager in itertools.islice(screen_managers_cycle_iter,
+                                                   slice_start,
+                                                   slice_end):
+                if screen_manager.process(screenshot) is not SampleMatch.FAIL:
+                    screenshot = yield True
+                    break
+            else:
+                screenshot = yield False
+
     @typechecked
     def run(self, monitor_idx: int):
-        # prepare screen managers iterator and initialize got_matched_screen_manager
-        screen_managers_list = [self.__map_screen_manager,
-                                self.__dialog_screen_manger]
-        screen_managers_cycle_iter = itertools.cycle(screen_managers_list)
-        got_matched_screen_manager = True
+        # prepare screen_manager_match generator and initialize got_match
+        screen_manager_match = self.screen_manager_match(self.__map_screen_manager,
+                                                         self.__dialog_screen_manger)
+        next(screen_manager_match)
+        got_match = True
         # got sct and use it as a context object
         with mss.mss() as sct:
             monitor = sct.monitors[monitor_idx]
-            # infinite loop
-            while True:
+            while got_match is not None:
                 # make screenshot
                 screenshot = sct.grab(monitor)
                 screenshot = np.array(screenshot)[:, :, :3]  # BGRA -> BGR
                 # process screenshot
-                # # start processing from the last used screen manager
-                # # that is strictly needed if it matched the previous screenshot
-                slice_start = len(screen_managers_list) - 1
-                # # end processing after trying all the screen managers
-                slice_end = slice_start + len(screen_managers_list)
-                # # process screenshot
-                for screen_manager in itertools.islice(screen_managers_cycle_iter,
-                                                       slice_start,
-                                                       slice_end):
-                    if screen_manager.process(screenshot) is not SampleMatch.FAIL:
-                        got_matched_screen_manager = True
-                        break
-                else:
-                    if got_matched_screen_manager:
-                        self._dispatch(UnknownScreenEvent())
-                        got_matched_screen_manager = False
+                match = screen_manager_match.send(screenshot)
+                if got_match and not match:
+                    self._dispatch(UnknownScreenEvent())
+                got_match = match
