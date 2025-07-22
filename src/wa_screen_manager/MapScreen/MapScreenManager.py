@@ -7,6 +7,7 @@ from typeguard import typechecked
 from wa_language.Language import Language
 from wa_screen_manager.BaseScreen.BaseSampler import BaseSampleReadingSampler
 from wa_screen_manager.SampleMatch import SampleMatch
+from ..BaseScreen.GameScreenEventDispatcher import GameScreenEventDispatcher
 from .MapScreenEvent import MapScreenEvent, GameScreenEvent
 from .MapScreenCalendarOCR import MapScreenCalendarOCR, NonStable
 from .MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
@@ -35,7 +36,7 @@ class MapCalendarSampler(BaseSampleReadingSampler):
                          sample_boxes=map_calendar_sample_boxes)
 
 
-class MapScreenManager:
+class MapScreenManager(GameScreenEventDispatcher):
     """MapScreenManager class
 
     Responsible for:
@@ -46,19 +47,14 @@ class MapScreenManager:
     @typechecked
     def __init__(self,
                  lang: Language):
+        super().__init__()
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
         self.__screen_sample = MapScreenSampler()
         self.__calendar_sample = MapCalendarSampler()
         self.__calendar_ocr = MapScreenCalendarOCR()
         self.__calendar_fuzzy_parser = MapScreenCalendarFuzzyParser(lang)
-        self.__listeners = []
         self.__prev__event = None
-
-    @typechecked
-    def add_event_listener(self, listener: Callable[[GameScreenEvent], None]):
-        if listener not in self.__listeners:
-            self.__listeners.append(listener)
 
     @typechecked
     def process(self, img: np.ndarray) -> SampleMatch:
@@ -78,6 +74,5 @@ class MapScreenManager:
                                        date_timeofday=date_timeofday)
                 if event != self.__prev__event:
                     self.__prev__event = event
-                    for listener in self.__listeners:
-                        listener(event)
+                    self._dispatch(event)
         return screen_sample_matches

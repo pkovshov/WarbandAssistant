@@ -11,17 +11,19 @@ from wa_language.model.types import PlayerSex
 from .SampleMatch import SampleMatch
 from .DialogScreen.DialogScreenManager import DialogScreenManager
 from .MapScreen.MapScreenManager import MapScreenManager
+from .BaseScreen.GameScreenEventDispatcher import GameScreenEventDispatcher
 from .GameUserFriendlyLogger import DialogScreenLogger
 from .DatasetProcessors import MasterDatasetsProcessor
-from .GameScreenEvent import GameScreenEvent, UnknownScreenEvent
+from .GameScreenEvent import UnknownScreenEvent
 
 
-class GameScreenManager:
+class GameScreenManager(GameScreenEventDispatcher):
     @typechecked
     def __init__(self,
                  player_name: Optional[str],
                  player_sex: Optional[PlayerSex],
                  datasets: Optional[List[str]]):
+        super().__init__()
         self.__logger = logging.getLogger(__name__)
         # TODO: someone need to warn if playername is blank string like '  '
         #       such name could broke fuzzy
@@ -33,35 +35,31 @@ class GameScreenManager:
         if player_name is not None:
             special_language = {"wa_player": player_name}
         lang = Language.load(special_language)
-        # create unknown screen event handlers
-        self.__event_handlers = []
-        # create screen managers
+        # create screen managers, collect event dispatchers
         self.__map_screen_manager = MapScreenManager(lang)
         self.__dialog_screen_manger = DialogScreenManager(lang, player_sex)
-        event_handlers = []
-        # create datasets processor that listens to screen manager
+        self.__game_screen_event_dispatchers = [
+            self.__map_screen_manager,
+            self.__dialog_screen_manger,
+            self
+        ]
+        # create datasets processor and register it's game screen event handler
         if datasets:
             datasets_processor = MasterDatasetsProcessor(datasets=datasets,
                                                          player_name=player_name,
                                                          player_sex=player_sex)
-            event_handlers.append(datasets_processor.on_game_screen_event)
-        # create user-friendly logger that listens to screen managers
+            self.append_game_screen_event_handler(datasets_processor.on_game_screen_event)
+        # create user-friendly logger and register it's game screen event handler
         user_friendly_logger = DialogScreenLogger(lang)
-        event_handlers.append(user_friendly_logger.on_game_screen_event)
-        # add all the event handlers to event dispatchers
-        for event_handler in event_handlers:
-            self.__map_screen_manager.add_event_listener(event_handler)
-            self.__dialog_screen_manger.add_event_listener(event_handler)
-            self.add_event_listener(event_handler)
+        self.append_game_screen_event_handler(user_friendly_logger.on_game_screen_event)
         # log initial parameters
         self.__logger.info("Player: name {}, sex {}"
                            .format("NOT defined" if player_name is None else f"= {repr(player_name)}",
                                    "NOT defined" if player_sex is None else f"= {player_sex.value}"))
 
-    @typechecked
-    def add_event_listener(self, listener: Callable[[GameScreenEvent], None]):
-        if listener not in self.__event_handlers:
-            self.__event_handlers.append(listener)
+    def append_game_screen_event_handler(self, handler):
+        for dispatcher in self.__game_screen_event_dispatchers:
+            dispatcher.append_handler(handler)
 
     @typechecked
     def run(self, monitor_idx: int):
@@ -78,8 +76,7 @@ class GameScreenManager:
                 unknown_screen_manager = False
 
             def on_unknown_screen():
-                for event_handler in self.__event_handlers:
-                    event_handler(UnknownScreenEvent())
+                self._dispatch(UnknownScreenEvent())
 
             on_unknown_screen()
             while True:
