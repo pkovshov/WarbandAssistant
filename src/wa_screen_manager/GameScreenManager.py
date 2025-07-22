@@ -63,38 +63,33 @@ class GameScreenManager(GameScreenEventDispatcher):
 
     @typechecked
     def run(self, monitor_idx: int):
-        screen_managers = [self.__map_screen_manager,
-                           self.__dialog_screen_manger]
+        # prepare screen managers iterator and initialize got_matched_screen_manager
+        screen_managers_list = [self.__map_screen_manager,
+                                self.__dialog_screen_manger]
+        screen_managers_cycle_iter = itertools.cycle(screen_managers_list)
+        got_matched_screen_manager = True
+        # got sct and use it as a context object
         with mss.mss() as sct:
             monitor = sct.monitors[monitor_idx]
-            screen_managers_iter = itertools.cycle(screen_managers)
-            current_screen_manager = next(screen_managers_iter)
-            unknown_screen_manager = True
-
-            def on_match_screen_manager():
-                nonlocal unknown_screen_manager
-                unknown_screen_manager = False
-
-            def on_unknown_screen():
-                self._dispatch(UnknownScreenEvent())
-
-            on_unknown_screen()
+            # infinite loop
             while True:
-                scr = sct.grab(monitor)
-                img = np.array(scr)[:, :, :3]  # BGRA -> BGR
-                match = current_screen_manager.process(img)
-                if match is SampleMatch.FAIL:
-                    for screen_manager in screen_managers_iter:
-                        if screen_manager is current_screen_manager:
-                            if not unknown_screen_manager:
-                                on_unknown_screen()
-                                unknown_screen_manager = True
-                            break  # we make a full loop
-                        match = screen_manager.process(img)
-                        if match is not SampleMatch.FAIL:
-                            current_screen_manager = screen_manager
-                            on_match_screen_manager()
-                            break
-                elif unknown_screen_manager:
-                    on_match_screen_manager()
-
+                # make screenshot
+                screenshot = sct.grab(monitor)
+                screenshot = np.array(screenshot)[:, :, :3]  # BGRA -> BGR
+                # process screenshot
+                # # start processing from the last used screen manager
+                # # that is strictly needed if it matched the previous screenshot
+                slice_start = len(screen_managers_list) - 1
+                # # end processing after trying all the screen managers
+                slice_end = slice_start + len(screen_managers_list)
+                # # process screenshot
+                for screen_manager in itertools.islice(screen_managers_cycle_iter,
+                                                       slice_start,
+                                                       slice_end):
+                    if screen_manager.process(screenshot) is not SampleMatch.FAIL:
+                        got_matched_screen_manager = True
+                        break
+                else:
+                    if got_matched_screen_manager:
+                        self._dispatch(UnknownScreenEvent())
+                        got_matched_screen_manager = False
