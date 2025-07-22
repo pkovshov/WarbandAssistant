@@ -7,7 +7,7 @@ from typeguard import typechecked
 from wa_language.Language import Language
 from wa_language.model.types import PlayerSex
 from wa_screen_manager.SampleMatch import SampleMatch
-from .DialogScreenEvent import DialogScreenEvent
+from .DialogScreenEvent import DialogScreenEvent, GameScreenEvent
 from .DialogScreenSamplers import DialogScreenScreenSampler, DialogScreenRelationSampler
 from .DialogScreenOCRs import DialogScreenTitleOCR, DialogScreenRelationOCR, DialogBodyOCR, NonStable
 from .DialogScreenTitleFuzzyParser import DialogScreenTitleFuzzyParser
@@ -41,7 +41,7 @@ class DialogScreenManager:
         self.__prev__event = None
 
     @typechecked
-    def add_event_listener(self, listener: Callable[[DialogScreenEvent], None]):
+    def add_event_listener(self, listener: Callable[[GameScreenEvent], None]):
         if listener not in self.__listeners:
             self.__listeners.append(listener)
 

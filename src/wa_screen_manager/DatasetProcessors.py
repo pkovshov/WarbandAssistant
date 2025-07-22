@@ -12,6 +12,7 @@ from wa_datasets.DialogTitlesDataset import DialogTitlesDataset
 from wa_datasets.MapCalendarsDataset import MapCalendarsDataset
 from .DialogScreen.DialogScreenEvent import DialogScreenEvent
 from .MapScreen.MapScreenEvent import MapScreenEvent
+from .GameScreenEvent import GameScreenEvent
 
 
 class DialogBodyProcessor:
@@ -32,15 +33,17 @@ class DialogBodyProcessor:
         self.__prev_body_ocr = None
 
     @typechecked
-    def process(self, event: DialogScreenEvent):
-        if event.body_ocr is not None and event.body_ocr != self.__prev_body_ocr:
-            self.__prev_body_ocr = event.body_ocr
-            self.__dataset.add(screenshot=event.image,
-                               screen_sample_matches=True,
-                               title_keys=event.title_keys,
-                               body_ocr=event.body_ocr,
-                               body_bounds=tuple((bound.key, bound.bind) for bound in event.body_bounds))
-
+    def on_game_screen_event(self, event: GameScreenEvent):
+        if isinstance(event, DialogScreenEvent):
+            if event.body_ocr is not None and event.body_ocr != self.__prev_body_ocr:
+                self.__prev_body_ocr = event.body_ocr
+                self.__dataset.add(screenshot=event.image,
+                                   screen_sample_matches=True,
+                                   title_keys=event.title_keys,
+                                   body_ocr=event.body_ocr,
+                                   body_bounds=tuple((bound.key, bound.bind) for bound in event.body_bounds))
+        else:
+            self.__prev_body_ocr = None
 
 class DialogRelationDatasetProcessor:
     NAME = DialogRelationsDataset.NAME
@@ -53,12 +56,13 @@ class DialogRelationDatasetProcessor:
                                                                  language=config.language)
 
     @typechecked
-    def process(self, event: DialogScreenEvent):
-        if event.relation_ocr is not None:
-            self.__dialog_relations_dataset.add(screenshot=event.image,
-                                                screen_sample_matches=True,
-                                                relation_ocr=event.relation_ocr,
-                                                relation=event.relation)
+    def on_game_screen_event(self, event: GameScreenEvent):
+        if isinstance(event, DialogScreenEvent):
+            if event.relation_ocr is not None:
+                self.__dialog_relations_dataset.add(screenshot=event.image,
+                                                    screen_sample_matches=True,
+                                                    relation_ocr=event.relation_ocr,
+                                                    relation=event.relation)
 
 
 class DialogTitleDatasetProcessor:
@@ -73,18 +77,18 @@ class DialogTitleDatasetProcessor:
                                                            player_name=player_name)
         self.__prev_title_ocr = None
 
-    def non_dialog_screen(self):
-        self.__prev_title_ocr = None
-
     @typechecked
-    def process(self, event: DialogScreenEvent):
-        if self.__prev_title_ocr != event.title_ocr:
-            self.__prev_title_ocr = event.title_ocr
-            self.__dialog_titles_dataset.add(screenshot=event.image,
-                                             screen_sample_matches=True,
-                                             title_ocr=event.title_ocr,
-                                             title_fuzzy_score=None,
-                                             title_keys=event.title_keys)
+    def on_game_screen_event(self, event: GameScreenEvent):
+        if isinstance(event, DialogScreenEvent):
+            if self.__prev_title_ocr != event.title_ocr:
+                self.__prev_title_ocr = event.title_ocr
+                self.__dialog_titles_dataset.add(screenshot=event.image,
+                                                 screen_sample_matches=True,
+                                                 title_ocr=event.title_ocr,
+                                                 title_fuzzy_score=None,
+                                                 title_keys=event.title_keys)
+        else:
+            self.__prev_title_ocr = None
 
 
 class MapCalendarDatasetProcessor:
@@ -99,18 +103,19 @@ class MapCalendarDatasetProcessor:
                                                            language=config.language)
 
     @typechecked
-    def process(self, event: MapScreenEvent):
-        self.__map_calendars_dataset.add(screenshot=event.image,
-                                         calendar_ocr=event.calendar_ocr,
-                                         calendar_overlapped=event.calendar_overlapped,
-                                         date_key=event.date_timeofday.date_key
-                                         if event.date_timeofday is not None else None,
-                                         year=event.date_timeofday.year
-                                         if event.date_timeofday is not None else None,
-                                         day=event.date_timeofday.day
-                                         if event.date_timeofday is not None else None,
-                                         timeofday_key=event.date_timeofday.timeofday_key
-                                         if event.date_timeofday is not None else None,)
+    def on_game_screen_event(self, event: GameScreenEvent):
+        if isinstance(event, MapScreenEvent):
+            self.__map_calendars_dataset.add(screenshot=event.image,
+                                             calendar_ocr=event.calendar_ocr,
+                                             calendar_overlapped=event.calendar_overlapped,
+                                             date_key=event.date_timeofday.date_key
+                                             if event.date_timeofday is not None else None,
+                                             year=event.date_timeofday.year
+                                             if event.date_timeofday is not None else None,
+                                             day=event.date_timeofday.day
+                                             if event.date_timeofday is not None else None,
+                                             timeofday_key=event.date_timeofday.timeofday_key
+                                             if event.date_timeofday is not None else None,)
 
 
 class MasterDatasetsProcessor:
@@ -133,22 +138,12 @@ class MasterDatasetsProcessor:
                                          if MapCalendarDatasetProcessor.NAME in datasets
                                          else None)
 
-    @typechecked
-    def on_dialog_screen(self, event: DialogScreenEvent):
+    def on_game_screen_event(self, event: GameScreenEvent):
         if self.__dialog_body_processor:
-            self.__dialog_body_processor.process(event)
+            self.__dialog_body_processor.on_game_screen_event(event)
         if self.__dialog_relation_processor:
-            self.__dialog_relation_processor.process(event)
+            self.__dialog_relation_processor.on_game_screen_event(event)
         if self.__dialog_title_processor:
-            self.__dialog_title_processor.process(event)
-
-    @typechecked
-    def on_map_screen(self, event: MapScreenEvent):
-        if self.__dialog_title_processor:
-            self.__dialog_title_processor.non_dialog_screen()
+            self.__dialog_title_processor.on_game_screen_event(event)
         if self.__map_calendar_processor:
-            self.__map_calendar_processor.process(event)
-
-    def on_unknown_screen(self):
-        if self.__dialog_title_processor:
-            self.__dialog_title_processor.non_dialog_screen()
+            self.__map_calendar_processor.on_game_screen_event(event)

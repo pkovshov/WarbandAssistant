@@ -4,6 +4,7 @@ import numpy as np
 from typeguard import typechecked
 
 from wa_language.Language import LangKey
+from wa_screen_manager.GameScreenEvent import GameScreenEvent
 
 
 class DateTimeofday(NamedTuple):
@@ -13,7 +14,7 @@ class DateTimeofday(NamedTuple):
     timeofday_key: LangKey
 
 
-class MapScreenEvent:
+class MapScreenEvent(GameScreenEvent):
     @typechecked
     def __init__(self,
                  image: np.ndarray,

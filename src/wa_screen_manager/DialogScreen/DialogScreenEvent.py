@@ -5,6 +5,7 @@ from typeguard import typechecked
 
 from wa_language.Language import LangKey
 from wa_language.syntax.Identifier import Identifier
+from wa_screen_manager.GameScreenEvent import GameScreenEvent
 
 
 class DialogBodyBound(NamedTuple):
@@ -12,7 +13,7 @@ class DialogBodyBound(NamedTuple):
     bind: Mapping[Identifier, Any]
 
 
-class DialogScreenEvent:
+class DialogScreenEvent(GameScreenEvent):
     @typechecked
     def __init__(self,
                  image: np.ndarray,

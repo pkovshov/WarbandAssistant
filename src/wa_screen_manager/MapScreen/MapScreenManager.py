@@ -7,7 +7,7 @@ from typeguard import typechecked
 from wa_language.Language import Language
 from wa_screen_manager.BaseScreen.BaseSampler import BaseSampleReadingSampler
 from wa_screen_manager.SampleMatch import SampleMatch
-from .MapScreenEvent import MapScreenEvent
+from .MapScreenEvent import MapScreenEvent, GameScreenEvent
 from .MapScreenCalendarOCR import MapScreenCalendarOCR, NonStable
 from .MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
 
@@ -56,7 +56,7 @@ class MapScreenManager:
         self.__prev__event = None
 
     @typechecked
-    def add_event_listener(self, listener: Callable[[MapScreenEvent], None]):
+    def add_event_listener(self, listener: Callable[[GameScreenEvent], None]):
         if listener not in self.__listeners:
             self.__listeners.append(listener)
 

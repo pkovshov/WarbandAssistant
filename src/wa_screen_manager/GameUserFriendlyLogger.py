@@ -16,8 +16,9 @@ from wa_language.model.dialog_model.comment_intro_keys import (comment_intro_pla
                                                                comment_intro_filter_king)
 from wa_language.model.dialog_model.private_chat_keys import (is_private_chat_key,
                                                               private_chat_keys_by_lord_personality)
-from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogScreenEvent
-from wa_screen_manager.MapScreen.MapScreenEvent import MapScreenEvent
+from .DialogScreen.DialogScreenEvent import DialogScreenEvent
+from .MapScreen.MapScreenEvent import MapScreenEvent
+from .GameScreenEvent import GameScreenEvent
 
 
 class DialogScreenLogger:
@@ -25,28 +26,27 @@ class DialogScreenLogger:
     def __init__(self, lang: Language):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
-        self.__listener = None
+        self.__eventHandlers = {
+            DialogScreenEvent: self.on_dialog_screen,
+            MapScreenEvent: self.on_map_screen
+        }
+        self.__prev_event_type = None
         self.__prev_map_date_timeofday = None
         self.__prev_dialog_title_ocr = None
         self.__prev_dialog_body_ocr = None
         self.__prev_dialog_relation = None
 
-    @property
-    def listener(self):
-        return self.__listener
-
-    @listener.setter
     @typechecked
-    def listener(self, value: Callable[[str], None]):
-        self.__listener = value
+    def on_game_screen_event(self, event: GameScreenEvent):
+        if self.__prev_event_type != type(event):
+            self.__prev_event_type = type(event)
+            self.__logger.info(event.__class__.__name__.replace("ScreenEvent", " Screem"))
+        event_handler = self.__eventHandlers.get(type(event),
+                                                 self.on_unknown_screen)
+        event_handler(event)
 
-    def __log(self, text: str):
-        if self.__listener:
-            self.__listener(text)
-        else:
-            self.__logger.info(text)
-
-    def on_unknown_screen(self):
+    @typechecked
+    def on_unknown_screen(self, event: GameScreenEvent):
         self.__prev_map_date_timeofday = None
         self.__prev_dialog_title_ocr = None
         self.__prev_dialog_body_ocr = None
@@ -70,7 +70,7 @@ class DialogScreenLogger:
             else:
                 text += repr(event.calendar_ocr)
                 text += " (FALSE NEGATIVE)"
-            self.__log(text)
+            self.__logger.info(text)
 
     @typechecked
     def on_dialog_screen(self, event: DialogScreenEvent):
@@ -129,7 +129,7 @@ class DialogScreenLogger:
                     text += f" ({body_key})"
             else:
                 text += repr(event.body_ocr)
-            self.__log(text)
+            self.__logger.info(text)
         # log relation
         if (
             event.relation_ocr is not None and
@@ -142,4 +142,4 @@ class DialogScreenLogger:
             self.__prev_dialog_relation = event.relation
             text = " "*len("Dialog: ")
             text += "Relation: " + str(event.relation) if event.relation is not None else "?"
-            self.__log(text)
+            self.__logger.info(text)
