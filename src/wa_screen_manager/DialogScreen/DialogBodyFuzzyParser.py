@@ -1,6 +1,5 @@
 from collections import namedtuple
 import logging
-from types import MappingProxyType
 from typing import Any, Mapping, NamedTuple, Optional, Tuple
 
 import rapidfuzz as fz

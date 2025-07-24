@@ -7,7 +7,9 @@ import os
 from os import path
 import subprocess
 import traceback
-from typing import Dict, Optional, Set, Tuple
+from types import MappingProxyType
+from typing import Any, Dict, Mapping, Optional, Set, Tuple
+
 
 import cv2
 import numpy as np
@@ -70,6 +72,15 @@ class BaseImageDataset(ABC):
             self.__git_status = self._load_git_status()
         return self.__git_status
 
+    @property
+    @typechecked
+    def meta_dict(self) -> Optional[Mapping[int, Any]]:
+        self.__load()
+        if self.__state is State.BLOCKED:
+            self._logger.warning(f"BLOCKED {self.__name} dataset does not support meta_dict")
+            return None
+        return MappingProxyType(self.__meta)
+
     @typechecked
     def meta_and_image_path(self) -> Optional[dict[int, MetaAndImagePath[object, str]]]:
         self.__load()
@@ -79,8 +90,7 @@ class BaseImageDataset(ABC):
         result = dict()
         for idx, meta in self.__meta.items():
             result[idx] = MetaAndImagePath(meta=meta,
-                                           image_path=path.join(self.__dir_path,
-                                                                self.__idx_to_png(idx)))
+                                           image_path=self.img_path(idx))
         return result
 
     @typechecked
@@ -98,7 +108,7 @@ class BaseImageDataset(ABC):
             if meta_key in self.__meta_index:
                 if is_soft_key:
                     for idx in self.__meta_index[meta_key]:
-                        image_path = path.join(self.__dir_path, self.__idx_to_png(idx))
+                        image_path = self.img_path(idx)
                         if np.array_equal(cv2.imread(image_path), image):
                             self._logger.info(f"{self.__name}    has {idx}")
                             return
@@ -147,6 +157,10 @@ class BaseImageDataset(ABC):
     def idx_to_stem(self, idx: int) -> str:
         return f"{idx:06d}"
 
+    @typechecked
+    def img_path(self, idx: int) -> str:
+        return path.join(self.__dir_path, self.__idx_to_png(idx))
+
     @abstractmethod
     def _meta_to_data(self, data: object) -> dict:
         """Convert dataset-specific metadata to a dictionary for YAML storage."""
@@ -191,8 +205,7 @@ class BaseImageDataset(ABC):
 
     @typechecked
     def __write_image(self, idx: int, image: np.ndarray) -> bool:
-        png_file_path = path.join(self.__dir_path,
-                                  self.__idx_to_png(idx))
+        png_file_path = self.img_path(idx)
         if path.isfile(png_file_path):
             self._logger.warning(f"REWRITE existent png file {png_file_path}")
         try:
@@ -322,10 +335,10 @@ class BaseImageDataset(ABC):
                 non_uniq = False
                 if meta_key in self.__meta_index:
                     if is_soft_key:
-                        image_path = path.join(self.__dir_path, self.__idx_to_png(idx))
+                        image_path = self.img_path(idx)
                         image = cv2.imread(image_path)
                         for dup_idx in self.__meta_index[meta_key]:
-                            image_path = path.join(self.__dir_path, self.__idx_to_png(dup_idx))
+                            image_path = self.img_path(idx)
                             if np.array_equal(cv2.imread(image_path), image):
                                 non_uniq = True
                                 break

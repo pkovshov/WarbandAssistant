@@ -59,7 +59,7 @@ class DialogBodiesDataset(BaseImageDataset):
                  lazy_load: bool = False):
         super().__init__(self.NAME,
                          # Hack to avoid assert on is_screenshot check in BaseImageDataset.add(...) method
-                         crop.resolution,
+                         crop.resolution if crop else None,
                          lazy_load)
         self.__resolution = resolution
         self.__crop = crop
