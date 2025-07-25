@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR, NonStable
 

@@ -13,7 +13,7 @@ from typing import Any, Dict, Mapping, Optional, Set, Tuple
 
 import cv2
 import numpy as np
-from typeguard import typechecked
+from wa_typechecker import typechecked
 import yaml
 
 from wa_types import Resolution, is_screenshot

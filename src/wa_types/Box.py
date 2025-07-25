@@ -1,6 +1,6 @@
 from typing import NamedTuple, Tuple
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from .Resolution import Resolution
 

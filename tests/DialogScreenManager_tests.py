@@ -2,7 +2,7 @@ from os import path
 
 import cv2
 import numpy as np
-from typeguard import TypeCheckError
+from wa_typechecker import TypeCheckError
 
 from wa_types import Box, Resolution
 from wa_language import Language

@@ -4,7 +4,7 @@ from typing import Callable, List, Optional
 
 import mss
 import numpy as np
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language import Language
 from wa_language.model.types import PlayerSex

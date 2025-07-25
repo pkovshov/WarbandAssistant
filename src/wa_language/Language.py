@@ -2,7 +2,7 @@ from collections.abc import Mapping
 import logging
 from typing import Dict, Iterator, Optional
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from .syntax.Errors import LangSyntaxError
 from . import loader
@@ -32,7 +32,7 @@ class LangKey(str):
 
 
 class Language(Mapping[LangKey, LangValue]):
-    @typechecked()
+    @typechecked
     def __init__(self, data: dict[str, str]):
         self.__logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.__data = {}

@@ -2,7 +2,7 @@ import logging
 from typing import Callable, Optional
 
 import numpy as np
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.Language import Language
 from wa_language.model.types import PlayerSex

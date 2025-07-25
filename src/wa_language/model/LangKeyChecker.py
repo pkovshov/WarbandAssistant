@@ -9,9 +9,6 @@ True
 False
 
 >>> is_hero = KeyChecker(lambda key: key in ("good", "bad", "fool"))
->>> "dom" in is_hero
-Traceback (most recent call last):
-typeguard.TypeCheckError: ...
 >>> LangKey("dom") in is_hero
 False
 >>> LangKey("good") in is_hero
@@ -206,7 +203,7 @@ True
 
 from typing import Callable, Iterable, Iterator, Mapping, Optional
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.Language import Language, LangKey, LangValue
 

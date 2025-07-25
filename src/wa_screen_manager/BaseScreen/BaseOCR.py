@@ -5,7 +5,7 @@ from typing import Union
 
 import numpy as np
 import pytesseract
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_types import Box, Resolution, is_screenshot
 

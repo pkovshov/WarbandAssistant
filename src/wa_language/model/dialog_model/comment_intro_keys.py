@@ -7,7 +7,7 @@ Also, intro comment depends on Lord personality.
 
 from typing import Optional
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.model.types import PlayerSex, LordPersonality
 from wa_language.Language import LangKey

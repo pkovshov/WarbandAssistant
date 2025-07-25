@@ -3,7 +3,7 @@ import logging
 from typing import Callable
 
 from wa_language.Language import Language
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.model import troop_keys
 from wa_language.model import calendar_model

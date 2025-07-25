@@ -1,5 +1,5 @@
 import numpy as np
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from .Resolution import Resolution
 

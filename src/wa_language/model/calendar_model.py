@@ -1,6 +1,6 @@
 from enum import Enum
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.syntax.Identifier import Identifier
 from .LangKeyChecker import key_checker

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import FrozenSet, Union
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 
 class Expression(ABC):

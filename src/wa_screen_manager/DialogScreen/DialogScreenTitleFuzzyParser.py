@@ -3,7 +3,7 @@ import logging
 from typing import Tuple
 
 import rapidfuzz as fz
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.Language import Language, LangKey
 from wa_language.model.troop_keys import is_troop_key

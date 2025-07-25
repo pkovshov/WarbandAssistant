@@ -1,6 +1,6 @@
 from typing import Optional
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 
 class DialogScreenRelationParser:

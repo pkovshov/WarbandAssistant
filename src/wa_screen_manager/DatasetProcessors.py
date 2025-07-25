@@ -2,7 +2,7 @@ import logging
 from os import path
 from typing import Optional, List
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 import path_conf
 from wa_language.model.types import PlayerSex

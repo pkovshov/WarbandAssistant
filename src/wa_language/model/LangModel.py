@@ -1,6 +1,6 @@
 from typing import Any, Dict, Iterable
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.syntax.Identifier import Identifier
 from wa_language.syntax.Binary import (Binary,

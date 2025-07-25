@@ -1,6 +1,6 @@
 from typing import FrozenSet, Optional, Tuple, Union
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from .Errors import LangSyntaxError
 from .Expression import Expression
@@ -43,7 +43,7 @@ class Ternary(Expression):
     def false_part(self) -> Interpolation:
         return self.__items[2]
 
-    @typechecked()
+    @typechecked
     def _extract_variables(self) -> FrozenSet[Identifier]:
         condition_variables = self.condition.variables
         true_part_variables = self.true_part.variables

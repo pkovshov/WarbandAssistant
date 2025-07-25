@@ -3,7 +3,7 @@ import logging
 from typing import Any, Mapping, NamedTuple, Optional, Tuple
 
 import rapidfuzz as fz
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.Language import Language, LangKey
 from wa_language.syntax.Binary import (BINARY_CONDITION_VARIABLE_FIRST_VALUE,

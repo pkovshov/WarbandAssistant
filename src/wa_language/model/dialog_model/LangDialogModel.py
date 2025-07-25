@@ -1,6 +1,6 @@
 from typing import Dict, Set, Tuple
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.Language import Language, LangKey
 from wa_language.model.types import PlayerSex, LangModelError

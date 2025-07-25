@@ -1,7 +1,7 @@
 from typing import Optional, NamedTuple
 
 import numpy as np
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.Language import LangKey
 from wa_screen_manager.GameScreenEvent import GameScreenEvent

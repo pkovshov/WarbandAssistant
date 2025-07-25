@@ -2,7 +2,7 @@ import logging
 from typing import Mapping, Optional
 
 import rapidfuzz as fz
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_language.Language import Language
 from wa_language.model.calendar_model import is_date_key, is_timeofday_key, DateValueModel

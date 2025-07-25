@@ -1,7 +1,7 @@
 import re
 from typing import FrozenSet, Union
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from .Errors import LangSyntaxError
 from .Expression import Expression

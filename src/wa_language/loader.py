@@ -3,7 +3,7 @@ import os
 import re
 from typing import Dict, List, Optional
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 
 logger = logging.getLogger(__name__)

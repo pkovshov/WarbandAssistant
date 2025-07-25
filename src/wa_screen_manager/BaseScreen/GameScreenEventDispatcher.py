@@ -1,6 +1,6 @@
 from typing import Callable
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from ..GameScreenEvent import GameScreenEvent
 

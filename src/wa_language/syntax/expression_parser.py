@@ -1,4 +1,4 @@
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from .Errors import LangSyntaxError
 from .Binary import Binary

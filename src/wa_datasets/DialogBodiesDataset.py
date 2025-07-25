@@ -4,7 +4,7 @@ from typing import Any, List, Mapping, NamedTuple, Optional, Tuple
 
 import cv2
 import numpy as np
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 import path_conf
 from wa_language.model.types import PlayerSex

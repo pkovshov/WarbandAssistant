@@ -1,6 +1,6 @@
 from typing import FrozenSet, List, Tuple, Union
 
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from .Errors import LangSyntaxError
 from .Field import Field

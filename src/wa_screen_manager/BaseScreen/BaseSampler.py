@@ -4,7 +4,7 @@ from typing import Tuple
 
 import cv2
 import numpy as np
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_types import Box, Resolution, is_screenshot
 from wa_screen_manager.SampleMatch import SampleMatch

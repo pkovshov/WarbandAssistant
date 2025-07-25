@@ -2,7 +2,7 @@ from typing import Optional, Union, Tuple
 
 import cv2
 import numpy as np
-from typeguard import typechecked
+from wa_typechecker import typechecked
 
 from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR, NonStableType, NonStable
 
