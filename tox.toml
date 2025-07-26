@@ -39,7 +39,7 @@ commands = [
 
 [env.dialog_relations]
 commands = [
-  ["pytest", "-s", "tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py"],
+  ["pytest", "tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py"],
 ]
 
 [env.map_calendars]
@@ -49,7 +49,9 @@ commands = [
 
 [env.smoke]
 commands = [
-  ["pytest", "--doctest-modules", "--ignore", "tests/test_parsing_by_datasets", "--ignore", "utils/map_calendars_add_overlapped.py"],
+  ["pytest", "--doctest-modules", "--ignore", "tests/test_parsing_by_datasets",
+                                  "--ignore", "utils/map_calendars_add_overlapped.py",
+                                  "--ignore", "tox.py"],
 ]
 
 [env.lang]

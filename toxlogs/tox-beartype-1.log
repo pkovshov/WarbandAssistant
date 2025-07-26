@@ -1,0 +1,114 @@
+smoke: commands[0]> pytest --doctest-modules --ignore tests/test_parsing_by_datasets --ignore utils/map_calendars_add_overlapped.py --ignore tox.py
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+cachedir: .tox/smoke/.pytest_cache
+rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
+plugins: cases-3.9.1, typeguard-4.4.4
+collecting ... collecting 15 items                                                            collecting 15 items                                                            collecting 19 items                                                            collected 19 items                                                             
+
+src/wa_language/Language.py ..                                           [ 10%]
+src/wa_language/model/LangKeyChecker.py .                                [ 15%]
+src/wa_language/syntax/Binary.py ..                                      [ 26%]
+src/wa_language/syntax/Field.py .                                        [ 31%]
+src/wa_language/syntax/Identifier.py ..                                  [ 42%]
+src/wa_language/syntax/Interpolation.py ....                             [ 63%]
+src/wa_language/syntax/Ternary.py .                                      [ 68%]
+src/wa_types/Box.py ..                                                   [ 78%]
+tests/datasets_test.py ....                                              [100%]
+
+============================== 19 passed in 3.15s ==============================
+smoke: OK ✔ in 3.62 seconds
+dialog_bodies: commands[0]> pytest tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+cachedir: .tox/dialog_bodies/.pytest_cache
+rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
+plugins: cases-3.9.1, typeguard-4.4.4
+collecting ... collecting 55 items                                                            collected 55 items                                                             
+
+tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py .......... [ 18%]
+.............................................                            [100%]
+
+total time    : 9.2886 sec
+collec time   : 0.6835 sec
+setups time   : 0.5916 sec
+calls time    : 7.9758 sec
+avg call time : 0.1450 sec
+passed        : 55 / 55
+
+============================== 55 passed in 9.29s ==============================
+dialog_bodies: OK ✔ in 9.56 seconds
+dialog_titles: commands[0]> pytest tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+cachedir: .tox/dialog_titles/.pytest_cache
+rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
+plugins: cases-3.9.1, typeguard-4.4.4
+collecting ... collecting 232 items                                                           collected 232 items                                                            
+
+tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py ......... [  3%]
+........................................................................ [ 34%]
+........................................................................ [ 65%]
+........................................................................ [ 96%]
+.......                                                                  [100%]
+
+total time    : 21.4741 sec
+collec time   : 1.4760 sec
+setups time   : 0.0611 sec
+calls time    : 19.7850 sec
+avg call time : 0.0853 sec
+passed        : 232 / 232
+
+============================= 232 passed in 21.47s =============================
+dialog_titles: OK ✔ in 21.78 seconds
+dialog_relations: commands[0]> pytest tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+cachedir: .tox/dialog_relations/.pytest_cache
+rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
+plugins: cases-3.9.1, typeguard-4.4.4
+collecting ... collected 40 items                                                             
+
+tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py ...... [ 15%]
+..................................                                       [100%]
+
+total time    : 3.5670 sec
+collec time   : 0.3597 sec
+setups time   : 0.0104 sec
+calls time    : 3.1716 sec
+avg call time : 0.0793 sec
+passed        : 40 / 40
+
+============================== 40 passed in 3.57s ==============================
+dialog_relations: OK ✔ in 3.82 seconds
+map_calendars: commands[0]> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py
+============================= test session starts ==============================
+platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
+cachedir: .tox/map_calendars/.pytest_cache
+rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
+plugins: cases-3.9.1, typeguard-4.4.4
+collecting ... collecting 436 items                                                           collected 436 items                                                            
+
+tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py ......... [  2%]
+........................................................................ [ 18%]
+........................................................................ [ 35%]
+........................................................................ [ 51%]
+........................................................................ [ 68%]
+........................................................................ [ 84%]
+...................................................................      [100%]
+
+total time    : 38.5870 sec
+collec time   : 0.9696 sec
+setups time   : 0.1467 sec
+calls time    : 37.1749 sec
+avg call time : 0.0853 sec
+passed        : 436 / 436
+
+============================= 436 passed in 38.59s =============================
+  smoke: OK (3.62=setup[0.03]+cmd[3.59] seconds)
+  dialog_bodies: OK (9.56=setup[0.00]+cmd[9.55] seconds)
+  dialog_titles: OK (21.78=setup[0.00]+cmd[21.78] seconds)
+  dialog_relations: OK (3.82=setup[0.01]+cmd[3.81] seconds)
+  map_calendars: OK (38.87=setup[0.00]+cmd[38.87] seconds)
+  congratulations :) (77.69 seconds)
+
