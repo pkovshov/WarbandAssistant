@@ -1,29 +1,69 @@
 from abc import ABC, abstractmethod
-from typing import FrozenSet, Union
+from typing import Any, Tuple
 
 from wa_typechecker import typechecked
 
 
 class Expression(ABC):
-    def __init__(self):
-        self.__variables = None
+    def __init__(self, items: Tuple[Any, ...]):
+        self.__items = items
 
     @property
-    def variables(self) -> FrozenSet["Identifier"]:
-        if self.__variables is None:
-            self.__variables = self._extract_variables()
-        return self.__variables
+    def _items(self) -> Tuple[Any, ...]:
+        return self.__items
+
+    def __eq__(self, other):
+        if isinstance(other, Expression):
+            return self.__items == other.__items
+        else:
+            return NotImplemented
+
+    def __hash__(self):
+        return hash(self.__items)
 
     @abstractmethod
-    def _extract_variables(self):
-        raise NotImplemented
-
-    def substitute(self, variable: "Identifier", value: str) -> Union[str, "Expression"]:
-        return self._substitute(variable, value)
-
-    @abstractmethod
-    def _substitute(self, variable: str, value: str):
+    def __str__(self):
         raise NotImplemented
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({repr(str(self))})"
+        return "{}({})".format(self.__class__.__name__,
+                               ", ".join(repr(item) for item in self.__items))
+
+    # @staticmethod
+    # def parser():
+    #     """Generator
+    #
+    #     Accepts one symbol in a row to be sent.
+    #     Ends when a return statement raises StopIteration.
+    #     The StopIteration value is either Expression
+    #     or a str instance if expression syntax was violated.
+    #     """
+    #     items = []
+    #     symbol = yield
+    #     if symbol != "{":
+    #         # expression must start with {
+    #         return ""
+    #     identifier_parser = Identifier.parser(stop_symbols="?}")
+    #     next(identifier_parser)
+    #     try:
+    #         symbol = yield
+    #         while symbol is not None:
+    #             identifier_parser.send(symbol)
+    #             symbol = yield
+    #         next(identifier_parser)
+    #     except StopIteration as result:
+    #         identifier_result = result.value
+    #     if isinstance(identifier_result, Identifier):
+    #         items.append(identifier_result)
+    #         if symbol == "}":
+    #             return IdentifierExpression(items)
+    #         else:
+    #             # TODO: use Interpolation parser
+    #             pass
+    #     else:
+    #         # TODO: use Binary parser
+    #         pass
+
+
+
+

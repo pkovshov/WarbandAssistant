@@ -6,8 +6,8 @@ import rapidfuzz as fz
 from wa_typechecker import typechecked
 
 from wa_language.Language import Language, LangKey
-from wa_language.syntax.Binary import (BINARY_CONDITION_VARIABLE_FIRST_VALUE,
-                                       BINARY_CONDITION_VARIABLE_SECOND_VALUE)
+from wa_language.Language import (BINARY_CONDITION_VARIABLE_FIRST_VALUE,
+                                  BINARY_CONDITION_VARIABLE_SECOND_VALUE)
 from wa_language.model.types import PlayerSex
 from wa_language.model.LangModel import SexLangValueModel
 from wa_language.model.dialog_model.LangDialogModel import LangDialogModel
@@ -85,7 +85,7 @@ class DialogBodyFuzzyParser:
         # check that matches has no unbinded variables
         # current implementation does not work with such strings
         for match in matches:
-            if len(match[TEXT].variables) > 0:
+            if len(match[TEXT].identifiers) + (1 if match[TEXT].has_binary else 0) > 0:
                 raise NotImplemented("Do not use Interpolations with variables other then BINARY_CONDITION_VARIABLE")
         # build boundaries
         boundary_keys = tuple(match[KEY].key for match in matches)

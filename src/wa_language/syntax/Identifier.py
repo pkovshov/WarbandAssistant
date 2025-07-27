@@ -1,111 +1,106 @@
-import re
-from typing import FrozenSet, Union
+"""
+Tests:
+# >>> Identifier("reg1")
+# Traceback (most recent call last):
+# NotImplementedError: ...
+>>> parser = Identifier.parser()
+>>> next(parser)
+>>> try:
+...    for s in "reg1":
+...        parser.send(s)
+...    next(parser)
+... except StopIteration as result:
+...    print(result.value)
+...    print(repr(result.value))
+reg1
+<Identifier: 'reg1'>
+>>> parser = Identifier.parser()
+>>> next(parser)
+>>> try:
+...    for s in "fizz and buzz":
+...        parser.send(s)
+... except StopIteration as result:
+...    print(result.value)
+...    print(repr(result.value))
+fizz
+<Identifier: 'fizz'>
+>>> parser = Identifier.parser()
+>>> next(parser)
+>>> try:
+...    for s in "__0_s2}":
+...        parser.send(s)
+... except StopIteration as result:
+...    print(result.value)
+...    print(repr(result.value))
+__0_s2
+<Identifier: '__0_s2'>
+>>> parser = Identifier.parser()
+>>> next(parser)
+>>> try:
+...    for s in "s?":
+...        parser.send(s)
+... except StopIteration as result:
+...    print(result.value)
+...    print(repr(result.value))
+s
+<Identifier: 's'>
+"""
 
 from wa_typechecker import typechecked
 
-from .Errors import LangSyntaxError
-from .Expression import Expression
 
+class Identifier(str):
+    """An identifier. See details in module description."""
+    # TODO: make private constructor
+    # def __new__(cls, val):
+    #     raise NotImplementedError("use parser generator")
 
-class Identifier(Expression):
-    """
-    An identifier expression. See details in module description.
+    def __repr__(self):
+        return "<{}: {}>".format(self.__class__.__name__, repr(str(self)))
 
-    Tests:
-    >>> ident_1 = Identifier('s3')
-    >>> print(ident_1.variable)
-    s3
-    >>> print(ident_1)
-    s3
-    >>> print(repr(ident_1))
-    Identifier('s3')
-    >>> ident_1 == eval(repr(ident_1))
-    True
-    >>> ident_2 = Identifier('reg5')
-    >>> ident_1 == ident_2
-    False
-    >>> hash(ident_1) == hash(ident_2)
-    False
-    >>> ident_3 = Identifier('s3')
-    >>> ident_1 == ident_3
-    True
-    >>> hash(ident_1) == hash(ident_3)
-    True
-    >>> Identifier("2")
-    Traceback (most recent call last):
-    wa_language.syntax.Errors.LangSyntaxError: ...
-    """
+    @classmethod
     @typechecked
-    def __init__(self, src: str):
-        super().__init__()
-        self.__item = parse_identifier(src)
+    def parser(cls):
+        """Generator
 
-    @property
-    @typechecked
-    def variable(self) -> str:
-        return self.__item
+        Accepts one symbol in a row to be sent.
+        Ends when a return statement raises StopIteration.
+        The StopIteration value is either Identifier
+        or an empty str
+        """
+        # initialize
+        string = []
+        lower_case_range = range(ord('a'), ord('z') + 1)
+        upper_case_range = range(ord('A'), ord('Z') + 1)
+        underscore_ord = ord('_')
+        digit_range = None  # will be created after first symbol check
 
-    @typechecked
-    def _extract_variables(self) -> FrozenSet["Identifier"]:
-        return frozenset((self,))
+        def result(cls):
+            if string:
+                # create Identifier
+                return super().__new__(cls, "".join(string))
+            else:
+                # return empty str because empty str could not be a valid Identifier
+                return ""
 
-    @typechecked
-    def _substitute(self, variable: "Identifier", value: str) -> Union[str, "Identifier"]:
-        if variable == self:
-            return value
-        else:
-            return self
-
-    def __eq__(self, other):
-        if isinstance(other, Identifier):
-            return self.__item == other.__item
-        else:
-            return NotImplemented
-
-    def __hash__(self):
-        return hash(self.__item)
-
-    def __str__(self):
-        return self.__item
-
-
-@typechecked
-def parse_identifier(src: str) -> str:
-    """Parse an expression as an identifier.
-    Tests:
-    >>> parse_identifier("s6")
-    's6'
-    >>> parse_identifier("reg14")
-    'reg14'
-    >>> parse_identifier("Ac97_342")
-    'Ac97_342'
-    >>> parse_identifier("__76wqe")
-    '__76wqe'
-    >>> parse_identifier("x")
-    'x'
-    >>> parse_identifier("_")
-    '_'
-    >>> parse_identifier("G")
-    'G'
-    >>> parse_identifier("5")
-    Traceback (most recent call last):
-    wa_language.syntax.Errors.LangSyntaxError: ...
-    >>> parse_identifier("86")
-    Traceback (most recent call last):
-    wa_language.syntax.Errors.LangSyntaxError: ...
-    >>> parse_identifier("s6:")
-    Traceback (most recent call last):
-    wa_language.syntax.Errors.LangSyntaxError: ...
-    >>> parse_identifier("s6?")
-    Traceback (most recent call last):
-    wa_language.syntax.Errors.LangSyntaxError: ...
-    """
-    if re.fullmatch("([a-z]|[A-Z]|_)([a-z]|[A-Z]|_|[0-9])*", src):
-        return src
-    else:
-        raise LangSyntaxError("Not an identifier: " + repr(src))
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod(optionflags=doctest.IGNORE_EXCEPTION_DETAIL)
+        # get first symbol
+        symbol = yield
+        while symbol is not None:
+            # process symbol
+            ordinal = ord(symbol)
+            if (
+                ordinal in lower_case_range or
+                ordinal in upper_case_range or
+                ordinal == underscore_ord or
+                (digit_range is not None and ordinal in digit_range)
+            ):
+                string.append(symbol)
+            else:
+                return result(cls)
+            # create digit range if needed
+            if digit_range is None:
+                digit_range = range(ord('0'), ord('9')+1)
+            # get next symbol
+            symbol = yield
+        # summarize on send None
+        return result(cls)

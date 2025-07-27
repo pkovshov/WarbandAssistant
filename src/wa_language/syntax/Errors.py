@@ -1,2 +1,2 @@
-class LangSyntaxError(Exception):
+class SyntaxError(Exception):
     pass

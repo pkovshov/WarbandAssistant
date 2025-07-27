@@ -1,101 +1,147 @@
-from typing import FrozenSet, List, Tuple, Union
+"""
+Tests:
+>>> from .TernaryExpression import TernaryExpression
+>>> result = Interpolation("Hi:{sir/lady}")
+>>> isinstance(result, Interpolation)
+True
+>>> print(result)
+Hi:{sir/lady}
+>>> len(result.items)
+2
+>>> isinstance(result.items[0], str)
+True
+>>> print(result.items[0])
+Hi:
+>>> isinstance(result.items[1], BinaryExpression)
+True
+>>> print(result.items[1].left, result.items[1].right)
+sir lady
+>>> result = Interpolation("{sister/brother}, Greetings!")
+>>> isinstance(result, Interpolation)
+True
+>>> print(result)
+{sister/brother}, Greetings!
+>>> len(result.items)
+2
+>>> isinstance(result.items[0], BinaryExpression)
+True
+>>> print(result.items[0].left, result.items[0].right)
+sister brother
+>>> isinstance(result.items[1], str)
+True
+>>> print(result.items[1])
+, Greetings!
+>>> result = Interpolation("{reg1?{reg2}:Hello {sir/madam} from {s1?me:us}} and welcome")
+>>> isinstance(result, Interpolation)
+True
+>>> print(result)
+{reg1?{reg2}:Hello {sir/madam} from {s1?me:us}} and welcome
+>>> len(result.items)
+2
+>>> isinstance(result.items[0], TernaryExpression)
+True
+>>> print(result.items[0].condition, result.items[0].true_part, result.items[0].false_part)
+reg1 {reg2} Hello {sir/madam} from {s1?me:us}
+>>> print(len(result.items[0].true_part.items))
+1
+>>> print(result.items[0].true_part.items[0].identifier)
+reg2
+>>> print(len(result.items[0].false_part.items))
+4
+>>> print(*result.items[0].false_part.items, sep='|')
+Hello |{sir/madam}| from |{s1?me:us}
+>>> isinstance(result.items[0].false_part.items[1], BinaryExpression)
+True
+>>> isinstance(result.items[0].false_part.items[3], TernaryExpression)
+True
+>>> isinstance(result.items[1], str)
+True
+>>> print(result.items[1])
+ and welcome
+"""
+
+from collections.abc import Collection
+from typing import Any, Iterable, Iterator, Tuple, Union
 
 from wa_typechecker import typechecked
-
-from .Errors import LangSyntaxError
-from .Field import Field
 from .Expression import Expression
+from .PlainText import PlainText
 from .Identifier import Identifier
+from .IdentifierExpression import IdentifierExpression
+from .BinaryExpression import BinaryExpression
 
 
 class Interpolation(str):
-    """An Interpolation. See details in module description.
-
-    Tests:
-    >>> interp = Interpolation("Hello")
-    >>> interp.items
-    ('Hello',)
-    >>> interp.fields
-    ()
-    >>> interp.raw
-    False
-    >>> list(interp)
-    ['H', 'e', 'l', 'l', 'o']
-    >>> interp[1:4]
-    'ell'
-    >>> interp == "Hello"
-    True
-    >>> hash(interp) == hash("Hello")
-    True
-    >>> interp = Interpolation("{reg14}")
-    >>> interp.items
-    (Field('{reg14}'),)
-    >>> interp.fields
-    (Field('{reg14}'),)
-    >>> interp.raw
-    False
-    >>> interp[4]
-    '1'
-    >>> interp.upper()
-    '{REG14}'
-    >>> 'reg' in interp
-    True
-    >>> interp = Interpolation("{s")
-    Traceback (most recent call last):
-    wa_language.syntax.Errors.LangSyntaxError: ...
-    >>> interp = Interpolation("{s", True)
-    >>> interp.items
-    ('{s',)
-    >>> interp.fields
-    ()
-    >>> interp.raw
-    True
-    """
     @typechecked
-    def __new__(cls, src: str, raw: bool = False):
+    def __new__(cls, src: str | list, raw: bool = False):
         """
         :param src: Source string.
         :param raw: Do not parse source string. Default = false
         """
-        items = (src,) if raw else tuple(parse_interpolation(src))
+        from .TernaryExpression import TernaryExpression
+        if isinstance(src, str):
+            parser = Interpolation.parser()
+            next(parser)
+            try:
+                for ch in src:
+                    parser.send(ch)
+                next(parser)
+            except StopIteration as stop:
+                items = tuple(stop.value)
+        else:
+            items = tuple(src)
+        has_binary = False
+        identifiers = set()
+        conditions = set()
+        for item in items:
+            if isinstance(item, IdentifierExpression):
+                identifiers.add(item.identifier)
+            elif isinstance(item, BinaryExpression):
+                has_binary = True
+            elif isinstance(item, TernaryExpression):
+                identifiers.add(item.condition)
+                identifiers |= set(item.true_part.identifiers + item.false_part.identifiers)
+                conditions.add(item.condition)
+                conditions |= set(item.true_part.conditions + item.false_part.conditions)
+            elif isinstance(item, str):
+                pass
+            else:
+                raise TypeError(f"items must be Expression or str, but got {item}")
         obj = super().__new__(cls, "".join(str(item) for item in items))
         obj.__items = items
-        obj.__fields = tuple(item for item in items if isinstance(item, Field))
-        obj.__variables = None
-        obj.__raw = raw
+        obj.__identifiers = tuple(identifiers)
+        obj.__conditions = tuple(conditions)
+        obj.__has_binary = has_binary
         return obj
 
     @property
-    @typechecked
-    def items(self) -> Tuple[Union[str, Field], ...]:
+    def has_binary(self) -> bool:
+        return self.__has_binary
+
+    @property
+    def items(self) -> Tuple[Identifier, ...]:
         return self.__items
 
     @property
-    @typechecked
-    def fields(self) -> Tuple[Field, ...]:
-        return self.__fields
+    def identifiers(self) -> Tuple[Identifier, ...]:
+        return self.__identifiers
 
     @property
-    @typechecked
-    def variables(self) -> FrozenSet[Identifier]:
-        """Extract all the identifiers from expression tree
+    def conditions(self) -> Tuple[Identifier, ...]:
+        return self.__conditions
 
-        Tests:
-        >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
-        >>> print(*sorted(str(ident) for ident in interp.variables))
-        reg3 s1 s2
-        >>> interp = Interpolation("{shk}, {boy/girl}")
-        >>> print(*sorted(str(ident) for ident in interp.variables))
-        shk wa_binary
-        """
-        if self.__variables is None:
-            self.__variables = frozenset()
-            for field in self.fields:
-                self.__variables |= field.expression.variables
-        return self.__variables
+    # # TODO: Deprecated
+    # @property
+    # @typechecked
+    # def items(self) -> Tuple[Union[str, Expression], ...]:
+    #     return self.__items
 
     @typechecked
     def substitute(self, variable: Identifier, value: str) -> "Interpolation":
+        from .TernaryExpression import TernaryExpression
+        from wa_language.Language import (BINARY_CONDITION_VARIABLE,
+                                          BINARY_CONDITION_VARIABLE_FIRST_VALUE,
+                                          BINARY_CONDITION_VARIABLE_SECOND_VALUE)
         """Substitute all the identifiers with same name by the given variable
         >>> interp = Interpolation("{s1}, {s2} yes {s1?{s2}:{reg3}}")
         >>> print(interp.substitute(Identifier("s1"), "Joe Dou"))
@@ -107,12 +153,23 @@ class Interpolation(str):
         """
         items = list(self.__items)
         for idx, item in enumerate(items):
-            if isinstance(item, Field):
-                substitution = item.expression.substitute(variable, value)
-                if isinstance(substitution, Expression):
-                    items[idx] = str(Field(substitution))
+            if isinstance(item, IdentifierExpression) and item.identifier == variable:
+                items[idx] = value
+            elif isinstance(item, BinaryExpression) and variable == BINARY_CONDITION_VARIABLE:
+                if value == BINARY_CONDITION_VARIABLE_FIRST_VALUE:
+                    items[idx] = item.left
+                elif value == BINARY_CONDITION_VARIABLE_SECOND_VALUE:
+                    items[idx] = item.right
+            elif isinstance(item, TernaryExpression):
+                if variable == item.condition:
+                    if value == "":
+                        items[idx] = str(item.false_part)
+                    else:
+                        items[idx] = str(item.true_part)
                 else:
-                    items[idx] = str(substitution)
+                    items[idx] = f"{{{item.condition}?{item.true_part.substitute(variable,value)}:{item.false_part.substitute(variable,value)}}}"
+            else:
+                items[idx] = str(item)
         return Interpolation("".join(items))
 
     # @typechecked
@@ -142,91 +199,63 @@ class Interpolation(str):
     #         spread_list = list(itertools.chain.from_iterable(spread_list))
     #     return spread_list
 
-    @property
-    @typechecked
-    def raw(self) -> bool:
-        return self.__raw
-
     def __repr__(self):
-        return "{}({}{})".format(self.__class__.__name__,
-                                 repr(str(self)),
-                                 ", raw = True" if self.__raw else "")
+        return "{}({})".format(self.__class__.__name__,
+                               ", ".join(repr(item) for item in self.__items))
 
+    @classmethod
+    def parser(cls, stop_symbol=None):
+        from . import expression_parser
+        string = []
+        items = []
+        parser = None
+        symbol = yield
 
-@typechecked
-def parse_interpolation(src: str) -> List[Union[str, Field]]:
-    """Parse string as an interpolation
+        def work_with_parser():
+            nonlocal parser
+            try:
+                parser.send(symbol)
+            except StopIteration as stop:
+                parser = None
+                result = stop.value
+                if isinstance(result, Expression):
+                    items.append(result)
+                else:
+                    # TODO: log warning
+                    return result
 
-    Tests:
-    >>> parse_interpolation("")
-    []
-    >>> parse_interpolation("aloha")
-    ['aloha']
-    >>> parse_interpolation("{_80}")
-    [Field('{_80}')]
-    >>> parse_interpolation("sand {fizz/buzz}")
-    ['sand ', Field('{fizz/buzz}')]
-    >>> parse_interpolation("{ro?ko:} bo")
-    [Field('{ro?ko:}'), ' bo']
-    >>> parse_interpolation("{s4}{reg8}")
-    [Field('{s4}'), Field('{reg8}')]
-    >>> parse_interpolation("{s4} {reg8}")
-    [Field('{s4}'), ' ', Field('{reg8}')]
-    >>> parse_interpolation("{s4} {reg8}")
-    [Field('{s4}'), ' ', Field('{reg8}')]
-    >>> parse_interpolation("As you wish, {sire/my lady}. {reg6?I:{reg7?You:{s11}}} will be the new {reg3?lady:lord} of {s1}.")
-    ['As you wish, ', Field('{sire/my lady}'), '. ', Field('{reg6?I:{reg7?You:{s11}}}'), ' will be the new ', Field('{reg3?lady:lord}'), ' of ', Field('{s1}'), '.']
-    >>> items = parse_interpolation("{reg3?Me and {reg4?{reg3} of my mates:one of my mates} are:I am}")
-    >>> items
-    [Field('{reg3?Me and {reg4?{reg3} of my mates:one of my mates} are:I am}')]
-    >>> items[0].expression
-    Ternary('reg3?Me and {reg4?{reg3} of my mates:one of my mates} are:I am')
-    >>> items[0].expression.condition
-    Identifier('reg3')
-    >>> items[0].expression.false_part
-    Interpolation('I am')
-    >>> items[0].expression.true_part
-    Interpolation('Me and {reg4?{reg3} of my mates:one of my mates} are')
-    >>> items[0].expression.true_part.items
-    ('Me and ', Field('{reg4?{reg3} of my mates:one of my mates}'), ' are')
-    >>> items[0].expression.true_part.fields
-    (Field('{reg4?{reg3} of my mates:one of my mates}'),)
-    >>> items[0].expression.true_part.fields[0].expression
-    Ternary('reg4?{reg3} of my mates:one of my mates')
-    >>> cond, true, false = items[0].expression.true_part.fields[0].expression
-    >>> cond
-    Identifier('reg4')
-    >>> true
-    Interpolation('{reg3} of my mates')
-    >>> print(*true.items, sep="|")
-    {reg3}| of my mates
-    >>> print(false)
-    one of my mates
-    """
-    items = []
-    depth = 0
-    prev_pos = 0
-    for curr_pos, char in enumerate(src):
-        if char == "{":
-            if depth == 0:
-                if prev_pos != curr_pos:
-                    items.append(src[prev_pos:curr_pos])
-                    prev_pos = curr_pos
-            depth += 1
-        elif char == "}":
-            depth -= 1
-            if depth == 0:
-                items.append(Field(src[prev_pos:curr_pos+1]))
-                prev_pos = curr_pos + 1
-    if depth != 0:
-        raise LangSyntaxError("Not an interpolation: " + repr(src))
-    if prev_pos != len(src):
-        items.append(src[prev_pos:])
-    return items
+        while symbol is not None:
+            if parser:
+                violator = work_with_parser()
+                if violator is not None:
+                    if items and isinstance(items[-1], str):
+                        string = list(items.pop() + violator)
+                    else:
+                        string = list(violator)
+                    continue  # for processing one more time a symbol that breaks syntax
+            elif symbol == "{":
+                if string:
+                    items.append("".join(string))
+                    string = []
+                parser = expression_parser.parser()
+                next(parser)
+                parser.send(symbol)
+            elif symbol != stop_symbol:
+                string.append(symbol)
+            else:
+                if string:
+                    items.append("".join(string))
+                return items
+            symbol = yield
 
+        if parser:
+            violator = work_with_parser()
+            if violator is not None:
+                if items and isinstance(items[-1], str):
+                    items[-1] = items[-1] + violator
+                else:
+                    items.append(violator)
+        elif string:
+            items.append("".join(string))
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod(optionflags=doctest.IGNORE_EXCEPTION_DETAIL)
-
-
+        return items

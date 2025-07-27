@@ -3,10 +3,10 @@ from typing import Any, Dict, Iterable
 from wa_typechecker import typechecked
 
 from wa_language.syntax.Identifier import Identifier
-from wa_language.syntax.Binary import (Binary,
-                                       BINARY_CONDITION_VARIABLE,
-                                       BINARY_CONDITION_VARIABLE_FIRST_VALUE,
-                                       BINARY_CONDITION_VARIABLE_SECOND_VALUE)
+from wa_language.Language import (BINARY_CONDITION_VARIABLE,
+                                  BINARY_CONDITION_VARIABLE_FIRST_VALUE,
+                                  BINARY_CONDITION_VARIABLE_SECOND_VALUE)
+
 from wa_language.syntax.Interpolation import Interpolation
 
 
