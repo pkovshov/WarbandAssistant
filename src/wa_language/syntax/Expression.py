@@ -1,29 +1,31 @@
 from abc import ABC, abstractmethod
-from typing import FrozenSet, Union
+from typing import Hashable, Tuple
 
 from wa_typechecker import typechecked
 
 
 class Expression(ABC):
-    def __init__(self):
-        self.__variables = None
+    @typechecked
+    def __init__(self, items: Tuple[Hashable, ...]):
+        self.__items = items
 
     @property
-    def variables(self) -> FrozenSet["Identifier"]:
-        if self.__variables is None:
-            self.__variables = self._extract_variables()
-        return self.__variables
+    def _items(self) -> Tuple[Hashable, ...]:
+        return self.__items
+
+    def __eq__(self, other):
+        if isinstance(other, Expression):
+            return self.__items == other.__items
+        else:
+            return NotImplemented
+
+    def __hash__(self):
+        return hash(self.__items)
 
     @abstractmethod
-    def _extract_variables(self):
-        raise NotImplemented
-
-    def substitute(self, variable: "Identifier", value: str) -> Union[str, "Expression"]:
-        return self._substitute(variable, value)
-
-    @abstractmethod
-    def _substitute(self, variable: str, value: str):
+    def __str__(self):
         raise NotImplemented
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({repr(str(self))})"
+        return "{}({})".format(self.__class__.__name__,
+                               ", ".join(repr(item) for item in self.__items))

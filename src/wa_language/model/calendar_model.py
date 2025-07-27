@@ -2,7 +2,6 @@ from enum import Enum
 
 from wa_typechecker import typechecked
 
-from wa_language.syntax.Identifier import Identifier
 from .LangKeyChecker import key_checker
 from .LangModel import LangValueModel
 
@@ -31,8 +30,8 @@ def month(date_key: str):
 
 
 class DateValueModel(LangValueModel):
-    YEAR_VAR = Identifier("reg2")
-    DAY_VAR = Identifier("reg1")
+    YEAR_VAR = "reg2"
+    DAY_VAR = "reg1"
 
     def __init__(self):
         super().__init__({self.YEAR_VAR: range(1257, 1278),

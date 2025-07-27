@@ -5,9 +5,9 @@ from wa_typechecker import typechecked
 from wa_language.Language import Language, LangKey
 from wa_language.model.types import PlayerSex, LangModelError
 from wa_language.model.LangKeyChecker import KeyChecker, LangKeyChecker
-from wa_language.syntax.Binary import (BINARY_CONDITION_VARIABLE,
-                                       BINARY_CONDITION_VARIABLE_FIRST_VALUE,
-                                       BINARY_CONDITION_VARIABLE_SECOND_VALUE)
+from wa_language.Language import (BINARY_CONDITION_VARIABLE,
+                                  BINARY_CONDITION_VARIABLE_FIRST_VALUE,
+                                  BINARY_CONDITION_VARIABLE_SECOND_VALUE)
 from wa_language.syntax.Interpolation import Interpolation
 from .comment_intro_keys import *
 from .private_chat_keys import *

@@ -4,16 +4,18 @@ from typing import Dict, Iterator, Optional
 
 from wa_typechecker import typechecked
 
-from .syntax.Errors import LangSyntaxError
 from . import loader
 from .syntax.Interpolation import Interpolation
+from .syntax.Errors import LangSyntaxError
 
+
+BINARY_CONDITION_VARIABLE = "wa_binary"
+BINARY_CONDITION_VARIABLE_FIRST_VALUE = "first"
+BINARY_CONDITION_VARIABLE_SECOND_VALUE = "second"
 
 class LangValue(Interpolation):
     """
     Tests:
-    >>> print(repr(LangValue("{reg1?Herro:{reg2}}")))
-    LangValue('{reg1?Herro:{reg2}}')
     >>> print(repr(LangValue("{reg1?Herro:{reg2", raw = True)))
     LangValue('{reg1?Herro:{reg2', raw = True)
     """

@@ -1,14 +1,13 @@
 from wa_language import Language
-from wa_language.syntax.Ternary import Ternary
+from wa_language.syntax.TernaryExpression import TernaryExpression
 
 lang = Language.load()
 for key, val in lang.items():
-    for field in val.fields:
-        expression = field.expression
-        if isinstance(expression, Ternary):
-            condition = expression.condition
-            true_part = expression.true_part
-            false_part = expression.false_part
-            if condition.variable in (true_part.variables | false_part.variables):
+    for item in val.items:
+        if isinstance(item, TernaryExpression):
+            condition = item.condition
+            true_part = item.true_part
+            false_part = item.false_part
+            if condition in (true_part.identifiers + false_part.identifiers):
                 print(key, val, sep="|")
                 break

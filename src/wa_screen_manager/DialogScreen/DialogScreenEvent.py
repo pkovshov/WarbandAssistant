@@ -1,16 +1,15 @@
-from typing import Any, Mapping, NamedTuple, Optional, Tuple
+from typing import Hashable, Mapping, NamedTuple, Optional, Tuple
 
 import numpy as np
 from wa_typechecker import typechecked
 
 from wa_language.Language import LangKey
-from wa_language.syntax.Identifier import Identifier
 from wa_screen_manager.GameScreenEvent import GameScreenEvent
 
 
 class DialogBodyBound(NamedTuple):
     key: LangKey
-    bind: Mapping[Identifier, Any]
+    bind: Mapping[str, Hashable]
 
 
 class DialogScreenEvent(GameScreenEvent):
