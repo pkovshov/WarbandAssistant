@@ -205,7 +205,9 @@ from typing import Callable, Iterable, Iterator, Mapping, Optional
 
 from wa_typechecker import typechecked
 
-from wa_language.Language import Language, LangKey, LangValue
+from wa_language.Language import Language
+from wa_language.LangKey import LangKey
+from wa_language.LangValue import LangValue
 
 
 class KeyChecker:

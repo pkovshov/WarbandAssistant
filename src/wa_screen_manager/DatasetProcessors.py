@@ -5,7 +5,7 @@ from typing import Optional, List
 from wa_typechecker import typechecked
 
 import path_conf
-from wa_language.model.types import PlayerSex
+from wa_language.Binding import PlayerSex
 from wa_datasets.DialogBodiesDataset import DialogBodiesDataset
 from wa_datasets.DialogRelationsDataset import DialogRelationsDataset
 from wa_datasets.DialogTitlesDataset import DialogTitlesDataset

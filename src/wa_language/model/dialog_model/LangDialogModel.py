@@ -1,17 +1,16 @@
 from typing import Dict, Set, Tuple
 
 from wa_typechecker import typechecked
-
-from wa_language.Language import Language, LangKey
-from wa_language.model.types import PlayerSex, LangModelError
+from wa_language.Language import Language
+from wa_language.LangKey import LangKey
+from wa_language.LangValue import LangValue
+from wa_language.LangVar import PlayerSexVar
+from wa_language.model.types import LangModelError
 from wa_language.model.LangKeyChecker import KeyChecker, LangKeyChecker
-from wa_language.Language import (BINARY_CONDITION_VARIABLE,
-                                  BINARY_CONDITION_VARIABLE_FIRST_VALUE,
-                                  BINARY_CONDITION_VARIABLE_SECOND_VALUE)
-from wa_language.syntax.Interpolation import Interpolation
 from .comment_intro_keys import *
 from .private_chat_keys import *
 from wa_language.model import troop_keys
+
 
 class LangDialogModel:
     def __init__(self, lang: Language, player_sex: Optional[PlayerSex]):
@@ -19,7 +18,7 @@ class LangDialogModel:
         self.__player_sex = player_sex
 
         self.__title_checker_to_body_keys: Dict[KeyChecker, Tuple[LangKey, ...]] = {}
-        self.__body_lang: Dict[LangKey, Interpolation] = {}
+        self.__body_lang: Dict[LangKey, LangValue] = {}
 
         self.__add_kings_bodies()
         self.__add_lords_bodies()
@@ -40,7 +39,7 @@ class LangDialogModel:
         return tuple()
 
     @typechecked
-    def get_value(self, key: LangKey) -> Optional[Interpolation]:
+    def get_value(self, key: LangKey) -> Optional[LangValue]:
         return self.__body_lang.get(key, None)
 
     def __add_kings_bodies(self):
@@ -98,15 +97,12 @@ class LangDialogModel:
         return None
 
     @typechecked
-    def substitute_sex(self, lang_val: Interpolation) -> Interpolation:
+    def substitute_sex(self, lang_val: LangValue) -> LangValue:
         if self.__player_sex is None:
             return lang_val
         else:
-            return lang_val.substitute(BINARY_CONDITION_VARIABLE,
-                                       BINARY_CONDITION_VARIABLE_FIRST_VALUE
-                                       if self.__player_sex is PlayerSex.MALE
-                                       else BINARY_CONDITION_VARIABLE_SECOND_VALUE)
+            return lang_val.bind(PlayerSexVar, self.__player_sex)
 
     @typechecked
-    def substitute_sex_to_lang(self, lang: Dict[LangKey, Interpolation]) -> Dict[LangKey, Interpolation]:
+    def substitute_sex_to_lang(self, lang: Dict[LangKey, LangValue]) -> Dict[LangKey, LangValue]:
         return {key: self.substitute_sex(val) for key, val in lang.items()}

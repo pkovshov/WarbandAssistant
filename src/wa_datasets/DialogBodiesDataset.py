@@ -1,15 +1,13 @@
 from collections import namedtuple
-from os import path
-from typing import Any, List, Mapping, NamedTuple, Optional, Tuple
+from typing import Any, Mapping, NamedTuple, Optional, Tuple
 
 import cv2
 import numpy as np
 from wa_typechecker import typechecked
 
-import path_conf
-from wa_language.model.types import PlayerSex
+from wa_language.Binding import PlayerSex
 from wa_types import Box, Resolution
-from wa_language.Language import LangKey
+from wa_language.LangKey import LangKey
 from wa_datasets.BaseImageDataset import BaseImageDataset, MetaAndImagePath
 
 # TODO: convert to a class with type checking

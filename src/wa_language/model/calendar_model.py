@@ -4,6 +4,7 @@ from wa_typechecker import typechecked
 
 from .LangKeyChecker import key_checker
 from .LangModel import LangValueModel
+from wa_language.LangVar import LangVar
 
 __date_key_to_month = {
     "str_january_reg1_reg2": 1,
@@ -30,8 +31,8 @@ def month(date_key: str):
 
 
 class DateValueModel(LangValueModel):
-    YEAR_VAR = "reg2"
-    DAY_VAR = "reg1"
+    YEAR_VAR = LangVar("reg2")
+    DAY_VAR = LangVar("reg1")
 
     def __init__(self):
         super().__init__({self.YEAR_VAR: range(1257, 1278),

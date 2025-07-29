@@ -9,8 +9,8 @@ from typing import Optional
 
 from wa_typechecker import typechecked
 
-from wa_language.model.types import PlayerSex, LordPersonality
-from wa_language.Language import LangKey
+from wa_language.model.types import LordPersonality
+from wa_language.Binding import PlayerSex
 from wa_language.model.LangKeyChecker import key_checker
 
 comment_intro_player_famous_checker = key_checker(lambda key: (key.startswith("str_comment_intro_famous_")))

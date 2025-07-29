@@ -10,7 +10,7 @@ class IdentifierExpression(Expression):
 
     @property
     def identifier(self) -> str:
-        return self._items[0]
+        return self._items[0]  # type: ignore
 
     def __str__(self):
         return f"{{{self.identifier}}}"

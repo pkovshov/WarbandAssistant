@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from datetime import datetime
 import os
 from os import path
 import subprocess
@@ -25,7 +26,7 @@ for i in range(1, 4):
             print()
             print()
         first = False
-        print(f"$ TYPECHECKER={checker} tox (run {i})")
+        print(f"$ TYPECHECKER={checker} tox (run {i}) at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
         env = os.environ.copy()
         env["TYPECHECKER"] = checker

@@ -1,5 +1,5 @@
 import logging
-from typing import Mapping, Optional
+from typing import Optional
 
 import rapidfuzz as fz
 from wa_typechecker import typechecked
@@ -19,8 +19,8 @@ class MapScreenCalendarFuzzyParser:
         self.__timeofday_lang = is_timeofday_key(lang)
         self.__date_lang = is_date_key(lang)
         self.__date_model = DateValueModel()
-        self.__month_spread = {key: val.substitute(DateValueModel.YEAR_VAR, "")
-                                       .substitute(DateValueModel.DAY_VAR, "")
+        self.__month_spread = {key: val.bind(DateValueModel.YEAR_VAR, "")
+                                       .bind(DateValueModel.DAY_VAR, "")
                                for key, val in self.__date_lang.items()}
         self.__prev_calendar_ocr = None
         self.__pref_date_timeofday = None

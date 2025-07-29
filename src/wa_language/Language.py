@@ -1,50 +1,18 @@
 from collections.abc import Mapping
-import logging
 from typing import Dict, Iterator, Optional
 
 from wa_typechecker import typechecked
 
 from . import loader
-from .syntax.Interpolation import Interpolation
-from .syntax.Errors import LangSyntaxError
-
-
-BINARY_CONDITION_VARIABLE = "wa_binary"
-BINARY_CONDITION_VARIABLE_FIRST_VALUE = "first"
-BINARY_CONDITION_VARIABLE_SECOND_VALUE = "second"
-
-class LangValue(Interpolation):
-    """
-    Tests:
-    >>> print(repr(LangValue("{reg1?Herro:{reg2", raw = True)))
-    LangValue('{reg1?Herro:{reg2', raw = True)
-    """
-    pass
-
-
-class LangKey(str):
-    """
-    Tests:
-    >>> print(repr(LangKey("wa_player")))
-    LangKey('wa_player')
-    """
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, repr(str(self)))
-
+from .LangKey import LangKey
+from .LangValue import LangValue
 
 
 class Language(Mapping[LangKey, LangValue]):
     @typechecked
-    def __init__(self, data: dict[str, str]):
-        self.__logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        self.__data = {}
-        for key, val in data.items():
-            try:
-                langval = LangValue(val)
-            except LangSyntaxError as error:
-                self.__logger.warning(f"Syntax error. Use raw mode with value: '{key}|{val}' Error: {error}")
-                langval = LangValue(val, raw=True)
-            self.__data[LangKey(key)] = langval
+    def __init__(self, data: Dict[str, str]):
+        self.__data = {(lang_key := LangKey(key)): LangValue(val, self, lang_key)
+                       for key, val in data.items()}
 
     @typechecked
     def __getitem__(self, key: LangKey) -> LangValue:
@@ -66,18 +34,18 @@ class Language(Mapping[LangKey, LangValue]):
         raise NotImplemented("Use operator is instead of ==")
 
 
-class LangContentError(Exception):
-    pass
-
-
 @typechecked
 def load(special_language: Optional[Dict[str, str]] = None) -> Language:
     import path_conf
     lang_dir_path = path_conf.language
     lang_file_paths = loader.find_files(lang_dir_path)
     if len(lang_file_paths) == 0:
-        raise LangContentError(f"No csv files found at {lang_dir_path}")
+        raise ValueError(f"No csv files found at {lang_dir_path}")
     lang = loader.load_files(*lang_file_paths, special_language=special_language)
     if len(lang) == (len(special_language) if special_language else 0):
-        raise LangContentError(f"Empty lang is loaded by {lang_dir_path}")
+        raise ValueError(f"Empty lang is loaded by {lang_dir_path}")
     return Language(lang)
+
+
+from . import LangValue as LangValueModule
+LangValueModule.Language = Language

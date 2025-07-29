@@ -1,5 +1,4 @@
 import logging
-from typing import Callable, Mapping, Optional
 
 import numpy as np
 from wa_typechecker import typechecked
@@ -8,7 +7,7 @@ from wa_language.Language import Language
 from wa_screen_manager.BaseScreen.BaseSampler import BaseSampleReadingSampler
 from wa_screen_manager.SampleMatch import SampleMatch
 from ..BaseScreen.GameScreenEventDispatcher import GameScreenEventDispatcher
-from .MapScreenEvent import MapScreenEvent, GameScreenEvent
+from .MapScreenEvent import MapScreenEvent
 from .MapScreenCalendarOCR import MapScreenCalendarOCR, NonStable
 from .MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
 

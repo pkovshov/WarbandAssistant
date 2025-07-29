@@ -5,7 +5,8 @@ from typing import Tuple
 import rapidfuzz as fz
 from wa_typechecker import typechecked
 
-from wa_language.Language import Language, LangKey
+from wa_language.Language import Language
+from wa_language.LangKey import LangKey
 from wa_language.model.troop_keys import is_troop_key
 
 

@@ -24,7 +24,7 @@ class Expression(ABC):
 
     @abstractmethod
     def __str__(self):
-        raise NotImplemented
+        raise NotImplementedError()
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__,

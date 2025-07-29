@@ -9,6 +9,7 @@ from .BinaryExpression import BinaryExpression
 from .TernaryExpression import TernaryExpression
 from .Interpolation import Interpolation
 
+
 @typechecked
 def parse_field(src: str) -> Expression:
     """Parse a field and return a corresponding expression
@@ -30,6 +31,7 @@ def parse_field(src: str) -> Expression:
     expr = src[1:-1]
     return parse_expression(expr)
 
+
 @typechecked
 def parse_expression(expr: str) -> Expression:
     try:
@@ -45,6 +47,7 @@ def parse_expression(expr: str) -> Expression:
     except LangSyntaxError:
         pass
     raise LangSyntaxError("Not an expression: " + repr(expr))
+
 
 @typechecked
 def parse_identifier(src: str) -> IdentifierExpression:
@@ -153,6 +156,7 @@ def parse_ternary(src: str) -> TernaryExpression:
                                  Interpolation(false_expr))
     except LangSyntaxError:
         raise LangSyntaxError("Not a ternary: " + repr(src))
+
 
 @typechecked
 def parse_interpolation(src: str) -> Tuple[Union[str, Expression], ...]:

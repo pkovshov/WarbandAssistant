@@ -9,7 +9,7 @@ import path_conf
 from wa_types import Box
 from wa_language import Language
 from wa_language.Language import LangKey
-from wa_language.model.types import PlayerSex
+from wa_language.Binding import PlayerSex
 from wa_datasets.DialogBodiesDataset import DialogBodiesDataset
 from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogBodyBound
 from wa_screen_manager.DialogScreen.DialogScreenOCRs import DialogBodyOCR

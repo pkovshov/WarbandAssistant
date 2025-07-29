@@ -7,7 +7,7 @@ import numpy as np
 from wa_typechecker import typechecked
 
 from wa_language import Language
-from wa_language.model.types import PlayerSex
+from wa_language.Binding import PlayerSex
 from .SampleMatch import SampleMatch
 from .DialogScreen.DialogScreenManager import DialogScreenManager
 from .MapScreen.MapScreenManager import MapScreenManager

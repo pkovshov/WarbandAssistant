@@ -1,5 +1,5 @@
 from wa_language.Language import load, LangKey
-from wa_language.model.types import PlayerSex
+from wa_language.Binding import PlayerSex
 from wa_language.model.dialog_model.LangDialogModel import LangDialogModel
 
 lang = load()

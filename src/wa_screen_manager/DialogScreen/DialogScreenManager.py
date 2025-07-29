@@ -5,8 +5,8 @@ import numpy as np
 from wa_typechecker import typechecked
 
 from wa_language.Language import Language
-from wa_language.model.types import PlayerSex
-from wa_screen_manager.SampleMatch import SampleMatch
+from wa_language.Binding import PlayerSex
+from ..SampleMatch import SampleMatch
 from ..BaseScreen.GameScreenEventDispatcher import GameScreenEventDispatcher
 from .DialogScreenEvent import DialogScreenEvent
 from .DialogScreenSamplers import DialogScreenScreenSampler, DialogScreenRelationSampler

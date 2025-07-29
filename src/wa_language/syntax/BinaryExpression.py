@@ -10,11 +10,11 @@ class BinaryExpression(Expression):
 
     @property
     def left(self) -> str:
-        return self._items[0]
+        return self._items[0]  # type: ignore
 
     @property
     def right(self) -> str:
-        return self._items[1]
+        return self._items[1]  # type: ignore
 
     def __str__(self):
         return f"{{{self.left}/{self.right}}}"

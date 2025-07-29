@@ -1,6 +1,5 @@
 import calendar as pycalendar
 import logging
-from typing import Callable
 
 from wa_language.Language import Language
 from wa_typechecker import typechecked
