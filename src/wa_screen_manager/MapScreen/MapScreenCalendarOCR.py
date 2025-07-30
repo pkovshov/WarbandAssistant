@@ -7,13 +7,13 @@ from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR, NonStable
 
 
 class MapScreenCalendarOCR(BaseOCR):
-    def __init__(self):
+    def __init__(self, whitelist):
         from wa_screen_manager import config
         from . import map_screen_config
         crop_box = map_screen_config.map_calendar_box
         super().__init__(resolution=config.resolution,
                          crop_box=crop_box,
-                         whitelist=config.whitelist_characters)
+                         whitelist=whitelist)
 
     @typechecked
     def _preprocess(self, crop_img: np.ndarray) -> np.ndarray:

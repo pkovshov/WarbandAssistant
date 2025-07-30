@@ -6,9 +6,9 @@ from wa_typechecker import typechecked
 
 from wa_language.Language import Language
 from wa_language.LangKey import LangKey
-from wa_language.Binding import PlayerSex
-from wa_language.model.LangModel import SexLangValueModel
-from wa_language.model.dialog_model.LangDialogModel import LangDialogModel
+from wa_language.LangVar import PlayerSex
+from wa_model.LangModel import SexLangValueModel
+from wa_model.dialog_model.LangDialogModel import LangDialogModel
 
 from .DialogScreenEvent import DialogBodyBound
 

@@ -1,15 +1,14 @@
 from typing import Dict, Set, Tuple
 
-from wa_typechecker import typechecked
 from wa_language.Language import Language
 from wa_language.LangKey import LangKey
 from wa_language.LangValue import LangValue
 from wa_language.LangVar import PlayerSexVar
-from wa_language.model.types import LangModelError
-from wa_language.model.LangKeyChecker import KeyChecker, LangKeyChecker
+from wa_language.KeyChecker import KeyChecker
+from wa_model.types import LangModelError
+from wa_model import troop_keys
 from .comment_intro_keys import *
 from .private_chat_keys import *
-from wa_language.model import troop_keys
 
 
 class LangDialogModel:
@@ -83,7 +82,7 @@ class LangDialogModel:
             raise LangModelError(f"Key {match_key} matches a checker from __title_key_checker_to_body_keys")
 
     @typechecked
-    def find_match_title_key(self, title_checker_lang: LangKeyChecker) -> Optional[LangKey]:
+    def find_match_title_key(self, title_checker_lang: Language) -> Optional[LangKey]:
         """
         :param self:
         :param exam_checker: A checker which keys are exams

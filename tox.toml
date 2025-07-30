@@ -56,5 +56,5 @@ commands = [
 
 [env.lang]
 commands = [
-  ["pytest", "src/wa_language", "--doctest-modules"],
+  ["pytest", "-s", "-v", "src/wa_language", "--doctest-modules"],
 ]

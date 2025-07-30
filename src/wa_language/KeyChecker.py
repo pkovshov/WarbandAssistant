@@ -1,11 +1,12 @@
 """
 Tests:
->>> lang = Language(dict(a="Anna", b="Boris", good="Robin Hood", bad="Ursula", fool="Pippin Took"))
+>>> from wa_language.Language import RootLanguage
+>>> lang = RootLanguage(dict(a="Anna", b="Boris", good="Robin Hood", bad="Ursula", fool="Pippin Took"))
 
 >>> is_alphabet = key_checker("alpha", "beta", "gama")
 >>> LangKey("alpha") in is_alphabet
 True
->>> LangKey("alpha") in is_alphabet(lang)
+>>> LangKey("alpha") in is_alphabet.lang(lang)
 False
 
 >>> is_hero = KeyChecker(lambda key: key in ("good", "bad", "fool"))
@@ -13,7 +14,7 @@ False
 False
 >>> LangKey("good") in is_hero
 True
->>> print(*sorted(is_hero(lang).values()), sep=", ")
+>>> print(*sorted(is_hero.lang(lang).values()), sep=", ")
 Pippin Took, Robin Hood, Ursula
 
 >>> is_good = KeyChecker("good")
@@ -21,7 +22,7 @@ Pippin Took, Robin Hood, Ursula
 True
 >>> LangKey("bad") in is_good
 False
->>> print(*is_good(lang).values(), sep=", ")
+>>> print(*is_good.lang(lang).values(), sep=", ")
 Robin Hood
 >>> is_good == is_hero
 False
@@ -31,7 +32,7 @@ False
 >>> is_good_2 = KeyChecker("good")
 >>> is_good_2 is is_good
 False
->>> set(is_good_2(lang).values()) == set(is_good(lang).values())
+>>> set(is_good_2.lang(lang).values()) == set(is_good.lang(lang).values())
 True
 >>> is_good_2 == is_good
 True
@@ -43,9 +44,9 @@ True
 False
 >>> LangKey("good") in is_hero_mult
 True
->>> print(*sorted(is_hero_mult(lang).values()), sep=", ")
+>>> print(*sorted(is_hero_mult.lang(lang).values()), sep=", ")
 Pippin Took, Robin Hood, Ursula
->>> set(is_hero_mult(lang).values()) == set(is_hero(lang).values())
+>>> set(is_hero_mult.lang(lang).values()) == set(is_hero.lang(lang).values())
 True
 >>> is_hero_mult == is_hero
 False
@@ -57,11 +58,11 @@ False
 False
 >>> LangKey("good") in is_hero_mult_2
 True
->>> print(*sorted(is_hero_mult_2(lang).values()), sep=", ")
+>>> print(*sorted(is_hero_mult_2.lang(lang).values()), sep=", ")
 Pippin Took, Robin Hood, Ursula
 >>> is_hero_mult_2 is is_hero_mult
 False
->>> set(is_hero_mult_2(lang).values()) == set(is_hero_mult(lang).values())
+>>> set(is_hero_mult_2.lang(lang).values()) == set(is_hero_mult.lang(lang).values())
 True
 >>> is_hero_mult_2 == is_hero_mult
 True
@@ -73,15 +74,15 @@ True
 False
 >>> LangKey("good") in is_hero_mult_3
 True
->>> print(*sorted(is_hero_mult_3(lang).values()), sep=", ")
+>>> print(*sorted(is_hero_mult_3.lang(lang).values()), sep=", ")
 Pippin Took, Robin Hood, Ursula
 >>> is_hero_mult_3 is is_hero_mult
 False
->>> is_hero_mult_3(lang) is is_hero_mult(lang)
+>>> is_hero_mult_3.lang(lang) is is_hero_mult.lang(lang)
 False
->>> is_hero_mult_3(lang) == is_hero_mult(lang)
+>>> dict(is_hero_mult_3.lang(lang)) == dict(is_hero_mult.lang(lang))
 True
->>> set(is_hero_mult_3(lang).values()) == set(is_hero_mult(lang).values())
+>>> set(is_hero_mult_3.lang(lang).values()) == set(is_hero_mult.lang(lang).values())
 True
 >>> is_hero_mult_3 == is_hero_mult  # due to lambda
 False
@@ -93,9 +94,9 @@ False
 False
 >>> LangKey("good") in is_hero_mult_4
 True
->>> print(*sorted(is_hero_mult_4(lang).values()), sep=", ")
+>>> print(*sorted(is_hero_mult_4.lang(lang).values()), sep=", ")
 Pippin Took, Robin Hood, Ursula
->>> set(is_hero_mult_4(lang).values()) == set(is_hero_mult(lang).values())
+>>> set(is_hero_mult_4.lang(lang).values()) == set(is_hero_mult.lang(lang).values())
 True
 >>> is_hero_mult_4 == is_hero_mult  # due to KeyChecker("good") != KeyChecker(lambda val: val == "good")
 False
@@ -104,7 +105,7 @@ False
 
 >>> KeyChecker("good") == KeyChecker(lambda val: val == "good")
 False
->>> KeyChecker("good")(lang) == KeyChecker(lambda val: val == "good")(lang)
+>>> dict(KeyChecker("good").lang(lang)) == dict(KeyChecker(lambda val: val == "good").lang(lang))
 True
 
 >>> is_good_mult = KeyChecker(KeyChecker(KeyChecker("good")))
@@ -112,70 +113,70 @@ True
 True
 >>> is_good_mult is is_good
 False
->>> set(is_good_mult(lang).values()) == set(is_good_mult(lang).values())
+>>> set(is_good_mult.lang(lang).values()) == set(is_good_mult.lang(lang).values())
 True
 >>> is_good_mult == is_good
 True
 >>> hash(is_good_mult) == hash(is_good)
 True
 
->>> is_not_good_hero = KeyChecker(is_hero, exclude=is_good)
+>>> is_not_good_hero = KeyChecker(is_hero, exclude_filter=is_good)
 >>> LangKey("bad") in is_not_good_hero
 True
 >>> LangKey("fool") in is_not_good_hero
 True
 >>> LangKey("good") in is_not_good_hero
 False
->>> print(*sorted(is_not_good_hero(lang).values()), sep=", ")
+>>> print(*sorted(is_not_good_hero.lang(lang).values()), sep=", ")
 Pippin Took, Ursula
 >>> KeyChecker(is_not_good_hero) is is_not_good_hero
 True
->>> is_not_good_hero_same = KeyChecker(is_hero, exclude=is_good)
+>>> is_not_good_hero_same = KeyChecker(is_hero, exclude_filter=is_good)
 >>> is_not_good_hero_same is is_not_good_hero
 False
->>> set(is_not_good_hero_same(lang).values()) == set(is_not_good_hero(lang).values())
+>>> set(is_not_good_hero_same.lang(lang).values()) == set(is_not_good_hero.lang(lang).values())
 True
 >>> is_not_good_hero_same == is_not_good_hero
 True
 >>> hash(is_not_good_hero_same) == hash(is_not_good_hero)
 True
 
->>> is_oo_hero = KeyChecker(is_hero, filter=KeyChecker(lambda x: "oo" in x))
+>>> is_oo_hero = KeyChecker(is_hero, include_filter=KeyChecker(lambda x: "oo" in x))
 >>> LangKey("bad") in is_oo_hero
 False
 >>> LangKey("fool") in is_oo_hero
 True
 >>> LangKey("good") in is_oo_hero
 True
->>> print(*sorted(is_oo_hero(lang).values()), sep=", ")
+>>> print(*sorted(is_oo_hero.lang(lang).values()), sep=", ")
 Pippin Took, Robin Hood
 >>> KeyChecker(is_oo_hero) is is_oo_hero
 True
->>> is_oo_hero_same = KeyChecker(is_hero, filter=KeyChecker(lambda x: "oo" in x))
+>>> is_oo_hero_same = KeyChecker(is_hero, include_filter=KeyChecker(lambda x: "oo" in x))
 >>> is_oo_hero_same is is_oo_hero
 False
->>> set(is_oo_hero_same(lang).values()) == set(is_oo_hero(lang).values())
+>>> set(is_oo_hero_same.lang(lang).values()) == set(is_oo_hero.lang(lang).values())
 True
 >>> is_oo_hero_same == is_oo_hero  # due to same labda functions are not equal
 False
 >>> hash(is_oo_hero_same) == hash(is_oo_hero)  # due to same labda functions are not equal
 False
 
->>> is_not_good_fool_hero = KeyChecker(is_hero, exclude=is_good, filter=KeyChecker("fool"))
+>>> is_not_good_fool_hero = KeyChecker(is_hero, exclude_filter=is_good, include_filter=KeyChecker("fool"))
 >>> LangKey("bad") in is_not_good_fool_hero
 False
 >>> LangKey("fool") in is_not_good_fool_hero
 True
 >>> LangKey("good") in is_not_good_fool_hero
 False
->>> print(*is_not_good_fool_hero(lang).values(), sep=", ")
+>>> print(*is_not_good_fool_hero.lang(lang).values(), sep=", ")
 Pippin Took
 >>> KeyChecker(is_not_good_fool_hero) is is_not_good_fool_hero
 True
->>> is_not_good_fool_hero_same = KeyChecker(is_hero, exclude=is_good, filter=KeyChecker("fool"))
+>>> is_not_good_fool_hero_same = KeyChecker(is_hero, exclude_filter=is_good, include_filter=KeyChecker("fool"))
 >>> is_not_good_fool_hero_same is is_not_good_fool_hero
 False
->>> set(is_not_good_fool_hero_same(lang).values()) == set(is_not_good_fool_hero(lang).values())
+>>> set(is_not_good_fool_hero_same.lang(lang).values()) == set(is_not_good_fool_hero.lang(lang).values())
 True
 >>> is_not_good_fool_hero_same == is_not_good_fool_hero
 True
@@ -194,20 +195,18 @@ TypeError: ...
 >>> KeyChecker("good", ["bad", "some"])
 Traceback (most recent call last):
 TypeError: ...
->>> print(*KeyChecker("good", KeyChecker("bad", "some"))(lang).values(), sep=', ')
+>>> print(*KeyChecker("good", KeyChecker("bad", "some")).lang(lang).values(), sep=', ')
 Robin Hood, Ursula
 
->>> is_hero(lang) is is_hero(lang)
+>>> is_hero.lang(lang) is is_hero.lang(lang)
 True
 """
 
-from typing import Callable, Iterable, Iterator, Mapping, Optional
+from typing import Callable, Iterable, Optional
 
 from wa_typechecker import typechecked
-
-from wa_language.Language import Language
-from wa_language.LangKey import LangKey
-from wa_language.LangValue import LangValue
+from .Language import Language
+from .LangKey import LangKey
 
 
 class KeyChecker:
@@ -218,12 +217,14 @@ class KeyChecker:
             return super().__new__(cls)
 
     @typechecked
-    def __init__(self, *args, filter: Optional["KeyChecker"] = None, exclude: Optional["KeyChecker"] = None):
+    def __init__(self, *args,
+                 include_filter: Optional["KeyChecker"] = None,
+                 exclude_filter: Optional["KeyChecker"] = None):
         if len(args) == 1 and args[0] is self:
             return  # do nothing to avoid maximum recursion depth exceeded
         self.__lang = None
-        self.__filter = filter
-        self.__exclude = exclude
+        self.__include_filter = include_filter
+        self.__exclude_filter = exclude_filter
         checkers = []
         if len(args) == 0:
             self.__check = None
@@ -258,38 +259,39 @@ class KeyChecker:
         self.__checkers = tuple(checkers)
         self.__check = self.__check_tuple
 
-    def __check_str(self, val):
-        return self.__str == val
+    def __check_str(self, lang_key):
+        return self.__str == lang_key
 
-    def __check_tuple(self, key: LangKey) -> bool:
-        return any(key in checker for checker in self.__checkers)
+    def __check_tuple(self, lang_key) -> bool:
+        return any(lang_key in checker for checker in self.__checkers)
+
+    def __contains__(self, lang_key) -> bool:
+        return ((lang_key in self.__include_filter if self.__include_filter else True) and
+                (lang_key not in self.__exclude_filter if self.__exclude_filter else True) and
+                (self.__check(lang_key) if self.__check else True))
 
     @typechecked
-    def __contains__(self, key: LangKey) -> bool:
-        return ((key in self.__filter if self.__filter else True) and
-                (key not in self.__exclude if self.__exclude else True) and
-                (self.__check(key) if self.__check else True))
-
-    @typechecked
-    def lang(self, language: Language) -> "LangKeyChecker":
+    def lang(self, language: Language) -> Language:
         if language is not self.__lang:
             self.__lang = language
-            self.__lang_key_checker = LangKeyChecker(language, self)
+            self.__lang_key_checker = KeyCheckerLanguage(language, self)
         return self.__lang_key_checker
 
     @typechecked
-    def __call__(self, lang: Language) -> "LangKeyChecker":
+    def __call__(self, lang: Language) -> Language:
+        # deprecated
+        raise NotImplementedError()
         if lang is not self.__lang:
             self.__lang = lang
-            self.__lang_key_checker = LangKeyChecker(lang, self)
+            self.__lang_key_checker = KeyCheckerLanguage(lang, self)
         return self.__lang_key_checker
 
     def __eq__(self, other):
         if not isinstance(other, KeyChecker):
             return NotImplemented
-        if self.__filter != other.__filter:
+        if self.__include_filter != other.__include_filter:
             return False
-        if self.__exclude != other.__exclude:
+        if self.__exclude_filter != other.__exclude_filter:
             return False
         try:
             return self.__str == other.__str
@@ -300,7 +302,7 @@ class KeyChecker:
                 return self.__check == other.__check
 
     def __hash__(self):
-        filter_and_exclude = self.__filter, self.__exclude
+        filter_and_exclude = self.__include_filter, self.__exclude_filter
         try:
             return hash((self.__str, filter_and_exclude))
         except AttributeError:
@@ -310,25 +312,13 @@ class KeyChecker:
                 return hash((self.__check, filter_and_exclude))
 
 
-class LangKeyChecker(Mapping[LangKey, LangValue]):
+class KeyCheckerLanguage(Language):
     @typechecked
     def __init__(self, lang: Language, checker: KeyChecker):
-        self.__data = {key: val for key, val in lang.items() if key in checker}
-
-    @typechecked
-    def __getitem__(self, key: LangKey) -> LangValue:
-        return self.__data[key]
-
-    def __iter__(self) -> Iterator[LangKey]:
-        return iter(self.__data)
-
-    @typechecked
-    def __contains__(self, key: LangKey) -> bool:
-        return key in self.__data
-
-    def __len__(self) -> int:
-        return len(self.__data)
+        super().__init__({key: val
+                          for key, val in lang.items()
+                          if key in checker})
 
 
-def key_checker(*args, filter=None, exclude=None):
-    return KeyChecker(*args, filter=filter, exclude=exclude)
+def key_checker(*args, include_filter=None, exclude_filter=None):
+    return KeyChecker(*args, include_filter=include_filter, exclude_filter=exclude_filter)

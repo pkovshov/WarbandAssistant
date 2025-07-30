@@ -1,5 +1,5 @@
-from ..LangKeyChecker import key_checker
-from wa_language.model.types import LordPersonality
+from wa_language.KeyChecker import key_checker
+from wa_model.types import LordPersonality
 
 # TODO: for philosophy use "dlga_lord_recruit_2_philosophy:lord_recruit_2" key with bind s43 to
 #       "str_political_philosophy_martial",

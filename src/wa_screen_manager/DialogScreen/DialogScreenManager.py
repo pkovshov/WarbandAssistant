@@ -1,11 +1,11 @@
 import logging
-from typing import Callable, Optional
+from typing import Optional
 
 import numpy as np
 from wa_typechecker import typechecked
 
 from wa_language.Language import Language
-from wa_language.Binding import PlayerSex
+from wa_language.LangVar import PlayerSex
 from ..SampleMatch import SampleMatch
 from ..BaseScreen.GameScreenEventDispatcher import GameScreenEventDispatcher
 from .DialogScreenEvent import DialogScreenEvent

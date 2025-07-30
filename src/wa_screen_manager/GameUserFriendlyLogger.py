@@ -4,17 +4,17 @@ import logging
 from wa_language.Language import Language
 from wa_typechecker import typechecked
 
-from wa_language.model import troop_keys
-from wa_language.model import calendar_model
-from wa_language.model.dialog_model.comment_intro_keys import (comment_intro_player_famous_checker,
-                                                               comment_intro_player_noble_checker,
-                                                               comment_intro_player_common_checker,
-                                                               comment_intro_player_female_only_checker,
-                                                               comment_intro_checker,
-                                                               comment_intro_filter_by_lord_personality,
-                                                               comment_intro_filter_king)
-from wa_language.model.dialog_model.private_chat_keys import (is_private_chat_key,
-                                                              private_chat_keys_by_lord_personality)
+from wa_model import troop_keys
+from wa_model import calendar_model
+from wa_model.dialog_model.comment_intro_keys import (comment_intro_player_famous_checker,
+                                                      comment_intro_player_noble_checker,
+                                                      comment_intro_player_common_checker,
+                                                      comment_intro_player_female_only_checker,
+                                                      comment_intro_checker,
+                                                      comment_intro_filter_by_lord_personality,
+                                                      comment_intro_filter_king)
+from wa_model.dialog_model.private_chat_keys import (is_private_chat_key,
+                                                     private_chat_keys_by_lord_personality)
 from .DialogScreen.DialogScreenEvent import DialogScreenEvent
 from .MapScreen.MapScreenEvent import MapScreenEvent
 from .GameScreenEvent import GameScreenEvent
@@ -40,12 +40,13 @@ class DialogScreenLogger:
         if self.__prev_event_type != type(event):
             self.__prev_event_type = type(event)
             self.__logger.info(event.__class__.__name__.replace("ScreenEvent", " Screem"))
-        event_handler = self.__eventHandlers.get(type(event),
-                                                 self.on_unknown_screen)
-        event_handler(event)
+            self.clear_cache()
+        event_handler = self.__eventHandlers.get(type(event))
+        if event_handler:
+            event_handler(event)
 
     @typechecked
-    def on_unknown_screen(self, event: GameScreenEvent):
+    def clear_cache(self):
         self.__prev_map_date_timeofday = None
         self.__prev_dialog_title_ocr = None
         self.__prev_dialog_body_ocr = None

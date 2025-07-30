@@ -10,20 +10,17 @@ from .LangValue import LangValue
 
 class Language(Mapping[LangKey, LangValue]):
     @typechecked
-    def __init__(self, data: Dict[str, str]):
-        self.__data = {(lang_key := LangKey(key)): LangValue(val, self, lang_key)
-                       for key, val in data.items()}
+    def __init__(self, data: Dict[LangKey, LangValue]):
+        self.__data = data
 
-    @typechecked
-    def __getitem__(self, key: LangKey) -> LangValue:
-        return self.__data[key]
+    def __getitem__(self, lang_key) -> LangValue:
+        return self.__data[lang_key]
 
     def __iter__(self) -> Iterator[LangKey]:
         return iter(self.__data)
 
-    @typechecked
-    def __contains__(self, key: LangKey) -> bool:
-        return key in self.__data
+    def __contains__(self, lang_key) -> bool:
+        return lang_key in self.__data
 
     def __len__(self) -> int:
         return len(self.__data)
@@ -31,7 +28,14 @@ class Language(Mapping[LangKey, LangValue]):
     def __eq__(self, other) -> bool:
         # Comparison is an expensive operation.
         # Since Language is immutable, it's sufficient to check by instance identity.
-        raise NotImplemented("Use operator is instead of ==")
+        raise NotImplementedError("Use operator is instead of ==")
+
+
+class RootLanguage(Language):
+    @typechecked
+    def __init__(self, data: Dict[str, str]):
+        super().__init__({(lang_key := LangKey(key)): LangValue(val, self, lang_key)
+                          for key, val in data.items()})
 
 
 @typechecked
@@ -44,7 +48,7 @@ def load(special_language: Optional[Dict[str, str]] = None) -> Language:
     lang = loader.load_files(*lang_file_paths, special_language=special_language)
     if len(lang) == (len(special_language) if special_language else 0):
         raise ValueError(f"Empty lang is loaded by {lang_dir_path}")
-    return Language(lang)
+    return RootLanguage(lang)
 
 
 from . import LangValue as LangValueModule

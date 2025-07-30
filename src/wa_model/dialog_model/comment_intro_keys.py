@@ -8,10 +8,9 @@ Also, intro comment depends on Lord personality.
 from typing import Optional
 
 from wa_typechecker import typechecked
-
-from wa_language.model.types import LordPersonality
-from wa_language.Binding import PlayerSex
-from wa_language.model.LangKeyChecker import key_checker
+from wa_language.LangVar import PlayerSex
+from wa_language.KeyChecker import key_checker
+from wa_model.types import LordPersonality
 
 comment_intro_player_famous_checker = key_checker(lambda key: (key.startswith("str_comment_intro_famous_")))
 comment_intro_player_noble_checker = key_checker(lambda key: (key.startswith("str_comment_intro_noble_")))
@@ -45,9 +44,9 @@ def build_lord_comment_intro_key_checker(lord_personality: Optional[LordPersonal
                if player_sex is PlayerSex.MALE
                else key_checker(comment_intro_all_sex_checker, comment_intro_player_female_only_checker))
     if lord_personality is not None:
-        checker = key_checker(checker, filter=comment_intro_filter_by_lord_personality[lord_personality])
+        checker = key_checker(checker, include_filter=comment_intro_filter_by_lord_personality[lord_personality])
     else:
-        checker = key_checker(checker, exclude=comment_intro_filter_king)
+        checker = key_checker(checker, exclude_filter=comment_intro_filter_king)
     return checker
 
 
@@ -56,7 +55,7 @@ def build_king_comment_intro_key_checker(player_sex: Optional[PlayerSex] = None)
     checker = (comment_intro_all_sex_checker
                if player_sex is PlayerSex.MALE
                else key_checker(comment_intro_all_sex_checker, comment_intro_player_female_only_checker))
-    return key_checker(checker, filter=comment_intro_filter_king)
+    return key_checker(checker, include_filter=comment_intro_filter_king)
 
 
 

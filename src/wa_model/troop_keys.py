@@ -1,6 +1,6 @@
 import re
 
-from .LangKeyChecker import key_checker
+from wa_language.KeyChecker import key_checker
 
 # TODO: Add enterprise's person titles that are absent in language resources
 #       (dialogs in brewery, tannery, ironworks e.t.c)

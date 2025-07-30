@@ -9,7 +9,7 @@ scrip_dir_path = os.path.abspath(os.path.dirname(__file__))
 os.chdir(scrip_dir_path)
 sys.path.append(os.path.abspath(os.path.join(scrip_dir_path, 'src')))
 
-from wa_language.Binding import PlayerSex
+from wa_language.LangVar import PlayerSex
 from wa_screen_manager.GameScreenManager import GameScreenManager
 import wa_screen_manager, wa_datasets, wa_language
 

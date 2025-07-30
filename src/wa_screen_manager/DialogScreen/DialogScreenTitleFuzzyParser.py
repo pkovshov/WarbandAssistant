@@ -7,7 +7,7 @@ from wa_typechecker import typechecked
 
 from wa_language.Language import Language
 from wa_language.LangKey import LangKey
-from wa_language.model.troop_keys import is_troop_key
+from wa_model.troop_keys import is_troop_key
 
 
 TEXT = 0
@@ -22,7 +22,7 @@ class DialogScreenTitleFuzzyParser:
         self.__logger = logging.getLogger(__name__)
         self.__title_score_cutoff = dialog_screen_config.fuzzy_title_score_cutoff
         self.__logger.info(f"title_score_cutoff = {self.__title_score_cutoff}")
-        self.__titles = is_troop_key(lang)
+        self.__titles = is_troop_key.lang(lang)
         self.__prev_title_ocr = None
         self.__prev_title_keys = None
 

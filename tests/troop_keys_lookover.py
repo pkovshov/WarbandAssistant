@@ -6,15 +6,15 @@ Focus on those that contain keys suitable for dialog titles.
 from os import path
 
 from wa_language.loader import *
-from wa_language.Language import Language, LangKey
+from wa_language.Language import Language, LangKey, RootLanguage
 import path_conf
-from wa_language.model.troop_keys import *
+from wa_model.troop_keys import *
 
-lang = Language(load_files(path.join(path_conf.language, "troops.csv")))
+lang = RootLanguage(load_files(path.join(path_conf.language, "troops.csv")))
 
 
 def print_checker_count(check, caption):
-    check = check(lang)
+    check = check.lang(lang)
     print(str(caption) + ":",
           len(check),
           next(iter(check.values())))
@@ -22,7 +22,7 @@ def print_checker_count(check, caption):
 
 
 def print_checker_troop(check):
-    check = check(lang)
+    check = check.lang(lang)
     val = next(iter(check.values()))
     print("troop",
           val + ":",
@@ -31,7 +31,7 @@ def print_checker_troop(check):
 
 
 def print_checker(check, caption):
-    check = check(lang)
+    check = check.lang(lang)
     print(str(caption) + ":")
     for key, val in check.items():
         print(f"{key}|{val}")
@@ -40,10 +40,10 @@ def print_checker(check, caption):
 
 
 def print_checker_and_non_pl(check, caption):
-    check = check(lang)
+    check = check.lang(lang)
     print(str(caption) + ":")
     for key, val in check.items():
-        print(f"{key}|{val}".ljust(40), "non-pl:", lang[LangKey(key[:-3])])
+        print(f"{key}|{val}".ljust(40), "non-pl:", lang[key[:-3]])
     print(len(check))
     print()
 

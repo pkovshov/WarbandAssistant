@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from wa_typechecker import typechecked
 
-from wa_language.Binding import PlayerSex
+from wa_language.LangVar import PlayerSex
 from wa_types import Box, Resolution
 from wa_language.LangKey import LangKey
 from wa_datasets.BaseImageDataset import BaseImageDataset, MetaAndImagePath

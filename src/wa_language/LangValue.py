@@ -1,5 +1,6 @@
 from functools import partial
-from typing import Any, FrozenSet, Iterable, List, Set, Union, TYPE_CHECKING
+import itertools
+from typing import overload, Any, FrozenSet, Iterable, Iterator, List, Mapping, NamedTuple, Set, Union, TYPE_CHECKING
 import logging
 
 from wa_typechecker import typechecked
@@ -10,11 +11,17 @@ from .syntax.BinaryExpression import BinaryExpression
 from .syntax.TernaryExpression import TernaryExpression
 from .syntax.Interpolation import Interpolation
 from .LangKey import LangKey
-from .LangVar import LangVar, PlayerSexVar
-from .Binding import Binding, EMPTY_BINDING, PlayerSex
-from .Spreading import SpreadType
+from .LangVar import LangVar, PlayerSexVar, PlayerSex, EMPTY_STR, FALSE_EMPTY_STR, TRUE_EMPTY_STR
+from .Spreading import Spreading, Spread
+from .Binding import Binding, EMPTY_BINDING
+
 if TYPE_CHECKING:
     from .Language import Language
+
+
+class BindingSpreading(NamedTuple):
+    binding: Binding
+    spreading: Spreading
 
 
 class LangValue(str):
@@ -61,24 +68,100 @@ class LangValue(str):
     def binding(self) -> Binding:
         return EMPTY_BINDING
 
-    @typechecked
+    @overload
     def bind(self, variable: LangVar, value: Any) -> "LangValue":
+        ...
+
+    @overload
+    def bind(self, binding: Binding) -> "LangValue":
+        ...
+
+    def bind(self, *args, **kwargs) -> "LangValue":
+        if kwargs:
+            raise TypeError("Keyword arguments are not supported")
+        if len(args) == 2:
+            return self._bind_with_pair(*args)
+        elif len(args) == 1:
+            return self._bind_with_binding(args[0])
+        else:
+            raise TypeError(f"bind got insufficient args: {', '.join(repr(arg) for arg in args)}")
+
+    @overload
+    def spread(self, variable: LangVar, value_spread: Spread) -> Iterator["LangValue"]:
+        ...
+
+    @overload
+    def spread(self, spreading: Spreading) -> Iterator["LangValue"]:
+        ...
+
+    def spread(self, *args, **kwargs) -> Iterator["LangValue"]:
+        if kwargs:
+            raise TypeError("Keyword arguments are not supported")
+        if len(args) == 2:
+            return self.__spread_with_pair(*args)
+        elif len(args) == 1:
+            return self.__spread_with_spreading(args[0])
+        else:
+            raise TypeError(f"spread got insufficient args: {', '.join(repr(arg) for arg in args)}")
+
+    def purge_spread(self) -> Iterator["LangValue"]:
+        binding, spreading = self.__build_purge_binding_spreading()
+        return self.bind(binding).spread(spreading)
+
+    @typechecked
+    def _bind_with_pair(self, variable: LangVar, value: Any) -> "LangValue":
         if variable not in self.variables:
             return self
-        bound_interpolation = bind_interpolation(self._interpolation,
-                                                 variable=variable,
-                                                 value=value)
+        bound_interpolation = bind_interpolation_with_pair(self._interpolation,
+                                                           variable=variable,
+                                                           value=value)
         binding = Binding({variable: value})
         return LangValueBound(interpolation=bound_interpolation,
                               binding=binding,
                               origin=self)
 
     @typechecked
-    def spread(self, variable: LangVar, value_spread: SpreadType) -> list["LangValue"]:
-        spread = []
-        for value in value_spread:
-            spread.append(self.bind(variable, value))
-        return spread
+    def _bind_with_binding(self, binding: Binding) -> "LangValue":
+        if len(binding) == 0:
+            return self
+        binding = dict(binding)
+        for var in list(binding):
+            if var not in self.variables:
+                del binding[var]
+        if len(binding) == 0:
+            return self
+        binding = Binding(binding)
+        bound_interpolation = bind_interpolation_with_mapping(self._interpolation,
+                                                              binding=binding)
+        return LangValueBound(interpolation=bound_interpolation,
+                              binding=binding,
+                              origin=self)
+
+    @typechecked
+    def __spread_with_pair(self,
+                           variable: LangVar,
+                           value_spread: Spread) -> Iterator["LangValue"]:
+        if variable in self.variables:
+            return (self.bind(variable, value) for value in value_spread)
+        else:
+            return iter([self])
+
+    @typechecked
+    def __spread_with_spreading(self, spreading: Spreading) -> Iterator["LangValue"]:
+        result_spread = iter([self])
+        for var, spread in spreading.items():
+            result_spread = itertools.chain.from_iterable(
+                lang_value.__spread_with_pair(var, spread) for
+                lang_value in result_spread)
+        return result_spread
+
+    def __build_purge_binding_spreading(self) -> BindingSpreading:
+        conditions_only = self.conditions - self.variables
+        variables_only = self.variables - self.conditions
+        # TODO: prevent copying within Binding and Spreading __init__
+        return BindingSpreading(binding=Binding({var: EMPTY_STR for var in variables_only}),
+                                spreading=Spreading({var: Spread(TRUE_EMPTY_STR, FALSE_EMPTY_STR)
+                                                     for var in conditions_only}))
 
     def __build_variables_and_conditions(self):
         variables = set()
@@ -101,7 +184,7 @@ class LangValueBound(LangValue):
         return self.__binding
 
     @typechecked
-    def bind(self, variable: LangVar, value: Any) -> "LangValue":
+    def _bind_with_pair(self, variable: LangVar, value: Any) -> "LangValue":
         if variable in self.__binding:
             if self.__binding[variable] == value:
                 return self
@@ -115,13 +198,40 @@ class LangValueBound(LangValue):
             if variable not in self.variables:
                 bound_interpolation = self._interpolation
             else:
-                bound_interpolation = bind_interpolation(self._interpolation,
-                                                         variable=variable,
-                                                         value=value)
+                bound_interpolation = bind_interpolation_with_pair(self._interpolation,
+                                                                   variable=variable,
+                                                                   value=value)
             binding = self.__binding | {variable: value}
             return LangValueBound(interpolation=bound_interpolation,
                                   binding=binding,
                                   origin=self.__origin)
+
+    @typechecked
+    def _bind_with_binding(self, binding: Binding) -> "LangValue":
+        if len(binding) == 0:
+            return self
+        binding = dict(binding)
+        for var, value in list(binding.items()):
+            if var in self.__binding:
+                if self.__binding[var] == value:
+                    del binding[var]
+                else:
+                    raise ValueError(f"try to re-bing {var} variable "
+                                     f"from {self.__binding[var]} "
+                                     f"to {value}")
+            elif var not in self.__origin.variables:
+                del binding[var]
+        binding_to_perform = {var: val for var, val in binding.items()
+                              if var in self.variables}
+        if len(binding_to_perform) == 0:
+            bound_interpolation = self._interpolation
+        else:
+            bound_interpolation = bind_interpolation_with_mapping(self._interpolation,
+                                                                  binding=binding_to_perform)
+        binding = self.__binding | binding
+        return LangValueBound(interpolation=bound_interpolation,
+                              binding=binding,
+                              origin=self.__origin)
 
 
 @typechecked
@@ -138,33 +248,6 @@ def build_variables_and_conditions(interpolation: Interpolation,
             conditions.add(LangVar(item.condition))
             build_variables_and_conditions(item.true_part, variables, conditions)
             build_variables_and_conditions(item.false_part, variables, conditions)
-
-
-@typechecked
-def _bind_interpolation_item(item: Union[str, Expression],
-                             variable: LangVar,
-                             value: Any) -> Union[str, Expression, Interpolation]:
-    if isinstance(item, IdentifierExpression) and item.identifier == variable:
-        return str(value)
-    elif isinstance(item, BinaryExpression) and variable == PlayerSexVar:
-        if value is PlayerSex.MALE:
-            return item.left
-        elif value is PlayerSex.FEMALE:
-            return item.right
-        else:
-            raise ValueError(f"PlayerSex variable must be bound with PlayerSex value, got {value}")
-    elif isinstance(item, TernaryExpression):
-        if variable == item.condition:
-            if value:
-                return bind_interpolation(item.true_part, variable, value, compress = False)
-            else:
-                return bind_interpolation(item.false_part, variable, value, compress = False)
-        else:
-            return TernaryExpression(item.condition,
-                                     bind_interpolation(item.true_part, variable, value),
-                                     bind_interpolation(item.false_part, variable, value))
-    else:
-        return item
 
 
 @typechecked
@@ -186,13 +269,87 @@ def _compress_interpolation_items(input_items: Iterable[Union[str, Expression, I
 
 
 @typechecked
-def bind_interpolation(interpolation: Interpolation,
-                       variable: LangVar,
-                       value: Any,
-                       compress=True) -> Interpolation:
-    bind_items_iter = map(partial(_bind_interpolation_item,
+def _bind_interpolation_item_with_pair(item: Union[str, Expression],
+                                       variable: LangVar,
+                                       value: Any) -> Union[str, Expression, Interpolation]:
+    if isinstance(item, IdentifierExpression) and item.identifier == variable:
+        return str(value)
+    elif isinstance(item, BinaryExpression) and variable == PlayerSexVar:
+        if value is PlayerSex.MALE:
+            return item.left
+        elif value is PlayerSex.FEMALE:
+            return item.right
+        else:
+            raise ValueError(f"PlayerSex variable must be bound with PlayerSex value, got {value}")
+    elif isinstance(item, TernaryExpression):
+        if variable == item.condition:
+            if value:
+                return bind_interpolation_with_pair(item.true_part, variable, value, compress=False)
+            else:
+                return bind_interpolation_with_pair(item.false_part, variable, value, compress=False)
+        else:
+            return TernaryExpression(item.condition,
+                                     bind_interpolation_with_pair(item.true_part, variable, value),
+                                     bind_interpolation_with_pair(item.false_part, variable, value))
+    else:
+        return item
+
+
+@typechecked
+def bind_interpolation_with_pair(interpolation: Interpolation,
+                                 variable: LangVar,
+                                 value: Any,
+                                 compress=True) -> Interpolation:
+    bind_items_iter = map(partial(_bind_interpolation_item_with_pair,
                                   value=value,
                                   variable=variable),
+                          interpolation.items)
+    if compress:
+        items = []
+        buffer = []
+        _compress_interpolation_items(input_items=bind_items_iter,
+                                      output_items=items,
+                                      string_buffer=buffer)
+        if buffer:
+            items.append("".join(buffer))
+        return Interpolation(tuple(items))
+    else:
+        return Interpolation(tuple(bind_items_iter))
+
+
+@typechecked
+def _bind_interpolation_item_with_mapping(item: Union[str, Expression],
+                                          binding: Mapping[str, Any]) -> Union[str, Expression, Interpolation]:
+    if isinstance(item, IdentifierExpression) and item.identifier in binding:
+        return str(binding[item.identifier])
+    elif isinstance(item, BinaryExpression) and PlayerSexVar in binding:
+        player_sex = binding[PlayerSexVar]
+        if player_sex is PlayerSex.MALE:
+            return item.left
+        elif player_sex is PlayerSex.FEMALE:
+            return item.right
+        else:
+            raise ValueError(f"PlayerSex variable must be bound with PlayerSex value, got {player_sex}")
+    elif isinstance(item, TernaryExpression):
+        if item.condition in binding:
+            if binding[item.condition]:
+                return bind_interpolation_with_mapping(item.true_part, binding, compress=False)
+            else:
+                return bind_interpolation_with_mapping(item.false_part, binding, compress=False)
+        else:
+            return TernaryExpression(item.condition,
+                                     bind_interpolation_with_mapping(item.true_part, binding),
+                                     bind_interpolation_with_mapping(item.false_part, binding))
+    else:
+        return item
+
+
+@typechecked
+def bind_interpolation_with_mapping(interpolation: Interpolation,
+                                    binding: Mapping[str, Any],
+                                    compress=True) -> Interpolation:
+    bind_items_iter = map(partial(_bind_interpolation_item_with_mapping,
+                                  binding=binding),
                           interpolation.items)
     if compress:
         items = []

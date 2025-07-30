@@ -3,11 +3,13 @@ import numpy as np
 import pytest
 
 from wa_language import Language
+from wa_language.LanguageModel import LanguageModel
+from wa_model import calendar_model
+from wa_screen_manager.MapScreen.MapScreenCalendarOCR import MapScreenCalendarOCR
+from wa_screen_manager.MapScreen.MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
 from wa_datasets.MapCalendarsDataset import (MapCalendarsDataset,
                                              VERIFICATION_SCREEN_TEARING,
                                              VERIFICATION_FALSE_NEGATIVE)
-from wa_screen_manager.MapScreen.MapScreenCalendarOCR import MapScreenCalendarOCR
-from wa_screen_manager.MapScreen.MapScreenCalendarFuzzyParser import MapScreenCalendarFuzzyParser
 
 
 def load_image_and_restore_crop(image_path, resolution, crop):
@@ -23,9 +25,15 @@ lang = Language.load()
 
 dataset = MapCalendarsDataset(lazy_load=True)
 
-ocr = MapScreenCalendarOCR()
+date_model = LanguageModel(model=calendar_model.date_model,
+                           language=lang)
+timeofday_model = LanguageModel(model=calendar_model.timeofday_model,
+                                language=lang)
+symbols = "".join(set(timeofday_model.symbols + date_model.symbols))
 
-parser = MapScreenCalendarFuzzyParser(lang)
+ocr = MapScreenCalendarOCR(symbols)
+
+parser = MapScreenCalendarFuzzyParser(date_model, timeofday_model)
 
 idx_meta_image = []
 

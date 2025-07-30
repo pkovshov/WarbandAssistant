@@ -4,6 +4,8 @@ import numpy as np
 from wa_typechecker import typechecked
 
 from wa_language.Language import Language
+from wa_language.LanguageModel import LanguageModel
+from wa_model import calendar_model
 from wa_screen_manager.BaseScreen.BaseSampler import BaseSampleReadingSampler
 from wa_screen_manager.SampleMatch import SampleMatch
 from ..BaseScreen.GameScreenEventDispatcher import GameScreenEventDispatcher
@@ -47,12 +49,17 @@ class MapScreenManager(GameScreenEventDispatcher):
     def __init__(self,
                  lang: Language):
         super().__init__()
-        self.__logger = logging.getLogger(__name__)
         self.__lang = lang
         self.__screen_sample = MapScreenSampler()
         self.__calendar_sample = MapCalendarSampler()
-        self.__calendar_ocr = MapScreenCalendarOCR()
-        self.__calendar_fuzzy_parser = MapScreenCalendarFuzzyParser(lang)
+        date_model = LanguageModel(model=calendar_model.date_model,
+                                   language=lang)
+        timeofday_model = LanguageModel(model=calendar_model.timeofday_model,
+                                        language=lang)
+        symbols = "".join(set(timeofday_model.symbols + date_model.symbols))
+        self.__calendar_ocr = MapScreenCalendarOCR(symbols)
+        self.__calendar_fuzzy_parser = MapScreenCalendarFuzzyParser(date_model,
+                                                                    timeofday_model)
         self.__prev__event = None
 
     @typechecked

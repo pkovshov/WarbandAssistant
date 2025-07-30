@@ -3,9 +3,8 @@ from typing import Any, Dict, Iterable
 from wa_typechecker import typechecked
 
 from wa_language.LangValue import LangValue
-from wa_language.LangVar import LangVar
+from wa_language.LangVar import LangVar, PlayerSex
 from wa_language.LangVar import PlayerSexVar
-from wa_language.Binding import PlayerSex
 from wa_language.Spreading import SpreadType
 
 

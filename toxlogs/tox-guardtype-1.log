@@ -4,19 +4,117 @@ platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
 cachedir: .tox/smoke/.pytest_cache
 rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
 plugins: cases-3.9.1, typeguard-4.4.4
-collecting ... collecting 17 items                                                            collecting 17 items                                                            collecting 17 items                                                            collecting 21 items                                                            collected 21 items                                                             
+collecting ... collecting 19 items                                                            collecting 19 items                                                            collecting 19 items                                                            collected 23 items                                                             
 
-src/wa_language/LangKey.py .                                             [  4%]
-src/wa_language/model/LangKeyChecker.py .                                [  9%]
-src/wa_language/semantics_test.py ......                                 [ 38%]
-src/wa_language/syntax/Interpolation.py .                                [ 42%]
-src/wa_language/syntax/parser.py .....                                   [ 66%]
-src/wa_language/syntax/syntax_test.py .                                  [ 71%]
-src/wa_types/Box.py ..                                                   [ 80%]
+src/wa_language/KeyChecker.py .                                          [  4%]
+src/wa_language/LangKey.py .                                             [  8%]
+src/wa_language/semantics_test.py ....F...                               [ 43%]
+src/wa_language/syntax/Interpolation.py .                                [ 47%]
+src/wa_language/syntax/parser.py .....                                   [ 69%]
+src/wa_language/syntax/syntax_test.py .                                  [ 73%]
+src/wa_types/Box.py ..                                                   [ 82%]
 tests/datasets_test.py ....                                              [100%]
 
-============================= 21 passed in 12.95s ==============================
-smoke: OK ✔ in 13.4 seconds
+=================================== FAILURES ===================================
+_______________________ test_bind_with_dict_lang_values ________________________
+
+    def test_bind_with_dict_lang_values():
+        lang = RootLanguage({
+            "tst_key": "As you wish, {sire/my lady}. {reg6?I:{reg7?{Sir/Lady}, you:{s11}}} will be the new {reg3?lady:lord} of {s1}.",
+        })
+        lang_value = next(iter(lang.values()))
+>       male_value = lang_value.bind(Binding({PlayerSexVar: PlayerSex.MALE, LangVar("reg7"): True}))
+
+src/wa_language/semantics_test.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/wa_language/LangValue.py:85: in bind
+    return self._bind_with_binding(args[0])
+src/wa_language/LangValue.py:127: in _bind_with_binding
+    binding = dict(binding)
+.tox/smoke/lib/python3.10/site-packages/typeguard/_functions.py:283: in check_variable_assignment
+    check_type_internal(val, annotation, memo)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = {PlayerSexVar: <PlayerSex.MALE: 'male'>, LangVar('reg7'): True}
+annotation = <class 'wa_language.Binding.Binding'>
+memo = <typeguard.TypeCheckMemo object at 0x784d7e74c500>
+
+    def check_type_internal(
+        value: Any,
+        annotation: Any,
+        memo: TypeCheckMemo,
+    ) -> None:
+        """
+        Check that the given object is compatible with the given type annotation.
+    
+        This function should only be used by type checker callables. Applications should use
+        :func:`~.check_type` instead.
+    
+        :param value: the value to check
+        :param annotation: the type annotation to check against
+        :param memo: a memo object containing configuration and information necessary for
+            looking up forward references
+        """
+    
+        if isinstance(annotation, ForwardRef):
+            try:
+                annotation = evaluate_forwardref(annotation, memo)
+            except NameError:
+                if memo.config.forward_ref_policy is ForwardRefPolicy.ERROR:
+                    raise
+                elif memo.config.forward_ref_policy is ForwardRefPolicy.WARN:
+                    warnings.warn(
+                        f"Cannot resolve forward reference {annotation.__forward_arg__!r}",
+                        TypeHintWarning,
+                        stacklevel=get_stacklevel(),
+                    )
+    
+                return
+    
+        if annotation is Any or annotation is SubclassableAny or isinstance(value, Mock):
+            return
+    
+        # Skip type checks if value is an instance of a class that inherits from Any
+        if not isclass(value) and SubclassableAny in type(value).__bases__:
+            return
+    
+        extras: tuple[Any, ...]
+        origin_type = get_origin(annotation)
+        if origin_type is Annotated:
+            annotation, *extras_ = get_args(annotation)
+            extras = tuple(extras_)
+            origin_type = get_origin(annotation)
+        else:
+            extras = ()
+    
+        if origin_type is not None:
+            args = get_args(annotation)
+    
+            # Compatibility hack to distinguish between unparametrized and empty tuple
+            # (tuple[()]), necessary due to https://github.com/python/cpython/issues/91137
+            if origin_type in (tuple, Tuple) and annotation is not Tuple and not args:
+                args = ((),)
+        else:
+            origin_type = annotation
+            args = ()
+    
+        for lookup_func in checker_lookup_functions:
+            checker = lookup_func(origin_type, args, extras)
+            if checker:
+                checker(value, origin_type, args, memo)
+                return
+    
+        if isclass(origin_type):
+            if not isinstance(value, origin_type):
+>               raise TypeCheckError(f"is not an instance of {qualified_name(origin_type)}")
+E               typeguard.TypeCheckError: value assigned to binding (dict) is not an instance of wa_language.Binding.Binding
+
+.tox/smoke/lib/python3.10/site-packages/typeguard/_checkers.py:965: TypeCheckError
+=========================== short test summary info ============================
+FAILED src/wa_language/semantics_test.py::test_bind_with_dict_lang_values - typeguard.TypeCheckError: value assigned to binding (dict) is not an instan...
+========================= 1 failed, 22 passed in 4.33s =========================
+smoke: exit 1 (4.74 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest --doctest-modules --ignore tests/test_parsing_by_datasets --ignore utils/map_calendars_add_overlapped.py --ignore tox.py pid=47988
+smoke: FAIL ✖ in 4.77 seconds
 dialog_bodies: commands[0]> pytest tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -28,15 +126,15 @@ collecting ... collecting 55 items                                             
 tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py .......... [ 18%]
 .............................................                            [100%]
 
-total time    : 12.1364 sec
-collec time   : 3.5020 sec
-setups time   : 0.6017 sec
-calls time    : 7.9940 sec
-avg call time : 0.1453 sec
+total time    : 9.6119 sec
+collec time   : 1.1257 sec
+setups time   : 0.5946 sec
+calls time    : 7.8546 sec
+avg call time : 0.1428 sec
 passed        : 55 / 55
 
-============================= 55 passed in 12.13s ==============================
-dialog_bodies: OK ✔ in 12.4 seconds
+============================== 55 passed in 9.61s ==============================
+dialog_bodies: OK ✔ in 9.86 seconds
 dialog_titles: commands[0]> pytest tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -51,15 +149,15 @@ tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py ......... [  3%]
 ........................................................................ [ 96%]
 .......                                                                  [100%]
 
-total time    : 24.6069 sec
-collec time   : 3.8063 sec
-setups time   : 0.0630 sec
-calls time    : 20.5734 sec
-avg call time : 0.0887 sec
+total time    : 21.4860 sec
+collec time   : 1.8968 sec
+setups time   : 0.0582 sec
+calls time    : 19.3930 sec
+avg call time : 0.0836 sec
 passed        : 232 / 232
 
-============================= 232 passed in 24.61s =============================
-dialog_titles: OK ✔ in 24.9 seconds
+============================= 232 passed in 21.48s =============================
+dialog_titles: OK ✔ in 21.76 seconds
 dialog_relations: commands[0]> pytest tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -71,43 +169,59 @@ collecting ... collecting 40 items                                             
 tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py ...... [ 15%]
 ..................................                                       [100%]
 
-total time    : 4.1131 sec
-collec time   : 0.8537 sec
-setups time   : 0.0106 sec
-calls time    : 3.2238 sec
-avg call time : 0.0806 sec
+total time    : 4.0494 sec
+collec time   : 0.8900 sec
+setups time   : 0.0100 sec
+calls time    : 3.1253 sec
+avg call time : 0.0781 sec
 passed        : 40 / 40
 
-============================== 40 passed in 4.11s ==============================
-dialog_relations: OK ✔ in 4.37 seconds
+============================== 40 passed in 4.05s ==============================
+dialog_relations: OK ✔ in 4.3 seconds
 map_calendars: commands[0]> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
 cachedir: .tox/map_calendars/.pytest_cache
 rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
 plugins: cases-3.9.1, typeguard-4.4.4
-collecting ... collecting 436 items                                                           collected 436 items                                                            
+collecting ... collecting 0 items / 1 error                                                   collected 0 items / 1 error                                                    
 
-tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py ......... [  2%]
-........................................................................ [ 18%]
-........................................................................ [ 35%]
-........................................................................ [ 51%]
-........................................................................ [ 68%]
-........................................................................ [ 84%]
-...................................................................      [100%]
 
-total time    : 43.9644 sec
-collec time   : 2.7040 sec
-setups time   : 0.1523 sec
-calls time    : 40.7882 sec
-avg call time : 0.0936 sec
-passed        : 436 / 436
-
-============================= 436 passed in 43.96s =============================
-  smoke: OK (13.40=setup[0.03]+cmd[13.36] seconds)
-  dialog_bodies: OK (12.40=setup[0.00]+cmd[12.39] seconds)
-  dialog_titles: OK (24.90=setup[0.01]+cmd[24.90] seconds)
-  dialog_relations: OK (4.37=setup[0.01]+cmd[4.36] seconds)
-  map_calendars: OK (44.25=setup[0.01]+cmd[44.24] seconds)
-  congratulations :) (99.36 seconds)
+total time    : 0.8934 sec
+collec time   : 0.8523 sec
+setups time   : 0.0000 sec
+calls time    : 0.0000 sec
+passed        : 0 / 0
+==================================== ERRORS ====================================
+_ ERROR collecting tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py _
+tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py:28: in <module>
+    date_model = LanguageModel(model=calendar_model.date_model,
+src/wa_language/LanguageModel.py:57: in __init__
+    self.__purge_spread = tuple(purge_spread)
+src/wa_language/LanguageModel.py:55: in <genexpr>
+    purge_spread = itertools.chain.from_iterable(
+src/wa_language/LanguageModel.py:51: in <genexpr>
+    val.purge_spread() for val in self.__language.values())
+src/wa_language/LangValue.py:109: in purge_spread
+    return self.bind(binding).spread(spreading)
+src/wa_language/LangValue.py:85: in bind
+    return self._bind_with_binding(args[0])
+src/wa_language/LangValue.py:127: in _bind_with_binding
+    binding = dict(binding)
+.tox/map_calendars/lib/python3.10/site-packages/typeguard/_functions.py:283: in check_variable_assignment
+    check_type_internal(val, annotation, memo)
+.tox/map_calendars/lib/python3.10/site-packages/typeguard/_checkers.py:965: in check_type_internal
+    raise TypeCheckError(f"is not an instance of {qualified_name(origin_type)}")
+E   typeguard.TypeCheckError: value assigned to binding (dict) is not an instance of wa_language.Binding.Binding
+=========================== short test summary info ============================
+ERROR tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py - typeguard.TypeCheckError: value assigned to binding (dict) is not an instan...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.91s ===============================
+map_calendars: exit 2 (1.12 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py pid=49890
+  smoke: FAIL code 1 (4.77=setup[0.03]+cmd[4.74] seconds)
+  dialog_bodies: OK (9.86=setup[0.00]+cmd[9.86] seconds)
+  dialog_titles: OK (21.76=setup[0.01]+cmd[21.75] seconds)
+  dialog_relations: OK (4.30=setup[0.01]+cmd[4.29] seconds)
+  map_calendars: FAIL code 2 (1.12=setup[0.01]+cmd[1.12] seconds)
+  evaluation failed :( (41.86 seconds)
 
