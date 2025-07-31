@@ -65,7 +65,7 @@ class DialogScreenManager(GameScreenEventDispatcher):
                 if body_ocr is NonStable:
                     body_ocr = None
                 if body_ocr is not None:
-                    body_bounds = self.__body_parser.bound(body_ocr=body_ocr, title_keys=title_keys)
+                    body_bounds = self.__body_parser.bounds(body_ocr=body_ocr, title_keys=title_keys)
                 else:
                     body_bounds = tuple()
                 event = DialogScreenEvent(image=img,

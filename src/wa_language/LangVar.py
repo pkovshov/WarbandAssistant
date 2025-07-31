@@ -38,6 +38,9 @@ class PlayerSex(Enum):
     MALE = 'male'
     FEMALE = 'female'
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}.{self.name}"
+
 
 class TrueStr(str):
     def __bool__(self):

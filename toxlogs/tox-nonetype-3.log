@@ -4,19 +4,19 @@ platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
 cachedir: .tox/smoke/.pytest_cache
 rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
 plugins: cases-3.9.1, typeguard-4.4.4
-collecting ... collecting 19 items                                                            collecting 19 items                                                            collected 23 items                                                             
+collecting ... collecting 19 items                                                            collecting 24 items                                                            collected 24 items                                                             
 
 src/wa_language/KeyChecker.py .                                          [  4%]
 src/wa_language/LangKey.py .                                             [  8%]
-src/wa_language/semantics_test.py ........                               [ 43%]
-src/wa_language/syntax/Interpolation.py .                                [ 47%]
-src/wa_language/syntax/parser.py .....                                   [ 69%]
-src/wa_language/syntax/syntax_test.py .                                  [ 73%]
-src/wa_types/Box.py ..                                                   [ 82%]
-tests/datasets_test.py ....                                              [100%]
+src/wa_language/semantics_test.py ........                               [ 41%]
+src/wa_language/syntax/Interpolation.py .                                [ 45%]
+src/wa_language/syntax/parser.py .....                                   [ 66%]
+src/wa_language/syntax/syntax_test.py .                                  [ 70%]
+src/wa_types/Box.py ..                                                   [ 79%]
+tests/datasets_test.py .....                                             [100%]
 
-============================== 23 passed in 2.51s ==============================
-smoke: OK ✔ in 2.94 seconds
+============================== 24 passed in 2.48s ==============================
+smoke: OK ✔ in 2.82 seconds
 dialog_bodies: commands[0]> pytest tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -28,15 +28,15 @@ collecting ... collected 55 items
 tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py .......... [ 18%]
 .............................................                            [100%]
 
-total time    : 8.8833 sec
-collec time   : 0.4638 sec
-setups time   : 0.5935 sec
-calls time    : 7.7886 sec
-avg call time : 0.1416 sec
+total time    : 8.9674 sec
+collec time   : 0.4456 sec
+setups time   : 0.5800 sec
+calls time    : 7.9046 sec
+avg call time : 0.1437 sec
 passed        : 55 / 55
 
-============================== 55 passed in 8.88s ==============================
-dialog_bodies: OK ✔ in 9.14 seconds
+============================== 55 passed in 8.97s ==============================
+dialog_bodies: OK ✔ in 9.22 seconds
 dialog_titles: commands[0]> pytest tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -51,15 +51,15 @@ tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py ......... [  3%]
 ........................................................................ [ 96%]
 .......                                                                  [100%]
 
-total time    : 20.7965 sec
-collec time   : 1.2936 sec
-setups time   : 0.0575 sec
-calls time    : 19.3085 sec
-avg call time : 0.0832 sec
+total time    : 21.0148 sec
+collec time   : 1.3210 sec
+setups time   : 0.0592 sec
+calls time    : 19.4949 sec
+avg call time : 0.0840 sec
 passed        : 232 / 232
 
-============================= 232 passed in 20.80s =============================
-dialog_titles: OK ✔ in 21.09 seconds
+============================= 232 passed in 21.01s =============================
+dialog_titles: OK ✔ in 21.31 seconds
 dialog_relations: commands[0]> pytest tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -71,15 +71,15 @@ collecting ... collected 40 items
 tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py ...... [ 15%]
 ..................................                                       [100%]
 
-total time    : 3.3853 sec
-collec time   : 0.2626 sec
-setups time   : 0.0100 sec
-calls time    : 3.0884 sec
-avg call time : 0.0772 sec
+total time    : 3.4375 sec
+collec time   : 0.2557 sec
+setups time   : 0.0103 sec
+calls time    : 3.1474 sec
+avg call time : 0.0787 sec
 passed        : 40 / 40
 
-============================== 40 passed in 3.38s ==============================
-dialog_relations: OK ✔ in 3.63 seconds
+============================== 40 passed in 3.44s ==============================
+dialog_relations: OK ✔ in 3.68 seconds
 map_calendars: commands[0]> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -96,18 +96,18 @@ tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py ......... [  2%]
 ........................................................................ [ 84%]
 ..................................................................       [100%]
 
-total time    : 36.8119 sec
-collec time   : 0.8146 sec
-setups time   : 0.1239 sec
-calls time    : 35.6185 sec
-avg call time : 0.0819 sec
+total time    : 37.6342 sec
+collec time   : 0.8206 sec
+setups time   : 0.1404 sec
+calls time    : 36.3930 sec
+avg call time : 0.0837 sec
 passed        : 435 / 435
 
-============================= 435 passed in 36.81s =============================
-  smoke: OK (2.94=setup[0.03]+cmd[2.91] seconds)
-  dialog_bodies: OK (9.14=setup[0.01]+cmd[9.13] seconds)
-  dialog_titles: OK (21.09=setup[0.01]+cmd[21.08] seconds)
-  dialog_relations: OK (3.63=setup[0.01]+cmd[3.62] seconds)
-  map_calendars: OK (37.07=setup[0.00]+cmd[37.06] seconds)
-  congratulations :) (73.91 seconds)
+============================= 435 passed in 37.63s =============================
+  smoke: OK (2.82=setup[0.03]+cmd[2.79] seconds)
+  dialog_bodies: OK (9.22=setup[0.00]+cmd[9.21] seconds)
+  dialog_titles: OK (21.31=setup[0.00]+cmd[21.31] seconds)
+  dialog_relations: OK (3.68=setup[0.01]+cmd[3.67] seconds)
+  map_calendars: OK (37.91=setup[0.00]+cmd[37.90] seconds)
+  congratulations :) (74.97 seconds)
 

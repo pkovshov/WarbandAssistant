@@ -1,15 +1,11 @@
-from typing import Hashable, Mapping, NamedTuple, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 from wa_typechecker import typechecked
 
-from wa_language.Language import LangKey
+from wa_language.LangKey import LangKey
+from wa_language.LangValue import LangValue
 from wa_screen_manager.GameScreenEvent import GameScreenEvent
-
-
-class DialogBodyBound(NamedTuple):
-    key: LangKey
-    bind: Mapping[str, Hashable]
 
 
 class DialogScreenEvent(GameScreenEvent):
@@ -20,7 +16,7 @@ class DialogScreenEvent(GameScreenEvent):
                  title_ocr_prep: str,
                  title_keys: Tuple[LangKey, ...],
                  body_ocr: Optional[str],
-                 body_bounds: Tuple[DialogBodyBound, ...],
+                 body_bounds: tuple[LangValue, ...],
                  relation_ocr: Optional[str],
                  relation: Optional[int],
                  ):
@@ -66,7 +62,7 @@ class DialogScreenEvent(GameScreenEvent):
 
     @property
     @typechecked
-    def body_bounds(self) -> Tuple[DialogBodyBound, ...]: return self.__body_bounds
+    def body_bounds(self) -> tuple[LangValue, ...]: return self.__body_bounds
 
     @property
     @typechecked

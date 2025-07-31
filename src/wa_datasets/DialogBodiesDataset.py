@@ -8,6 +8,7 @@ from wa_typechecker import typechecked
 from wa_language.LangVar import PlayerSex
 from wa_types import Box, Resolution
 from wa_language.LangKey import LangKey
+from wa_language.LangValue import LangValue
 from wa_datasets.BaseImageDataset import BaseImageDataset, MetaAndImagePath
 
 # TODO: convert to a class with type checking
@@ -43,6 +44,18 @@ class MetaKey(NamedTuple):
         return hash(self.body_ocr)
 
 
+def keys_and_bindings(lang_values: tuple[LangValue, ...]) -> list:
+    lang_values = sorted(lang_values, key=lambda lang_val: lang_val.key)
+    lang_values_pack = []
+    for lang_val in lang_values:
+        binding = lang_val.binding
+        binding_pack = []
+        for lang_var in sorted(binding):
+            binding_pack.append([repr(lang_var), repr(binding[lang_var])])
+        lang_values_pack.append([str(lang_val.key), binding_pack])
+    return lang_values_pack
+
+
 class DialogBodiesDataset(BaseImageDataset):
     NAME = "dialog_bodies"
 
@@ -73,22 +86,13 @@ class DialogBodiesDataset(BaseImageDataset):
     def meta_and_image_path(self) -> Optional[dict[int, MetaAndImagePath[MetaItem, str]]]:
         return super().meta_and_image_path()
 
-    @staticmethod
-    def pack_body_bounds(body_bounds: Tuple[Tuple[LangKey, Mapping[str, Any]], ...]):
-        result = []
-        for bound in body_bounds:
-            key = str(bound[0])
-            bind = {str(key):str(val) for key, val in bound[1].items()}
-            result.append([key, bind])
-        return result
-
     @typechecked
     def add(self,
             screenshot: np.ndarray,
             screen_sample_matches: bool,
             title_keys: Tuple[LangKey, ...],
             body_ocr: Optional[str],
-            body_bounds
+            body_bounds: tuple[LangValue, ...]
             ):
         if not body_bounds:
             return
@@ -109,9 +113,9 @@ class DialogBodiesDataset(BaseImageDataset):
                              crop=tuple(self.__crop),
                              mask=tuple(mask),
                              screen_sample_matches=screen_sample_matches,
-                             title_keys=tuple(str(key) for key in title_keys),
+                             title_keys=[str(key) for key in title_keys],
                              body_ocr=body_ocr,
-                             body_bounds=self.pack_body_bounds(body_bounds),
+                             body_bounds=keys_and_bindings(body_bounds),
                              git_branch=self.git_status.branch,
                              git_commit=self.git_status.commit,
                              git_has_modified=self.git_status.has_modified),

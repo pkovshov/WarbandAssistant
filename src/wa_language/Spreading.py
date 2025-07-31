@@ -25,6 +25,8 @@ class Spread(Collection):
             items = args
         if not isinstance(items, get_args(SpreadType)):
             raise TypeError(f"insufficient argument type: expected {get_args(SpreadType)}, got {items}")
+        if len(items) == 0:
+            raise ValueError(f"empty items {items}")
         # we don't need to copy due to all the SpreadType cases are immutable
         self.__items = items
 

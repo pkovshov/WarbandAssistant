@@ -44,9 +44,9 @@ def build_lord_comment_intro_key_checker(lord_personality: Optional[LordPersonal
                if player_sex is PlayerSex.MALE
                else key_checker(comment_intro_all_sex_checker, comment_intro_player_female_only_checker))
     if lord_personality is not None:
-        checker = key_checker(checker, include_filter=comment_intro_filter_by_lord_personality[lord_personality])
+        checker = key_checker(checker, pass_filter=comment_intro_filter_by_lord_personality[lord_personality])
     else:
-        checker = key_checker(checker, exclude_filter=comment_intro_filter_king)
+        checker = key_checker(checker, deny_filter=comment_intro_filter_king)
     return checker
 
 
@@ -55,7 +55,7 @@ def build_king_comment_intro_key_checker(player_sex: Optional[PlayerSex] = None)
     checker = (comment_intro_all_sex_checker
                if player_sex is PlayerSex.MALE
                else key_checker(comment_intro_all_sex_checker, comment_intro_player_female_only_checker))
-    return key_checker(checker, include_filter=comment_intro_filter_king)
+    return key_checker(checker, pass_filter=comment_intro_filter_king)
 
 
 

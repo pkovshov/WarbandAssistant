@@ -6,7 +6,7 @@ from .private_chat_keys import *
 personality_to_lord_body_checker = {
     personality: key_checker(
         key_checker(comment_intro_checker,
-                    include_filter=comment_intro_filter_by_lord_personality[personality]),
+                    pass_filter=comment_intro_filter_by_lord_personality[personality]),
         private_chat_keys_by_lord_personality[personality])
     for personality in LordPersonality
 }

@@ -224,6 +224,10 @@ def test_spread():
         for item in collect:
             assert item in spread
 
+    def check_with_empty_collection(value):
+        with pytest.raises(ValueError):
+            Spread(value)
+
     def check_with_wrong_type(value):
         with pytest.raises(TypeError):
             Spread(value)
@@ -231,10 +235,12 @@ def test_spread():
     check_with_collection(range(1, 10))
     check_with_collection(range(12))
     check_with_collection(range(-5, 20, 3))
-    check_with_collection(range(0))
     check_with_collection((1, -5, 19, 0.8, True, False, None, 'A', 'qW-er', 19, [1, 2, 'qer'], {1, 4, 9}))
-    check_with_collection(tuple())
     check_with_collection(tuple(range(12)))
+
+    check_with_empty_collection(range(0))
+    check_with_empty_collection(tuple())
+
 
     check_with_wrong_type("Hello")
     check_with_wrong_type([1, 2, 3])

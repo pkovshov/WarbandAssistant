@@ -1,7 +1,8 @@
-import cv2
 from functools import partial
 from os import path
+from typing import Any, Mapping, NamedTuple
 
+import cv2
 import pytest
 from pytest_cases import lazy_value
 
@@ -10,8 +11,7 @@ from wa_types import Box
 from wa_language import Language
 from wa_language.Language import LangKey
 from wa_language.LangVar import PlayerSex
-from wa_datasets.DialogBodiesDataset import DialogBodiesDataset
-from wa_screen_manager.DialogScreen.DialogScreenEvent import DialogBodyBound
+from wa_datasets.DialogBodiesDataset import DialogBodiesDataset, keys_and_bindings
 from wa_screen_manager.DialogScreen.DialogScreenOCRs import DialogBodyOCR
 from wa_screen_manager.DialogScreen.DialogBodyFuzzyParser import DialogBodyFuzzyParser
 
@@ -31,7 +31,6 @@ female_parser = DialogBodyFuzzyParser(lang, PlayerSex.FEMALE)
 male_params = []
 female_params = []
 
-
 def load_image(idx, meta):
     crop = Box(*meta.crop)
     mask = Box(*meta.mask)
@@ -45,10 +44,7 @@ def load_test_arguments(idx, meta):
     return [idx,
             meta.body_ocr,
             tuple(LangKey(key) for key in meta.title_keys),
-            sorted(list(DialogBodyBound(key=LangKey(bound[0]),
-                                        bind=dict(bound[1]))
-                        for bound in meta.body_bounds),
-                   key=lambda bound: bound.key),
+            meta.body_bounds,
             lazy_value(partial(load_image, idx=idx, meta=meta))]
 
 
@@ -64,5 +60,6 @@ for idx, meta in dataset.meta_dict.items():
 def test_male_dialog_body_dataset(idx, body_ocr_exp, title_keys, body_bounds_exp, image, parser):
     ocr.ocr(image)  # Dry run to simulate two identical images in a row
     body_ocr = ocr.ocr(image)
-    body_bounds = parser.bound(body_ocr, title_keys)
-    assert sorted(body_bounds, key=lambda bound: bound.key) == body_bounds_exp, f"OCR: {body_ocr}"
+    body_bounds = parser.bounds(body_ocr, title_keys)
+    body_bounds = keys_and_bindings(body_bounds)
+    assert body_bounds == body_bounds_exp, f"OCR: {body_ocr}"

@@ -120,7 +120,7 @@ True
 >>> hash(is_good_mult) == hash(is_good)
 True
 
->>> is_not_good_hero = KeyChecker(is_hero, exclude_filter=is_good)
+>>> is_not_good_hero = KeyChecker(is_hero, deny_filter=is_good)
 >>> LangKey("bad") in is_not_good_hero
 True
 >>> LangKey("fool") in is_not_good_hero
@@ -131,7 +131,7 @@ False
 Pippin Took, Ursula
 >>> KeyChecker(is_not_good_hero) is is_not_good_hero
 True
->>> is_not_good_hero_same = KeyChecker(is_hero, exclude_filter=is_good)
+>>> is_not_good_hero_same = KeyChecker(is_hero, deny_filter=is_good)
 >>> is_not_good_hero_same is is_not_good_hero
 False
 >>> set(is_not_good_hero_same.lang(lang).values()) == set(is_not_good_hero.lang(lang).values())
@@ -141,7 +141,7 @@ True
 >>> hash(is_not_good_hero_same) == hash(is_not_good_hero)
 True
 
->>> is_oo_hero = KeyChecker(is_hero, include_filter=KeyChecker(lambda x: "oo" in x))
+>>> is_oo_hero = KeyChecker(is_hero, pass_filter=KeyChecker(lambda x: "oo" in x))
 >>> LangKey("bad") in is_oo_hero
 False
 >>> LangKey("fool") in is_oo_hero
@@ -152,7 +152,7 @@ True
 Pippin Took, Robin Hood
 >>> KeyChecker(is_oo_hero) is is_oo_hero
 True
->>> is_oo_hero_same = KeyChecker(is_hero, include_filter=KeyChecker(lambda x: "oo" in x))
+>>> is_oo_hero_same = KeyChecker(is_hero, pass_filter=KeyChecker(lambda x: "oo" in x))
 >>> is_oo_hero_same is is_oo_hero
 False
 >>> set(is_oo_hero_same.lang(lang).values()) == set(is_oo_hero.lang(lang).values())
@@ -162,7 +162,7 @@ False
 >>> hash(is_oo_hero_same) == hash(is_oo_hero)  # due to same labda functions are not equal
 False
 
->>> is_not_good_fool_hero = KeyChecker(is_hero, exclude_filter=is_good, include_filter=KeyChecker("fool"))
+>>> is_not_good_fool_hero = KeyChecker(is_hero, deny_filter=is_good, pass_filter=KeyChecker("fool"))
 >>> LangKey("bad") in is_not_good_fool_hero
 False
 >>> LangKey("fool") in is_not_good_fool_hero
@@ -173,7 +173,7 @@ False
 Pippin Took
 >>> KeyChecker(is_not_good_fool_hero) is is_not_good_fool_hero
 True
->>> is_not_good_fool_hero_same = KeyChecker(is_hero, exclude_filter=is_good, include_filter=KeyChecker("fool"))
+>>> is_not_good_fool_hero_same = KeyChecker(is_hero, deny_filter=is_good, pass_filter=KeyChecker("fool"))
 >>> is_not_good_fool_hero_same is is_not_good_fool_hero
 False
 >>> set(is_not_good_fool_hero_same.lang(lang).values()) == set(is_not_good_fool_hero.lang(lang).values())
@@ -218,13 +218,13 @@ class KeyChecker:
 
     @typechecked
     def __init__(self, *args,
-                 include_filter: Optional["KeyChecker"] = None,
-                 exclude_filter: Optional["KeyChecker"] = None):
+                 pass_filter: Optional["KeyChecker"] = None,
+                 deny_filter: Optional["KeyChecker"] = None):
         if len(args) == 1 and args[0] is self:
             return  # do nothing to avoid maximum recursion depth exceeded
         self.__lang = None
-        self.__include_filter = include_filter
-        self.__exclude_filter = exclude_filter
+        self.__pass_filter = pass_filter
+        self.__deny_filter = deny_filter
         checkers = []
         if len(args) == 0:
             self.__check = None
@@ -266,8 +266,8 @@ class KeyChecker:
         return any(lang_key in checker for checker in self.__checkers)
 
     def __contains__(self, lang_key) -> bool:
-        return ((lang_key in self.__include_filter if self.__include_filter else True) and
-                (lang_key not in self.__exclude_filter if self.__exclude_filter else True) and
+        return ((lang_key in self.__pass_filter if self.__pass_filter else True) and
+                (lang_key not in self.__deny_filter if self.__deny_filter else True) and
                 (self.__check(lang_key) if self.__check else True))
 
     @typechecked
@@ -289,9 +289,9 @@ class KeyChecker:
     def __eq__(self, other):
         if not isinstance(other, KeyChecker):
             return NotImplemented
-        if self.__include_filter != other.__include_filter:
+        if self.__pass_filter != other.__pass_filter:
             return False
-        if self.__exclude_filter != other.__exclude_filter:
+        if self.__deny_filter != other.__deny_filter:
             return False
         try:
             return self.__str == other.__str
@@ -302,7 +302,7 @@ class KeyChecker:
                 return self.__check == other.__check
 
     def __hash__(self):
-        filter_and_exclude = self.__include_filter, self.__exclude_filter
+        filter_and_exclude = self.__pass_filter, self.__deny_filter
         try:
             return hash((self.__str, filter_and_exclude))
         except AttributeError:
@@ -320,5 +320,5 @@ class KeyCheckerLanguage(Language):
                           if key in checker})
 
 
-def key_checker(*args, include_filter=None, exclude_filter=None):
-    return KeyChecker(*args, include_filter=include_filter, exclude_filter=exclude_filter)
+def key_checker(*args, pass_filter=None, deny_filter=None):
+    return KeyChecker(*args, pass_filter=pass_filter, deny_filter=deny_filter)

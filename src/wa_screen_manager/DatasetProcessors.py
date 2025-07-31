@@ -41,7 +41,7 @@ class DialogBodyProcessor:
                                    screen_sample_matches=True,
                                    title_keys=event.title_keys,
                                    body_ocr=event.body_ocr,
-                                   body_bounds=tuple((bound.key, bound.bind) for bound in event.body_bounds))
+                                   body_bounds=event.body_bounds)
         else:
             self.__prev_body_ocr = None
 

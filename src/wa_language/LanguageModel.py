@@ -77,7 +77,7 @@ class LanguageModel(Mapping[LangKey, Spreading]):
         return self.__language
 
     @property
-    def purge_spread(self) -> tuple[LangValue]:
+    def purge_spread(self) -> tuple[LangValue, ...]:
         return self.__purge_spread
 
     @property
