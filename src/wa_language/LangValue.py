@@ -1,5 +1,4 @@
 from functools import partial
-import itertools
 from typing import overload, Any, FrozenSet, Iterable, Iterator, List, Mapping, NamedTuple, Set, Union, TYPE_CHECKING
 import logging
 
@@ -17,11 +16,6 @@ from .Binding import Binding, EMPTY_BINDING
 
 if TYPE_CHECKING:
     from .Language import Language
-
-
-class BindingSpreading(NamedTuple):
-    binding: Binding
-    spreading: Spreading
 
 
 class LangValue(str):
@@ -105,7 +99,21 @@ class LangValue(str):
             raise TypeError(f"spread got insufficient args: {', '.join(repr(arg) for arg in args)}")
 
     def purge_spread(self) -> Iterator["LangValue"]:
-        binding, spreading = self.__build_purge_binding_spreading()
+        conditions_only = self.conditions
+        variables_only = self.variables - self.conditions
+        if PlayerSexVar not in variables_only:
+            # TODO: prevent copying within Binding and Spreading __init__
+            binding = Binding({var: EMPTY_STR for var in variables_only})
+            spreading = Spreading({var: Spread(TRUE_EMPTY_STR, FALSE_EMPTY_STR)
+                                 for var in conditions_only})
+        else:
+            # TODO: prevent copying within Binding and Spreading __init__
+            binding = Binding({var: EMPTY_STR for var in variables_only
+                               if var is not PlayerSexVar})
+            spreading = {var: Spread(TRUE_EMPTY_STR, FALSE_EMPTY_STR)
+                         for var in conditions_only}
+            spreading[PlayerSexVar] = Spread(PlayerSex.MALE, PlayerSex.FEMALE)
+            spreading = Spreading(spreading)
         return self.bind(binding).spread(spreading)
 
     @typechecked
@@ -140,9 +148,9 @@ class LangValue(str):
     @typechecked
     def __spread_with_pair(self,
                            variable: LangVar,
-                           value_spread: Spread) -> Iterator["LangValue"]:
+                           variable_values: Spread) -> Iterator["LangValue"]:
         if variable in self.variables:
-            return (self.bind(variable, value) for value in value_spread)
+            return (self.bind(variable, value) for value in variable_values)
         else:
             return iter([self])
 
@@ -150,18 +158,11 @@ class LangValue(str):
     def __spread_with_spreading(self, spreading: Spreading) -> Iterator["LangValue"]:
         result_spread = iter([self])
         for var, spread in spreading.items():
-            result_spread = itertools.chain.from_iterable(
-                lang_value.__spread_with_pair(var, spread) for
-                lang_value in result_spread)
+            def gen(lang_values, variable, variable_values):
+                for lang_value in lang_values:
+                    yield from lang_value.__spread_with_pair(variable, variable_values)
+            result_spread = gen(result_spread, var, spread)
         return result_spread
-
-    def __build_purge_binding_spreading(self) -> BindingSpreading:
-        conditions_only = self.conditions - self.variables
-        variables_only = self.variables - self.conditions
-        # TODO: prevent copying within Binding and Spreading __init__
-        return BindingSpreading(binding=Binding({var: EMPTY_STR for var in variables_only}),
-                                spreading=Spreading({var: Spread(TRUE_EMPTY_STR, FALSE_EMPTY_STR)
-                                                     for var in conditions_only}))
 
     def __build_variables_and_conditions(self):
         variables = set()
@@ -329,7 +330,7 @@ def _bind_interpolation_item_with_mapping(item: Union[str, Expression],
         elif player_sex is PlayerSex.FEMALE:
             return item.right
         else:
-            raise ValueError(f"PlayerSex variable must be bound with PlayerSex value, got {player_sex}")
+            raise ValueError(f"PlayerSex variable must be bound with PlayerSex value, got {repr(player_sex)}")
     elif isinstance(item, TernaryExpression):
         if item.condition in binding:
             if binding[item.condition]:

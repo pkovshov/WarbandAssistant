@@ -250,6 +250,18 @@ def test_spread():
 
     # TODO: add test for Spread.__init__ with several args or with empty args
 
+def test_purge_spread_with_unbind_sex_var():
+    lang = RootLanguage({
+        "tst_key": "As you wish, {sire/my lady}. {reg6?I:Wee} glad to see {s11}",
+    })
+    lang_value = next(iter(lang.values()))
+    purge_spread = sorted(lang_value.purge_spread())
+    assert purge_spread == [
+        "As you wish, my lady. I glad to see ",
+        "As you wish, my lady. Wee glad to see ",
+        "As you wish, sire. I glad to see ",
+        "As you wish, sire. Wee glad to see ",
+    ]
 
 def test():
     lang = RootLanguage({
