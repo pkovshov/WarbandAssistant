@@ -15,6 +15,7 @@ from wa_model.dialog_model.comment_intro_keys import (comment_intro_player_famou
                                                       comment_intro_filter_king)
 from wa_model.dialog_model.private_chat_keys import (is_private_chat_key,
                                                      private_chat_keys_by_lord_personality)
+from wa_model.dialog_model.gossip_about_character_model import *
 from .DialogScreen.DialogScreenEvent import DialogScreenEvent
 from .MapScreen.MapScreenEvent import MapScreenEvent
 from .GameScreenEvent import GameScreenEvent
@@ -39,7 +40,8 @@ class DialogScreenLogger:
     def on_game_screen_event(self, event: GameScreenEvent):
         if self.__prev_event_type != type(event):
             self.__prev_event_type = type(event)
-            self.__logger.info(event.__class__.__name__.replace("ScreenEvent", " Screem"))
+            screen_name = event.__class__.__name__.replace("ScreenEvent", " Screen")
+            self.__logger.info(f"=== {screen_name} =========="[:23])
             self.clear_cache()
         event_handler = self.__eventHandlers.get(type(event))
         if event_handler:
@@ -58,7 +60,7 @@ class DialogScreenLogger:
             return
         if self.__prev_map_date_timeofday != event.date_timeofday:
             self.__prev_map_date_timeofday = event.date_timeofday
-            text = "Map: "
+            text = ""
             if event.date_timeofday:
                 year = event.date_timeofday.year
                 month = pycalendar.month_name[calendar_model.month(event.date_timeofday.date_key)]
@@ -83,7 +85,7 @@ class DialogScreenLogger:
             self.__prev_dialog_title_ocr = event.title_ocr
             self.__prev_dialog_relation = None
             # build title text
-            text = "Dialog: "
+            text = ""
             if event.title_keys:
                 title_key = event.title_keys[0]
                 val = self.__lang[title_key]
@@ -102,13 +104,14 @@ class DialogScreenLogger:
             # build body text
             if event.body_bounds:
                 body_key = event.body_bounds[0].key
+                body_binding = event.body_bounds[0].binding
                 if body_key in is_private_chat_key:
                     text += "Private chat"
                     for personality, checker in private_chat_keys_by_lord_personality.items():
                         if body_key in checker:
                             text += f" with {personality.value.capitalize()} lord"
                             break
-                    text += f" ({body_key})"
+                    text += f" : {body_key}"
                 elif body_key in comment_intro_checker:
                     text += "Intro"
                     if body_key in comment_intro_filter_king:
@@ -126,7 +129,22 @@ class DialogScreenLogger:
                         text += " to Famous player"
                     elif body_key in comment_intro_player_female_only_checker:
                         text += " to Female"
-                    text += f" ({body_key})"
+                    text += f" : {body_key}"
+                elif body_key in gossip_about_character_keys:
+                    lord_key = body_binding.get(GOSSIP_ABOUT_CHARACTER_LORD_VAR)
+                    personality = "Nondescript"
+                    for personality, checker in gossip_about_character_keys_by_lord_personality.items():
+                        if body_key in checker:
+                            personality = personality.value.capitalize()
+                            break
+                    if lord_key is None:
+                        text += f"(FNE) Lord is {personality}: {repr(event.body_ocr)}"
+                    else:
+                        lord_name = self.__lang[lord_key]
+                        text += f'Lord {lord_name} is {personality} : {body_key}("{GOSSIP_ABOUT_CHARACTER_LORD_VAR}"={repr(lord_key)})'
+                else:
+                    text += f"{body_key}({body_binding}): "
+                    text += repr(event.body_ocr)
             else:
                 text += repr(event.body_ocr)
             self.__logger.info(text)
@@ -140,6 +158,6 @@ class DialogScreenLogger:
             event.relation != self.__prev_dialog_relation
         ):
             self.__prev_dialog_relation = event.relation
-            text = " "*len("Dialog: ")
+            text = ""
             text += "Relation: " + str(event.relation) if event.relation is not None else "?"
             self.__logger.info(text)

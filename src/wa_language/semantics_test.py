@@ -1,6 +1,7 @@
 import pytest
 
 from wa_language.Language import RootLanguage
+from wa_language.LangKey import LangKey
 from wa_language.LangVar import LangVar, PlayerSexVar, PLAYER_NAME_VAR, PlayerSex
 from wa_language.Spreading import Spread
 from wa_language.Binding import Binding
@@ -268,3 +269,5 @@ def test():
         "tst_greet": "Greetings, {sir/lady} {playername}"
     })
     assert lang["tst_greet"] == "Greetings, {sir/lady} {playername}"
+    key_1 = LangKey("s6")
+    key_2 = LangKey(key_1)

@@ -38,8 +38,11 @@ class DialogBodyFuzzyParser:
         if len(body_models) == 0:
             return tuple()
         body_models = list(body_models.values())
-        bounds_and_scores = [self.__model_fuzzy_parser.bounds(model, body_ocr)
-                             for model in body_models]
+        bounds_and_scores = []
+        for model in body_models:
+            bounds_and_score = self.__model_fuzzy_parser.bounds(model, body_ocr)
+            if bounds_and_score.bounds:
+                bounds_and_scores.append(bounds_and_score)
         if len(bounds_and_scores) == 0:
             return tuple()
         best_score = max(bns.score for bns in bounds_and_scores)

@@ -6,13 +6,14 @@ from wa_language.Language import Language
 from wa_language.LangKey import LangKey
 from wa_language.LangVar import PlayerSex
 from wa_language.KeyChecker import KeyChecker
-from wa_language.Spreading import EMPTY_SPREADING
+from wa_language.Spreading import LanguageSpread, Spreading, EMPTY_SPREADING
 from wa_language.LanguageModel import LanguageModel
 from wa_model.types import LangModelError
 from wa_model import troop_keys
 from wa_screen_manager.config import whitelist_characters
 from .comment_intro_keys import *
 from .private_chat_keys import *
+from .gossip_about_character_model import *
 
 
 class DialogBodyModel(Mapping[LangKey, LanguageModel]):
@@ -74,6 +75,25 @@ class DialogBodyModel(Mapping[LangKey, LanguageModel]):
         )
         self.__add_body_model(lord_title_checker, lord_body_model)
 
+    def __add_citizens_and_villagers_bodies(self):
+        citizens_and_villagers_keys = key_checker(troop_keys.is_town_walker_key,
+                                                  troop_keys.is_village_walker_key)
+        citizens_and_villagers_body_model = LanguageModel(
+            model={
+                gossip_about_character_keys:
+                    Spreading({
+                        GOSSIP_ABOUT_CHARACTER_LORD_VAR:
+                            LanguageSpread(troop_keys.is_lord_key.lang(self.__language))
+                    })
+            },
+            language = self.__language,
+            symbols = whitelist_characters,
+            player_name = self.__player_name,
+            player_sex = self.__player_sex
+        )
+        self.__add_body_model(citizens_and_villagers_keys, citizens_and_villagers_body_model)
+
     def __build(self):
         self.__add_kings_bodies()
         self.__add_lords_bodies()
+        self.__add_citizens_and_villagers_bodies()

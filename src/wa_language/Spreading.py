@@ -1,11 +1,15 @@
 from collections.abc import Collection, Mapping
-from typing import get_args, overload, Dict, Iterator, Union
+from typing import get_args, overload, Iterator, Union, TYPE_CHECKING
 
 from wa_typechecker import typechecked
+from .LangKey import LangKeyStr
 from .LangVar import LangVar
 
+if TYPE_CHECKING:
+    from .Language import Language
 
-SpreadType = Union[tuple, range]
+
+SpreadType = Union[tuple, range, "Language"]
 
 
 class Spread(Collection):
@@ -41,6 +45,15 @@ class Spread(Collection):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({repr(self.__items)})"
+
+
+class LanguageSpread(Spread):
+    @typechecked
+    def __init__(self, language: "Language"):
+        lang_keys_with_substitutes = tuple(
+            LangKeyStr(key, val) for key, val in language.items()
+        )
+        super().__init__(lang_keys_with_substitutes)
 
 
 class Spreading(Mapping[LangVar, Spread]):

@@ -53,3 +53,5 @@ def load(special_language: Optional[Dict[str, str]] = None) -> Language:
 
 from . import LangValue as LangValueModule
 LangValueModule.Language = Language
+from . import Spreading as SpreadingModule
+SpreadingModule.Language = Language
