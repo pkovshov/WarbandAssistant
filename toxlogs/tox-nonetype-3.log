@@ -15,100 +15,103 @@ src/wa_language/syntax/syntax_test.py .                                  [ 72%]
 src/wa_types/Box.py ..                                                   [ 80%]
 tests/datasets_test.py .....                                             [100%]
 
-============================== 25 passed in 1.76s ==============================
-smoke: OK ✔ in 1.98 seconds
+============================== 25 passed in 2.32s ==============================
+smoke: OK ✔ in 2.54 seconds
 dialog_bodies: commands[0]> pytest tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
 cachedir: .tox/dialog_bodies/.pytest_cache
 rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
 plugins: cases-3.9.1, typeguard-4.4.4
-collecting ... collecting 55 items                                                            collected 55 items                                                             
+collecting ... collecting 59 items                                                            collected 59 items                                                             
 
-tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py .......... [ 18%]
-.............................................                            [100%]
+tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py .......... [ 16%]
+.................................................                        [100%]
 
-total time    : 9.4243 sec
-collec time   : 0.9102 sec
-setups time   : 0.5865 sec
-calls time    : 7.8887 sec
-avg call time : 0.1434 sec
-passed        : 55 / 55
+total time    : 10.9427 sec
+collec time   : 2.1967 sec
+setups time   : 0.5901 sec
+calls time    : 8.1140 sec
+avg call time : 0.1375 sec
+passed        : 59 / 59
 
-============================== 55 passed in 9.42s ==============================
-dialog_bodies: OK ✔ in 9.69 seconds
+============================= 59 passed in 10.94s ==============================
+dialog_bodies: OK ✔ in 11.27 seconds
 dialog_titles: commands[0]> pytest tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
 cachedir: .tox/dialog_titles/.pytest_cache
 rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
 plugins: cases-3.9.1, typeguard-4.4.4
-collecting ... collecting 232 items                                                           collected 232 items                                                            
+collecting ... collecting 295 items                                                           collected 295 items                                                            
 
 tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py ......... [  3%]
-........................................................................ [ 34%]
-........................................................................ [ 65%]
-........................................................................ [ 96%]
-.......                                                                  [100%]
+........................................................................ [ 27%]
+........................................................................ [ 51%]
+........................................................................ [ 76%]
+......................................................................   [100%]
 
-total time    : 21.9734 sec
-collec time   : 1.1584 sec
-setups time   : 0.9198 sec
-calls time    : 19.7285 sec
-avg call time : 0.0850 sec
-passed        : 232 / 232
+total time    : 25.6621 sec
+collec time   : 2.4549 sec
+setups time   : 1.0931 sec
+calls time    : 21.9155 sec
+avg call time : 0.0743 sec
+passed        : 295 / 295
 
-============================= 232 passed in 21.97s =============================
-dialog_titles: OK ✔ in 22.29 seconds
+============================= 295 passed in 25.66s =============================
+dialog_titles: OK ✔ in 26.03 seconds
 dialog_relations: commands[0]> pytest tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
 cachedir: .tox/dialog_relations/.pytest_cache
 rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
 plugins: cases-3.9.1, typeguard-4.4.4
-collecting ... collecting 40 items                                                            collected 40 items                                                             
+collecting ... collecting 57 items                                                            collected 57 items                                                             
 
-tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py ...... [ 15%]
-..................................                                       [100%]
+tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py ...... [ 10%]
+...................................................                      [100%]
 
-total time    : 3.9643 sec
-collec time   : 0.6440 sec
-setups time   : 0.1117 sec
-calls time    : 3.1807 sec
-avg call time : 0.0795 sec
-passed        : 40 / 40
+total time    : 5.4758 sec
+collec time   : 0.6488 sec
+setups time   : 0.1688 sec
+calls time    : 4.6221 sec
+avg call time : 0.0811 sec
+passed        : 57 / 57
 
-============================== 40 passed in 3.96s ==============================
-dialog_relations: OK ✔ in 4.21 seconds
+============================== 57 passed in 5.47s ==============================
+dialog_relations: OK ✔ in 5.72 seconds
 map_calendars: commands[0]> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
 cachedir: .tox/map_calendars/.pytest_cache
 rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
 plugins: cases-3.9.1, typeguard-4.4.4
-collecting ... collecting 463 items                                                           collected 463 items                                                            
+collecting ... collecting 662 items                                                           collected 662 items                                                            
 
 tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py ......... [  1%]
-........................................................................ [ 17%]
+........................................................................ [ 12%]
+........................................................................ [ 23%]
 ........................................................................ [ 33%]
-........................................................................ [ 48%]
-........................................................................ [ 64%]
-........................................................................ [ 79%]
-........................................................................ [ 95%]
-......................                                                   [100%]
+........................................................................ [ 44%]
+........................................................................ [ 55%]
+........................................................................ [ 66%]
+........................................................................ [ 77%]
+........................................................................ [ 88%]
+........................................................................ [ 99%]
+.....                                                                    [100%]
 
-total time    : 42.0313 sec
-collec time   : 1.1565 sec
-setups time   : 1.6148 sec
-calls time    : 38.9164 sec
-avg call time : 0.0841 sec
-passed        : 463 / 463
+total time    : 51.3104 sec
+collec time   : 2.5268 sec
+setups time   : 2.1610 sec
+calls time    : 46.1556 sec
+avg call time : 0.0697 sec
+passed        : 662 / 662
 
-============================= 463 passed in 42.03s =============================
-  smoke: OK (1.98=setup[0.03]+cmd[1.95] seconds)
-  dialog_bodies: OK (9.69=setup[0.01]+cmd[9.68] seconds)
-  dialog_titles: OK (22.29=setup[0.01]+cmd[22.28] seconds)
-  dialog_relations: OK (4.21=setup[0.01]+cmd[4.21] seconds)
-  map_calendars: OK (42.39=setup[0.00]+cmd[42.38] seconds)
-  congratulations :) (80.61 seconds)
+============================= 662 passed in 51.31s =============================
+  smoke: OK (2.54=setup[0.03]+cmd[2.51] seconds)
+  dialog_bodies: OK (11.27=setup[0.01]+cmd[11.27] seconds)
+  dialog_titles: OK (26.02=setup[0.01]+cmd[26.02] seconds)
+  dialog_relations: OK (5.72=setup[0.01]+cmd[5.72] seconds)
+  map_calendars: OK (51.77=setup[0.00]+cmd[51.76] seconds)
+  congratulations :) (97.37 seconds)
 

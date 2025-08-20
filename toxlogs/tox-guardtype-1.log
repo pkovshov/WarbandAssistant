@@ -38,7 +38,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 value = {PlayerSexVar: PlayerSex.MALE, LangVar('reg7'): True}
 annotation = <class 'wa_language.Binding.Binding'>
-memo = <typeguard.TypeCheckMemo object at 0x729e2d1c5d40>
+memo = <typeguard.TypeCheckMemo object at 0x7c513a16f480>
 
     def check_type_internal(
         value: Any,
@@ -134,7 +134,7 @@ src/wa_language/LangValue.py:135: in _bind_with_binding
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
 value = {LangVar('s11'): ''}, annotation = <class 'wa_language.Binding.Binding'>
-memo = <typeguard.TypeCheckMemo object at 0x729df94ef980>
+memo = <typeguard.TypeCheckMemo object at 0x7c51710fe640>
 
     def check_type_internal(
         value: Any,
@@ -210,9 +210,9 @@ E               typeguard.TypeCheckError: value assigned to binding (dict) is no
 =========================== short test summary info ============================
 FAILED src/wa_language/semantics_test.py::test_bind_with_dict_lang_values - typeguard.TypeCheckError: value assigned to binding (dict) is not an instan...
 FAILED src/wa_language/semantics_test.py::test_purge_spread_with_unbind_sex_var - typeguard.TypeCheckError: value assigned to binding (dict) is not an instan...
-========================= 2 failed, 23 passed in 2.31s =========================
-smoke: exit 1 (2.50 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest --doctest-modules --ignore tests/test_parsing_by_datasets --ignore utils --ignore tox.py --ignore tests/DialogScreenManager_tests.py pid=1257163
-smoke: FAIL ✖ in 2.54 seconds
+========================= 2 failed, 23 passed in 2.80s =========================
+smoke: exit 1 (3.00 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest --doctest-modules --ignore tests/test_parsing_by_datasets --ignore utils --ignore tox.py --ignore tests/DialogScreenManager_tests.py pid=1301897
+smoke: FAIL ✖ in 3.03 seconds
 dialog_bodies: commands[0]> pytest tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -222,8 +222,8 @@ plugins: cases-3.9.1, typeguard-4.4.4
 collecting ... collecting 0 items / 1 error                                                   collected 0 items / 1 error                                                    
 
 
-total time    : 1.3605 sec
-collec time   : 1.3179 sec
+total time    : 1.3406 sec
+collec time   : 1.3002 sec
 setups time   : 0.0000 sec
 calls time    : 0.0000 sec
 passed        : 0 / 0
@@ -251,52 +251,52 @@ E   typeguard.TypeCheckError: value assigned to binding (dict) is not an instanc
 =========================== short test summary info ============================
 ERROR tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py - typeguard.TypeCheckError: value assigned to binding (dict) is not an instan...
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-=============================== 1 error in 1.40s ===============================
-dialog_bodies: exit 2 (1.58 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py pid=1257308
-dialog_bodies: FAIL ✖ in 1.59 seconds
+=============================== 1 error in 1.38s ===============================
+dialog_bodies: exit 2 (1.56 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest tests/test_parsing_by_datasets/dialog_body_by_dataset_test.py pid=1302047
+dialog_bodies: FAIL ✖ in 1.56 seconds
 dialog_titles: commands[0]> pytest tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
 cachedir: .tox/dialog_titles/.pytest_cache
 rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
 plugins: cases-3.9.1, typeguard-4.4.4
-collecting ... collecting 232 items                                                           collected 232 items                                                            
+collecting ... collecting 295 items                                                           collected 295 items                                                            
 
 tests/test_parsing_by_datasets/dialog_title_by_dataset_test.py ......... [  3%]
-........................................................................ [ 34%]
-........................................................................ [ 65%]
-........................................................................ [ 96%]
-.......                                                                  [100%]
+........................................................................ [ 27%]
+........................................................................ [ 51%]
+........................................................................ [ 76%]
+......................................................................   [100%]
 
-total time    : 22.6371 sec
-collec time   : 1.8494 sec
-setups time   : 0.9301 sec
-calls time    : 19.6930 sec
-avg call time : 0.0849 sec
-passed        : 232 / 232
+total time    : 26.7253 sec
+collec time   : 3.6282 sec
+setups time   : 1.1036 sec
+calls time    : 21.7924 sec
+avg call time : 0.0739 sec
+passed        : 295 / 295
 
-============================= 232 passed in 22.64s =============================
-dialog_titles: OK ✔ in 22.95 seconds
+============================= 295 passed in 26.72s =============================
+dialog_titles: OK ✔ in 27.11 seconds
 dialog_relations: commands[0]> pytest tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
 cachedir: .tox/dialog_relations/.pytest_cache
 rootdir: /sandbox/MountAndBladeWarband/WarbandAssistant
 plugins: cases-3.9.1, typeguard-4.4.4
-collecting ... collecting 40 items                                                            collected 40 items                                                             
+collecting ... collecting 57 items                                                            collected 57 items                                                             
 
-tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py ...... [ 15%]
-..................................                                       [100%]
+tests/test_parsing_by_datasets/dialog_relation_by_dataset_test.py ...... [ 10%]
+...................................................                      [100%]
 
-total time    : 4.6170 sec
-collec time   : 1.2424 sec
-setups time   : 0.1149 sec
-calls time    : 3.2325 sec
-avg call time : 0.0808 sec
-passed        : 40 / 40
+total time    : 6.1449 sec
+collec time   : 1.3148 sec
+setups time   : 0.1681 sec
+calls time    : 4.6234 sec
+avg call time : 0.0811 sec
+passed        : 57 / 57
 
-============================== 40 passed in 4.62s ==============================
-dialog_relations: OK ✔ in 4.88 seconds
+============================== 57 passed in 6.14s ==============================
+dialog_relations: OK ✔ in 6.41 seconds
 map_calendars: commands[0]> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py
 ============================= test session starts ==============================
 platform linux -- Python 3.10.18, pytest-8.4.1, pluggy-1.6.0
@@ -306,8 +306,8 @@ plugins: cases-3.9.1, typeguard-4.4.4
 collecting ... collecting 0 items / 1 error                                                   collected 0 items / 1 error                                                    
 
 
-total time    : 1.6988 sec
-collec time   : 1.6509 sec
+total time    : 1.9061 sec
+collec time   : 1.8485 sec
 setups time   : 0.0000 sec
 calls time    : 0.0000 sec
 passed        : 0 / 0
@@ -335,12 +335,12 @@ E   typeguard.TypeCheckError: value assigned to binding (dict) is not an instanc
 =========================== short test summary info ============================
 ERROR tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py - typeguard.TypeCheckError: value assigned to binding (dict) is not an instan...
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-=============================== 1 error in 1.72s ===============================
-map_calendars: exit 2 (2.01 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py pid=1258798
-  smoke: FAIL code 1 (2.54=setup[0.03]+cmd[2.50] seconds)
-  dialog_bodies: FAIL code 2 (1.59=setup[0.01]+cmd[1.58] seconds)
-  dialog_titles: OK (22.95=setup[0.01]+cmd[22.94] seconds)
-  dialog_relations: OK (4.88=setup[0.01]+cmd[4.87] seconds)
-  map_calendars: FAIL code 2 (2.01=setup[0.01]+cmd[2.01] seconds)
-  evaluation failed :( (34.01 seconds)
+=============================== 1 error in 1.92s ===============================
+map_calendars: exit 2 (2.18 seconds) /sandbox/MountAndBladeWarband/WarbandAssistant> pytest tests/test_parsing_by_datasets/map_calendar_by_dataset_test.py pid=1303945
+  smoke: FAIL code 1 (3.03=setup[0.03]+cmd[3.00] seconds)
+  dialog_bodies: FAIL code 2 (1.56=setup[0.01]+cmd[1.56] seconds)
+  dialog_titles: OK (27.11=setup[0.00]+cmd[27.10] seconds)
+  dialog_relations: OK (6.41=setup[0.01]+cmd[6.40] seconds)
+  map_calendars: FAIL code 2 (2.18=setup[0.01]+cmd[2.18] seconds)
+  evaluation failed :( (40.33 seconds)
 
