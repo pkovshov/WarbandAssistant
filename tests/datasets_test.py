@@ -5,7 +5,7 @@ from os import path
 import numpy as np
 
 import path_conf
-from wa_types import Box, Resolution
+from wa_types import Box, Resolution, LanguageCode
 from wa_language.Language import RootLanguage
 from wa_language.LangKey import LangKey
 from wa_language.LangVar import LangVar, PlayerSex, PlayerSexVar, PLAYER_NAME_VAR
@@ -49,7 +49,8 @@ def test_dialog_bodies_dataset():
          "kl_wong": "Wong",
          "kl_marry_wong": "Marry Wong",
          "kl_meir_wong": "Marry Wong",
-         "kl_complex": "Hi, {sir/lady} {playername}. My name is {reg1}"}
+         "kl_complex": "Hi, {sir/lady} {playername}. My name is {reg1}"},
+        language_code=LanguageCode.EN
     )
     width, height = 400, 200
     dataset = DialogBodiesDataset(resolution=Resolution(width, height),

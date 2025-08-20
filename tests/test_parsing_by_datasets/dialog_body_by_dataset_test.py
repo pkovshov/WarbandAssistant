@@ -7,57 +7,61 @@ import pytest
 from pytest_cases import lazy_value
 
 import path_conf
-from wa_types import Box
+from wa_model.dialog_model.DialogBodyModel import DialogBodyModel
+from wa_types import Box, LanguageCode
 from wa_language import Language
 from wa_language.Language import LangKey
 from wa_language.LangVar import PlayerSex
 from wa_datasets.DialogBodiesDataset import DialogBodiesDataset, keys_and_bindings
 from wa_screen_manager.DialogScreen.DialogScreenOCRs import DialogBodyOCR
 from wa_screen_manager.DialogScreen.DialogBodyFuzzyParser import DialogBodyFuzzyParser
+from .base_dataset_staff import load_idxes_and_metas_by_langcode_and_playersex, lazy_image_value
 
-
-blank = cv2.imread(path.join(path_conf.samples, "dialog_screen_blank.png"))
-
-
-lang = Language.load()
+blank_image = cv2.imread(path.join(path_conf.samples, "dialog_screen_blank.png"))
 
 dataset = DialogBodiesDataset(lazy_load=True)
 
-ocr = DialogBodyOCR()
-
-male_parser = DialogBodyFuzzyParser(lang, PlayerSex.MALE)
-female_parser = DialogBodyFuzzyParser(lang, PlayerSex.FEMALE)
-
-male_params = []
-female_params = []
-
-def load_image(idx, meta):
-    crop = Box(*meta.crop)
-    mask = Box(*meta.mask)
-    blank_copy = blank.copy()
-    image = cv2.imread(dataset.img_path(idx))
-    blank_copy[(mask + crop.point).slice] = image[mask.slice]
-    return blank_copy
+idxes_and_metas_by_langcode_and_playersex = load_idxes_and_metas_by_langcode_and_playersex(dataset)
 
 
-def load_test_arguments(idx, meta):
-    return [idx,
-            meta.body_ocr,
-            tuple(LangKey(key) for key in meta.title_keys),
-            meta.body_bounds,
-            lazy_value(partial(load_image, idx=idx, meta=meta))]
+language_by_langcode = dict()
+ocrs_and_parsers_by_langcode_and_playersex: dict[tuple[LanguageCode, PlayerSex], tuple[Any, Any]] = dict()
+for langcode_and_playersex in idxes_and_metas_by_langcode_and_playersex:
+    langcode, playersex = langcode_and_playersex
+    if langcode not in language_by_langcode:
+        language_by_langcode[langcode] = Language.load(langcode)
+    language = language_by_langcode[langcode]
+    model = DialogBodyModel(language=language,
+                            player_name=None,
+                            player_sex=playersex)
+    ocr = DialogBodyOCR(language_code=langcode,
+                        whitelist=model.symbols)
+    parser = DialogBodyFuzzyParser(model)
+    ocrs_and_parsers_by_langcode_and_playersex[langcode_and_playersex] = (ocr, parser)
+
+params = []
+
+for langcode_and_playersex, idxes_and_metas in idxes_and_metas_by_langcode_and_playersex.items():
+    ocr, parser = ocrs_and_parsers_by_langcode_and_playersex[langcode_and_playersex]
+    for idx, meta in idxes_and_metas:
+        params.append((idx,
+                       meta.body_ocr,
+                       tuple(LangKey(key) for key in meta.title_keys),
+                       meta.body_bounds,
+                       lazy_image_value(dataset, idx, meta, blank_image),
+                       ocr,
+                       parser))
 
 
-for idx, meta in dataset.meta_dict.items():
-    argumets = load_test_arguments(idx=idx, meta=meta)
-    if meta.playersex == 'male':
-        male_params.append(argumets + [male_parser])
-    elif meta.playersex == 'female':
-        female_params.append(argumets + [female_parser])
-
-
-@pytest.mark.parametrize("idx, body_ocr_exp, title_keys, body_bounds_exp, image, parser", male_params + female_params)
-def test_male_dialog_body_dataset(idx, body_ocr_exp, title_keys, body_bounds_exp, image, parser):
+@pytest.mark.parametrize("idx,"
+                         "body_ocr_exp,"
+                         "title_keys,"
+                         "body_bounds_exp,"
+                         "image,"
+                         "ocr,"
+                         "parser",
+                         params)
+def test_male_dialog_body_dataset(idx, body_ocr_exp, title_keys, body_bounds_exp, image, ocr, parser):
     ocr.ocr(image)  # Dry run to simulate two identical images in a row
     body_ocr = ocr.ocr(image)
     body_bounds = parser.bounds(body_ocr, title_keys)

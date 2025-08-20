@@ -24,7 +24,8 @@ def main(args):
     logging.getLogger(__name__).setLevel(log_level)
     game_Screen_manager = GameScreenManager(player_name=args.playername,
                                             player_sex=args.playersex,
-                                            datasets=args.datasets)
+                                            datasets=args.datasets,
+                                            language_code = args.language_code)
     # run
     monitor = args.monitor
     if args.datasets:
@@ -76,6 +77,13 @@ parser_sex_group.add_argument('-male', '--male',
 parser_sex_group.add_argument('-female', '--female',
                               dest='playersex', action='store_const', const=PlayerSex.FEMALE,
                               help='Female player sex')
+parser_language_code_group = parser.add_mutually_exclusive_group()
+parser_language_code_group.add_argument('-en', '--en',
+                                        dest='language_code', action='store_const', const='en',
+                                        help='en language')
+parser_language_code_group.add_argument('-ru', '--ru',
+                                        dest='language_code', action='store_const', const='ru',
+                                        help='ru language')
 parser.set_defaults(func=main)
 
 

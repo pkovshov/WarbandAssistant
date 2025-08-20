@@ -2,9 +2,7 @@ import itertools
 import logging
 
 from wa_typechecker import typechecked
-from wa_language.Language import Language
 from wa_language.LangKey import LangKey
-from wa_language.LangVar import PlayerSex
 from wa_language.LangValue import LangValue
 from wa_model.dialog_model.DialogBodyModel import DialogBodyModel
 from ..BaseScreen.ModelFuzzyParser import ModelFuzzyParser, isclose
@@ -12,11 +10,8 @@ from ..BaseScreen.ModelFuzzyParser import ModelFuzzyParser, isclose
 
 class DialogBodyFuzzyParser:
     @typechecked
-    def __init__(self, lang: Language, player_sex: PlayerSex | None):
-        self.__logger = logging.getLogger(__name__)
-        self.__dialog_body_model = DialogBodyModel(language=lang,
-                                                   player_name=None,
-                                                   player_sex=player_sex)
+    def __init__(self, dialog_body_model: DialogBodyModel):
+        self.__dialog_body_model = dialog_body_model
         self.__model_fuzzy_parser = ModelFuzzyParser(score_cutoff=80)
         self.__prev_body_ocr = None
         self.__prev_title_keys = None

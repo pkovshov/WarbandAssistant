@@ -7,7 +7,7 @@ import numpy as np
 import pytesseract
 from wa_typechecker import typechecked
 
-from wa_types import Box, Resolution, is_screenshot
+from wa_types import Box, Resolution, is_screenshot, LanguageCode
 
 
 class NonStableType(Enum):
@@ -22,11 +22,19 @@ class BaseOCR(ABC):
     def __init__(self,
                  resolution: Resolution,
                  crop_box: Box,
+                 language_code: LanguageCode,
                  whitelist: str):
         self._logger = logging.getLogger(f"{type(self).__module__}.{type(self).__name__}")
         self.__resolution = resolution
         self.__crop_slice = crop_box.slice
         self.__whitelist = whitelist
+        match language_code:
+            case LanguageCode.EN:
+                self.__language_code = "eng"
+            case LanguageCode.RU:
+                self.__language_code = "rus"
+            case _:
+                raise ValueError(f"Unknown language code: {language_code}")
         self.__prev_crop_img = None
         self.__prev_text_ocr = None
 
@@ -49,7 +57,7 @@ class BaseOCR(ABC):
         oem = 1
         pcm = 6
         config = f'--oem {oem} --psm {pcm} -c tessedit_char_whitelist="{whitelist}"'
-        result = pytesseract.image_to_string(img, config=config)
+        result = pytesseract.image_to_string(img, lang=self.__language_code, config=config)
         result = result.strip()
         return result
 

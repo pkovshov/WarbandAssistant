@@ -1,11 +1,17 @@
-from typing import NamedTuple, Tuple
+from typing import overload, NamedTuple, Tuple
+
+import numpy as np
 
 from wa_typechecker import typechecked
-
 from .Resolution import Resolution
 
+class _BaseBox(NamedTuple):
+    l: int  # Left coordinate
+    t: int  # Top coordinate
+    r: int  # Right coordinate
+    b: int  # Bottom coordinate
 
-class Box(NamedTuple):
+class Box(_BaseBox):
     """LEFT, TOP, RIGHT, BOTTOM
     Tests:
     >>> box = Box(0, 100, 200, 250)
@@ -23,11 +29,28 @@ class Box(NamedTuple):
     (slice(100, 250, None), slice(0, 200, None))
     >>> print(box.resolution)
     Resolution(width=200, height=150)
+    >>> box = Box(np.zeros((5, 3)))
+    >>> print(box)
+    Box(l=0, t=0, r=3, b=5)
     """
-    l: int  # Left coordinate
-    t: int  # Top coordinate
-    r: int  # Right coordinate
-    b: int  # Bottom coordinate
+
+    @overload
+    def __new__(cls, image: np.ndarray):
+        ...
+
+    @overload
+    def __new__(cls, l: int, t: int, r: int, b: int):
+        ...
+
+    def __new__(cls, *args, **kwargs):
+        if (
+            len(args) == 1 and len(kwargs) == 0 and
+            isinstance((array:=args[0]), np.ndarray) and
+            array.ndim >= 2
+        ):
+            return super().__new__(cls, l=0, t=0, r=array.shape[1], b=array.shape[0])
+        else:
+            return super().__new__(cls, *args, **kwargs)
 
     @property
     def slice(self) -> Tuple[slice, slice]:

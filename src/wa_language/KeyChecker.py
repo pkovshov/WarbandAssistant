@@ -1,7 +1,9 @@
 """
 Tests:
+>>> from wa_types import LanguageCode
 >>> from wa_language.Language import RootLanguage
->>> lang = RootLanguage(dict(a="Anna", b="Boris", good="Robin Hood", bad="Ursula", fool="Pippin Took"))
+>>> lang = RootLanguage(dict(a="Anna", b="Boris", good="Robin Hood", bad="Ursula", fool="Pippin Took"),
+...                     language_code=LanguageCode.EN)
 
 >>> is_alphabet = key_checker("alpha", "beta", "gama")
 >>> LangKey("alpha") in is_alphabet
@@ -317,7 +319,8 @@ class KeyCheckerLanguage(Language):
     def __init__(self, lang: Language, checker: KeyChecker):
         super().__init__({key: val
                           for key, val in lang.items()
-                          if key in checker})
+                          if key in checker},
+                         language_code=lang.language_code)
 
 
 def key_checker(*args, pass_filter=None, deny_filter=None):

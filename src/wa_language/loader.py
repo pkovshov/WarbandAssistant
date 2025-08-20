@@ -3,6 +3,8 @@ import os
 import re
 from typing import Dict, List, Optional
 
+import chardet
+
 from wa_typechecker import typechecked
 
 
@@ -10,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 @typechecked
-def load_files(*args: str, special_language: Optional[Dict[str, str]] = None, encoding=None, ) -> Dict[str, str]:
+def load_files(*args: str, special_language: Optional[Dict[str, str]] = None) -> Dict[str, str]:
     """
     :param args: Paths to the files to be loaded.
     :param special_language: An additional language that is not present in the files or uses special keys.
@@ -27,9 +29,14 @@ def load_files(*args: str, special_language: Optional[Dict[str, str]] = None, en
     dup_keys = set()
     source_str = lambda file_path, number: f"{file_path}:{number}"
     for file_path in args:
+        encoding = None
+        # TODO: prevent twice opening a *.csv file
+        with open(file_path, 'rb') as file:
+            raw_data = file.read()
+            encoding = chardet.detect(raw_data)["encoding"]
         with open(file_path, encoding=encoding) as file:
             for number, line in enumerate(file, start=1):
-                line = line[:-1]  # remove "\n" at the end of each line
+                line = line.rstrip()  # remove "\n" at the end of each line
                 pos = line.find("|")
                 if pos < 0:
                     logger.warning(f"{source_str(file_path, number)} Absent splitter. Discard line: {line}")

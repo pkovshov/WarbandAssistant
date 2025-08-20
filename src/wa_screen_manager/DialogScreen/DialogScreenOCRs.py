@@ -1,20 +1,22 @@
-from typing import Optional, Union, Tuple
+from typing import Union
 
 import cv2
 import numpy as np
-from wa_typechecker import typechecked
 
+from wa_typechecker import typechecked
+from wa_types import LanguageCode
 from wa_screen_manager.BaseScreen.BaseOCR import BaseOCR, NonStableType, NonStable
 
 
 class DialogScreenTitleOCR(BaseOCR):
-    def __init__(self):
+    def __init__(self, language_code: LanguageCode, whitelist: str):
         from wa_screen_manager import config
         from . import dialog_screen_config
         crop_box = dialog_screen_config.title_box
         super().__init__(resolution=config.resolution,
                          crop_box=crop_box,
-                         whitelist=config.whitelist_characters)
+                         language_code=language_code,
+                         whitelist=whitelist)
         blank_image = cv2.imread(dialog_screen_config.dialog_screen_blank_img_path)
         blank_image = blank_image[crop_box.slice]
         blank_image = cv2.cvtColor(blank_image, cv2.COLOR_BGR2GRAY)
@@ -41,14 +43,15 @@ class DialogScreenTitleOCR(BaseOCR):
 
 
 class DialogScreenRelationOCR(BaseOCR):
-    def __init__(self):
-        import path_conf
+    def __init__(self, language_code: LanguageCode):
+        from wa_config import screen_conf
         from wa_screen_manager import config
         from . import dialog_screen_config
         crop_box = dialog_screen_config.relation_box
         super().__init__(resolution=config.resolution,
                          crop_box=crop_box,
-                         whitelist=config.whitelist_numbers)
+                         language_code=language_code,
+                         whitelist=screen_conf.DIGITS + screen_conf.MINUS)
         blank_image = cv2.imread(dialog_screen_config.dialog_screen_blank_img_path)
         blank_image = blank_image[crop_box.slice]
         blank_image = cv2.cvtColor(blank_image, cv2.COLOR_BGR2GRAY)
@@ -62,20 +65,21 @@ class DialogScreenRelationOCR(BaseOCR):
         img = cv2.absdiff(self.__blank_img_gray, img)
         img = cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX)
         img = 255 - img
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(20, 20))
         img = clahe.apply(img)
         img = cv2.GaussianBlur(img, (13, 13), 0.7)
         return img
 
 
 class DialogBodyOCR(BaseOCR):
-    def __init__(self):
+    def __init__(self, language_code: LanguageCode, whitelist: str):
         from wa_screen_manager import config
         from . import dialog_screen_config
         crop_box = dialog_screen_config.body_box
         super().__init__(resolution=config.resolution,
                          crop_box=crop_box,
-                         whitelist=config.whitelist_characters)
+                         language_code=language_code,
+                         whitelist=whitelist)
         blank_image = cv2.imread(dialog_screen_config.dialog_screen_blank_img_path)
         blank_image = blank_image[crop_box.slice]
         blank_image = cv2.cvtColor(blank_image, cv2.COLOR_BGR2GRAY)

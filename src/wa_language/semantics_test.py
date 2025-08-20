@@ -5,6 +5,7 @@ from wa_language.LangKey import LangKey
 from wa_language.LangVar import LangVar, PlayerSexVar, PLAYER_NAME_VAR, PlayerSex
 from wa_language.Spreading import Spread
 from wa_language.Binding import Binding
+from wa_types import LanguageCode
 
 
 def test_lang_var():
@@ -75,7 +76,8 @@ def test_lang_var():
 def test_variables_and_conditions():
     lang = RootLanguage({
         "tst_key": "As you wish, {sire/my lady}. {reg6?I:{reg7?You:{s11}}} will be the new {reg3?lady:lord} of {s1}."
-    })
+    },
+                        language_code=LanguageCode.EN)
     lang_value = next(iter(lang.values()))
     assert isinstance(lang_value, str)
     assert lang_value.variables == {PlayerSexVar, "reg6", "reg7", "s11", "reg3", "s1"}
@@ -85,7 +87,8 @@ def test_variables_and_conditions():
 def test_bind_lang_values():
     lang = RootLanguage({
         "tst_key": "As you wish, {sire/my lady}. {reg6?I:{reg7?{Sir/Lady}, you:{s11}}} will be the new {reg3?lady:lord} of {s1}.",
-    })
+    },
+                        language_code=LanguageCode.EN)
     lang_value = next(iter(lang.values()))
     assert len(lang_value.binding) == 0
     male_value = lang_value.bind(PlayerSexVar, PlayerSex.MALE)
@@ -103,7 +106,8 @@ def test_bind_lang_values():
 
     lang = RootLanguage({
         "tst_control": "We control {reg13?{reg13} towns:}"
-    })
+    },
+                        language_code=LanguageCode.EN)
     control_value = lang["tst_control"]
     bound_value = control_value.bind(LangVar("reg13"), 0)
     assert "We control " == bound_value
@@ -120,7 +124,8 @@ def test_bind_lang_values():
 def test_bind_bound_lang_values():
     lang = RootLanguage({
         "tst_key": "As you wish, {sire/my lady}. {reg6?I:{reg7?{Sir/Lady}, you:{s11}}} will be the new {reg3?lady:lord} of {s1}.",
-    })
+    },
+                        language_code=LanguageCode.EN)
     lang_value = next(iter(lang.values()))
     male_value = lang_value.bind(PlayerSexVar, PlayerSex.MALE)
     with pytest.raises(ValueError):
@@ -148,7 +153,8 @@ def test_bind_bound_lang_values():
 def test_bind_with_dict_lang_values():
     lang = RootLanguage({
         "tst_key": "As you wish, {sire/my lady}. {reg6?I:{reg7?{Sir/Lady}, you:{s11}}} will be the new {reg3?lady:lord} of {s1}.",
-    })
+    },
+                        language_code=LanguageCode.EN)
     lang_value = next(iter(lang.values()))
     male_value = lang_value.bind(Binding({PlayerSexVar: PlayerSex.MALE, LangVar("reg7"): True}))
     assert "As you wish, sire. {reg6?I:Sir, you} will be the new {reg3?lady:lord} of {s1}." == male_value
@@ -165,7 +171,8 @@ def test_bind_with_dict_lang_values():
 
     lang = RootLanguage({
         "tst_control": "We control {reg13?{reg13} towns:}"
-    })
+    },
+                        language_code=LanguageCode.EN)
     control_value = lang["tst_control"]
     bound_value = control_value.bind(Binding({LangVar("reg13"): 0, PlayerSexVar: PlayerSex.MALE}))
     assert "We control " == bound_value
@@ -254,7 +261,8 @@ def test_spread():
 def test_purge_spread_with_unbind_sex_var():
     lang = RootLanguage({
         "tst_key": "As you wish, {sire/my lady}. {reg6?I:Wee} glad to see {s11}",
-    })
+    },
+                        language_code=LanguageCode.EN)
     lang_value = next(iter(lang.values()))
     purge_spread = sorted(lang_value.purge_spread())
     assert purge_spread == [
@@ -267,7 +275,8 @@ def test_purge_spread_with_unbind_sex_var():
 def test():
     lang = RootLanguage({
         "tst_greet": "Greetings, {sir/lady} {playername}"
-    })
+    },
+                        language_code=LanguageCode.EN)
     assert lang["tst_greet"] == "Greetings, {sir/lady} {playername}"
     key_1 = LangKey("s6")
     key_2 = LangKey(key_1)

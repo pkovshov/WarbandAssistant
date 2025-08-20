@@ -9,8 +9,10 @@ from wa_language.loader import *
 from wa_language.Language import Language, LangKey, RootLanguage
 import path_conf
 from wa_model.troop_keys import *
+from wa_types import LanguageCode
 
-lang = RootLanguage(load_files(path.join(path_conf.language, "troops.csv")))
+lang = RootLanguage(load_files(path.join(path_conf.language, "troops.csv")),
+                    language_code=LanguageCode.EN)
 
 
 def print_checker_count(check, caption):

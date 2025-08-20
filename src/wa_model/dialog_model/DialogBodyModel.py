@@ -2,6 +2,7 @@ from collections.abc import Mapping
 from typing import Iterator
 
 from wa_typechecker import typechecked
+from wa_config import screen_conf
 from wa_language.Language import Language
 from wa_language.LangKey import LangKey
 from wa_language.LangVar import PlayerSex
@@ -10,7 +11,6 @@ from wa_language.Spreading import LanguageSpread, Spreading, EMPTY_SPREADING
 from wa_language.LanguageModel import LanguageModel
 from wa_model.types import LangModelError
 from wa_model import troop_keys
-from wa_screen_manager.config import whitelist_characters
 from .comment_intro_keys import *
 from .private_chat_keys import *
 from .gossip_about_character_model import *
@@ -28,8 +28,15 @@ class DialogBodyModel(Mapping[LangKey, LanguageModel]):
         self.__language = language
         self.__player_name = player_name
         self.__player_sex = player_sex
+        self.__symbols = (screen_conf.ALPHABET[language.language_code] +
+                          screen_conf.PUNCTUATION +
+                          screen_conf.DIGITS)
         self.__data = {}
         self.__build()
+
+    @property
+    def symbols(self) -> str:
+        return self.__symbols
 
     def __getitem__(self, lang_key) -> LanguageModel:
         return self.__data[lang_key]
@@ -57,7 +64,7 @@ class DialogBodyModel(Mapping[LangKey, LanguageModel]):
             model={build_king_comment_intro_key_checker(player_sex=self.__player_sex):
                    EMPTY_SPREADING},
             language=self.__language,
-            symbols=whitelist_characters,
+            symbols=self.__symbols,
             player_name=self.__player_name,
             player_sex=self.__player_sex
         )
@@ -69,7 +76,7 @@ class DialogBodyModel(Mapping[LangKey, LanguageModel]):
             model={build_lord_comment_intro_key_checker(player_sex=self.__player_sex): EMPTY_SPREADING,
                    is_private_chat_key: EMPTY_SPREADING},
             language=self.__language,
-            symbols=whitelist_characters,
+            symbols=self.__symbols,
             player_name=self.__player_name,
             player_sex=self.__player_sex
         )
@@ -87,7 +94,7 @@ class DialogBodyModel(Mapping[LangKey, LanguageModel]):
                     })
             },
             language = self.__language,
-            symbols = whitelist_characters,
+            symbols = self.__symbols,
             player_name = self.__player_name,
             player_sex = self.__player_sex
         )

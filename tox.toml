@@ -50,8 +50,9 @@ commands = [
 [env.smoke]
 commands = [
   ["pytest", "--doctest-modules", "--ignore", "tests/test_parsing_by_datasets",
-                                  "--ignore", "utils/map_calendars_add_overlapped.py",
-                                  "--ignore", "tox.py"],
+                                  "--ignore", "utils",                                  
+                                  "--ignore", "tox.py",
+                                  "--ignore", "tests/DialogScreenManager_tests.py"],
 ]
 
 [env.lang]

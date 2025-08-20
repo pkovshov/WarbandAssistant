@@ -123,9 +123,9 @@ class BaseImageDataset(ABC):
         if not self.__write_image(idx, image):
             self._logger.warning(f"meta causes above error: {repr(meta)}")
             return
+        self._logger.info(f"{self.__name} ADD    {idx}")
         self.__max_idx = idx
         self.__meta_index[meta_key].append(idx)
-        self._logger.info(f"{self.__name} ADD    {self.__meta_index[meta_key][0]}")
 
     @typechecked
     def replace_meta(self, idx: int, meta: object):

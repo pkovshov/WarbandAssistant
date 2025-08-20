@@ -2,10 +2,12 @@ import logging
 from typing import Optional
 
 import numpy as np
-from wa_typechecker import typechecked
 
+from wa_typechecker import typechecked
+from wa_config import screen_conf
 from wa_language.Language import Language
 from wa_language.LangVar import PlayerSex
+from wa_model.dialog_model.DialogBodyModel import DialogBodyModel
 from ..SampleMatch import SampleMatch
 from ..BaseScreen.GameScreenEventDispatcher import GameScreenEventDispatcher
 from .DialogScreenEvent import DialogScreenEvent
@@ -32,13 +34,20 @@ class DialogScreenManager(GameScreenEventDispatcher):
         self.__logger = logging.getLogger(__name__)
         self.__lang = lang
         self.__screen_sample = DialogScreenScreenSampler()
-        self.__title_ocr = DialogScreenTitleOCR()
+        self.__title_ocr = DialogScreenTitleOCR(language_code=lang.language_code,
+                                                whitelist=screen_conf.ALPHABET[lang.language_code] +
+                                                          screen_conf.PUNCTUATION +
+                                                          screen_conf.DIGITS)
         self.__title_parser = DialogScreenTitleFuzzyParser(lang)
         self.__relation_sampler = DialogScreenRelationSampler()
-        self.__relation_ocr = DialogScreenRelationOCR()
+        self.__relation_ocr = DialogScreenRelationOCR(language_code=lang.language_code)
         self.__relation_parser = DialogScreenRelationParser()
-        self.__body_ocr = DialogBodyOCR()
-        self.__body_parser = DialogBodyFuzzyParser(lang, player_sex)
+        self.__body_model = DialogBodyModel(language=lang,
+                                            player_name=None,
+                                            player_sex=player_sex)
+        self.__body_ocr = DialogBodyOCR(language_code=lang.language_code,
+                                        whitelist=self.__body_model.symbols)
+        self.__body_parser = DialogBodyFuzzyParser(self.__body_model)
         self.__prev__event = None
 
     @typechecked

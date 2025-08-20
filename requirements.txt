@@ -1,3 +1,5 @@
+beartype
+chardet
 mss
 numpy
 opencv-python
@@ -5,4 +7,3 @@ pytesseract
 pyyaml
 rapidfuzz
 typeguard
-beartype

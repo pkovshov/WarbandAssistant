@@ -57,7 +57,8 @@ class MapScreenManager(GameScreenEventDispatcher):
         timeofday_model = LanguageModel(model=calendar_model.timeofday_model,
                                         language=lang)
         symbols = "".join(set(timeofday_model.symbols + date_model.symbols))
-        self.__calendar_ocr = MapScreenCalendarOCR(symbols)
+        self.__calendar_ocr = MapScreenCalendarOCR(language_code=lang.language_code,
+                                                   whitelist=symbols)
         self.__calendar_fuzzy_parser = MapScreenCalendarFuzzyParser(date_model,
                                                                     timeofday_model)
         self.__prev__event = None

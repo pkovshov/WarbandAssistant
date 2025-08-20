@@ -4,8 +4,10 @@ from typing import List, Optional
 
 import mss
 import numpy as np
-from wa_typechecker import typechecked
 
+from wa_typechecker import typechecked
+from wa_config import game_conf
+from wa_types import LanguageCode
 from wa_language import Language
 from wa_language.LangVar import PlayerSex
 from .SampleMatch import SampleMatch
@@ -20,9 +22,10 @@ from .GameScreenEvent import UnknownScreenEvent
 class GameScreenManager(GameScreenEventDispatcher):
     @typechecked
     def __init__(self,
-                 player_name: Optional[str],
-                 player_sex: Optional[PlayerSex],
-                 datasets: Optional[List[str]]):
+                 player_name: str | None,
+                 player_sex: PlayerSex | None,
+                 datasets: List[str] | None,
+                 language_code: str | None):
         super().__init__()
         self.__logger = logging.getLogger(__name__)
         # TODO: someone need to warn if playername is blank string like '  '
@@ -31,10 +34,16 @@ class GameScreenManager(GameScreenEventDispatcher):
         #       or maybe is part of other dialog titles (Merchant for example)
         #       Also it needs to process such cases in DialogScreen
         # build language
+        try:
+            language_code = LanguageCode(language_code)
+        except ValueError:
+            language_code = None
+        if language_code is None:
+            language_code = game_conf.language_code
         special_language = None
         if player_name is not None:
             special_language = {"wa_player": player_name}
-        lang = Language.load(special_language)
+        lang = Language.load(language_code, special_language)
         # create screen managers, collect event dispatchers
         self.__map_screen_manager = MapScreenManager(lang)
         self.__dialog_screen_manger = DialogScreenManager(lang, player_sex)
@@ -46,6 +55,7 @@ class GameScreenManager(GameScreenEventDispatcher):
         # create datasets processor and register it's game screen event handler
         if datasets:
             datasets_processor = MasterDatasetsProcessor(datasets=datasets,
+                                                         language_code=language_code,
                                                          player_name=player_name,
                                                          player_sex=player_sex)
             self.append_game_screen_event_handler(datasets_processor.on_game_screen_event)
@@ -53,6 +63,7 @@ class GameScreenManager(GameScreenEventDispatcher):
         user_friendly_logger = DialogScreenLogger(lang)
         self.append_game_screen_event_handler(user_friendly_logger.on_game_screen_event)
         # log initial parameters
+        self.__logger.info(f"Language: {language_code}")
         self.__logger.info("Player: name {}, sex {}"
                            .format("NOT defined" if player_name is None else f"= {repr(player_name)}",
                                    "NOT defined" if player_sex is None else f"= {player_sex.value}"))

@@ -44,6 +44,6 @@ class MapScreenCalendarFuzzyParser:
         timeofday_bound = timeofday_bounds[0]
         date_bound = date_bounds[0]
         return DateTimeofday(date_key=date_bound.key,
-                             year=date_bound.binding[YEAR_VAR],
-                             day=date_bound.binding[DAY_VAR],
+                             year=date_bound.binding.get(YEAR_VAR),
+                             day=date_bound.binding.get(DAY_VAR),
                              timeofday_key=timeofday_bound.key)

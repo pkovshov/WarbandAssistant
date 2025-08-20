@@ -45,7 +45,7 @@ class LanguageModel(Mapping[LangKey, Spreading]):
         for lang in keychecker_languages.values():
             for key, val in lang.items():
                 self.__language[key] = val.bind(player_name_sex_binding)
-        self.__language = Language(self.__language)
+        self.__language = Language(self.__language, language_code=language.language_code)
         # build model purge spread from all the model lang values' purge spreads
         purge_spread = itertools.chain.from_iterable(
             val.purge_spread() for val in self.__language.values())
