@@ -62,6 +62,8 @@ class BaseImageDataset(ABC):
         self.__max_idx = 0
         self.__git_status = None
         if not lazy_load:
+            if path.isdir(path_conf.datasets):
+                os.makedirs(self.__dir_path, exist_ok=True)
             self.__git_status = self._load_git_status()
             self.__load()
 
