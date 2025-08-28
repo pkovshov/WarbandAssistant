@@ -9,6 +9,9 @@ scrip_dir_path = os.path.abspath(os.path.dirname(__file__))
 os.chdir(scrip_dir_path)
 sys.path.append(os.path.abspath(os.path.join(scrip_dir_path, 'src')))
 
+logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
+
+import path_conf
 from wa_language.LangVar import PlayerSex
 from wa_screen_manager.GameScreenManager import GameScreenManager
 import wa_screen_manager, wa_datasets, wa_language
@@ -17,19 +20,21 @@ import wa_screen_manager, wa_datasets, wa_language
 def main(args):
     # config logging
     log_level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(format="%(asctime)s %(levelname)s %(name)s : %(message)s")
     logging.getLogger(wa_screen_manager.__name__).setLevel(log_level)
     logging.getLogger(wa_datasets.__name__).setLevel(log_level)
     logging.getLogger(wa_language.__name__).setLevel(log_level)
     logging.getLogger(__name__).setLevel(log_level)
     game_Screen_manager = GameScreenManager(player_name=args.playername,
                                             player_sex=args.playersex,
-                                            datasets=args.datasets,
+                                            datasets=args.datasets if path_conf.datasets else None,
                                             language_code = args.language_code)
     # run
     monitor = args.monitor
     if args.datasets:
-        print("START", "datasets:", ", ".join(args.datasets))
+        if path_conf.datasets:
+            print("START", "datasets:", ", ".join(args.datasets))
+        else:
+            print("START", "datasets OFF (absent datasets path): SKIP", ", ".join(args.datasets))
     else:
         print("START", "datasets", "OFF")
     try:

@@ -1,6 +1,3 @@
 {
-  "language": "/sandbox/MountAndBladeWarband/WarbandAssistant/resources/languages",
-  "samples": "/sandbox/MountAndBladeWarband/WarbandAssistant/resources/samples",
-  "datasets": "/sandbox/MountAndBladeWarband/datasets/screens",
-  "test_output": "/sandbox/MountAndBladeWarband/WarbandAssistant/tests/output"
+  "datasets": "/sandbox/MountAndBladeWarband/datasets"
 }
